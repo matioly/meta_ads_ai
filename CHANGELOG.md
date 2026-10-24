@@ -1,0 +1,85 @@
+# Release notes — Meta Ads AI
+
+## Marco funcional de 24/10/2026 — painel autenticado e rascunhos persistentes
+
+Código de referência: [0cd2c6d](https://github.com/matioly/meta_ads_ai/commit/0cd2c6d1972ae8424fec1ca4e29bc9dbb57499ab).
+
+Este registro consolida as entregas do primeiro ciclo. A numeração 1.0.0 em package.json permanece como inicial do pacote; este documento não cria uma tag ou GitHub Release.
+
+### Resultado para o usuário
+
+O usuário consegue entrar com e-mail/senha, selecionar uma clínica vinculada, criar um rascunho, buscar, editar seus dados e excluí-lo. Os dados são persistidos no PostgreSQL e sobrevivem à atualização da página e a novos logins. O painel mantém o layout aprovado.
+
+Cada rascunho possui nome, objetivo e orçamento diário planejado. Indicadores mostram quantidade e soma do orçamento da clínica selecionada. Não existem publicação de anúncios, métricas Meta ou geração de IA neste marco.
+
+### Entregas por etapa
+
+1. **Fundação:** repositório próprio, package.json, gitignore, servidor Express, modo watch local, health check e deploy Railway.
+2. **Banco:** pool PostgreSQL, /health/db e migrations transacionais com controle por nome.
+3. **Modelo de acesso:** users, companies e company_members com owner/admin/member.
+4. **Interface inicial:** visão geral, campanhas, integrações, modal, busca e indicadores. A primeira versão guardava rascunhos somente em memória do navegador.
+5. **Autenticação:** login, bcrypt, sessões PostgreSQL, logout, perfil e proteção das páginas/APIs; bootstrap do usuário inicial e das duas clínicas.
+6. **Correções da implantação:** bootstrap funcional, configuração inicial validada e criação efetiva da tabela de sessões.
+7. **Persistência de campanhas:** migration 004, módulo campaigns, criação/listagem/exclusão por clínica, validação e permissões no servidor.
+8. **Edição:** PUT por campanha e clínica, botão Editar e reaproveitamento do modal. Nova campanha reinicia o formulário e não sobrescreve a edição anterior.
+9. **Documentação:** README, arquitetura, operação, backlog e guia de retomada adicionados após a validação manual da edição.
+
+### Histórico de commits funcionais
+
+Todos os commits abaixo são de 24/10/2026. Ordem do primeiro ao mais recente.
+
+| Commit | Mensagem |
+|---|---|
+| [9d8dc8c](https://github.com/matioly/meta_ads_ai/commit/9d8dc8cc079caf2f7c348cfc54e8a2ea511373a7) | chore: inicia projeto meta_ads_ai |
+| [18ee21c](https://github.com/matioly/meta_ads_ai/commit/18ee21c668c509a5eb503f8ed81b840314f04310) | feat: adiciona servidor inicial e health check |
+| [4d88fc3](https://github.com/matioly/meta_ads_ai/commit/4d88fc34a11dba01926630b4c3c1e61b1f8de58f) | feat: conecta PostgreSQL e adiciona verificacao do banco |
+| [0b728e2](https://github.com/matioly/meta_ads_ai/commit/0b728e2b42c41de3f0f2b5fec8722c08019a0e6c) | feat: cria tabelas de usuarios empresas e permissoes |
+| [ae92aac](https://github.com/matioly/meta_ads_ai/commit/ae92aacb0d7413af7d45be9e54cc54aba9219a73) | feat: adiciona painel inicial com rascunhos de campanhas |
+| [eb92727](https://github.com/matioly/meta_ads_ai/commit/eb9272789d57cc291073b463a3683efe8bb38be7) | feat: adiciona login sessoes e usuario inicial |
+| [ad261cd](https://github.com/matioly/meta_ads_ai/commit/ad261cd79b12e87ffeafa09962df4589bae241fb) | fix: adiciona implementacao do bootstrap |
+| [cff3427](https://github.com/matioly/meta_ads_ai/commit/cff3427983b77a422161b1428fd1aa8113ac5e07) | fix: cria tabela de sessoes ausente |
+| [df65fa6](https://github.com/matioly/meta_ads_ai/commit/df65fa6750f19f1e3264a5da5cbbe3f09617e240) | feat: salva rascunhos de campanhas por clinica |
+| [0cd2c6d](https://github.com/matioly/meta_ads_ai/commit/0cd2c6d1972ae8424fec1ca4e29bc9dbb57499ab) | feat: permite editar rascunhos de campanhas |
+
+### Incidentes resolvidos e aprendizado
+
+| Problema observado | Correção e observação |
+|---|---|
+| users não existia ao consultar | Configuração/execução de migrations foi conferida; logs posteriores confirmaram 001 aplicada |
+| Build concluído, mas health check falhava | Servidor falhava antes de escutar a porta; investigar execução, não só build |
+| bootstrap is not a function | Commit ad261cd adicionou a implementação/exportação do bootstrap |
+| BOOTSTRAP_CONFIG_INVALID | Configuração inicial corrigida até o log de usuário inicial concluído; sem guardar valores secretos |
+| Login falhava com relation user_sessions does not exist | 002_sessions.sql estava vazia; migration corretiva 003 criou a tabela exigida por connect-pg-simple |
+| Rascunhos desapareciam ao atualizar | Persistência PostgreSQL com 004 e rotas de campanhas |
+| Necessidade de excluir para alterar campanha | Edição via PUT e modal preenchido |
+
+O erro pg_stat_statements em consultas railway:dataui apareceu nos logs do PostgreSQL. Não era a tabela usada pelo login; nenhuma correção dessa extensão foi implementada como parte do produto.
+
+Avisos LF/CRLF do Git e npm sobre production não impediram os commits/deploys relatados. dotenv com zero entradas em .env é compatível com variáveis já fornecidas pelo ambiente.
+
+### Validação e grau de evidência
+
+- **Confirmado pelo operador na conversa:** página inicial abriu e layout aprovado; endpoint de banco conectado; login, logout e novo login; persistência dos rascunhos; etapa de edição testada.
+- **Conferido no repositório:** implementação das rotas e dos controles, estrutura de banco, scripts e configuração Railway presentes no commit de referência.
+- **Histórico de verificações:** comandos node --check utilizados; na etapa anterior foram relatadas verificações isoladas da lógica de rotas com banco simulado. Essas verificações não estão versionadas como suíte do projeto.
+- **Não realizado por esta atualização documental:** novo teste ponta a ponta no Railway, inspeção das variáveis reais, auditoria de segurança, restauração de backup ou teste com Meta/IA.
+- **Limite atual:** npm test ainda contém o placeholder padrão com saída de erro. Não existe pipeline de testes versionado na árvore revisada.
+
+A confirmação manual das etapas não deve ser interpretada como cobertura de todos os cenários negativos de autorização, concorrência e falhas externas.
+
+### Compatibilidade e operação
+
+- Nenhuma dependência adicional, alteração de código funcional ou migration nesta atualização documental.
+- Para reproduzir o banco, executar a sequência 001–004 pelo runner, incluindo a 002 histórica vazia.
+- Preservar migrations já aplicadas; correções futuras usam novo arquivo.
+- A edição não muda o ID, a clínica, a data de criação ou o autor inicial.
+- Exclusão de rascunhos é física. Não há recuperação pelo painel.
+- A aplicação ainda não possui alteração de senha, convites, upload, auditoria completa ou sincronização externa.
+
+### Próximo marco proposto
+
+Briefing completo por campanha, seguido de mídia e integrações graduais. Ver prioridades, dependências e aceite em [BACKLOG](docs/BACKLOG.md), e o ponto exato de continuidade em [RETOMADA](docs/RETOMADA.md).
+
+## Como registrar futuras entregas
+
+Adicionar seção com data, commit/PR, problema resolvido, comportamento novo, alterações de banco/configuração, testes executados, limitações e próximo passo. Não substituir o histórico anterior. Usar versão formal somente quando houver decisão de versionamento e tag correspondente.

@@ -1,0 +1,195 @@
+# Operação e desenvolvimento
+
+Referência: 24/10/2026. Configuração de código verificada até 0cd2c6d. O estado das variáveis e serviços no Railway não foi inspecionado nesta atualização; o histórico de deploy e testes foi informado pelo operador.
+
+## Ambiente local
+
+Usar Node compatível com Express 5 e node --watch. Os builds compartilhados usaram Node 24; o projeto ainda não fixa engines ou packageManager. Usar npm com package-lock.json.
+
+1. Sincronizar o repositório sem perder alterações locais.
+2. Criar um PostgreSQL de desenvolvimento separado.
+3. Criar .env local, sem versioná-lo.
+4. Instalar dependências, migrar e iniciar:
+
+```sh
+npm ci
+npm run db:migrate
+npm run dev
+```
+
+Não há etapa de build de frontend. npm start executa node src/server.js; npm run dev usa node --watch src/server.js.
+
+## Variáveis
+
+| Variável | Uso |
+|---|---|
+| DATABASE_URL | Obrigatória; conexão PostgreSQL do ambiente |
+| SESSION_SECRET | Obrigatória; mínimo 32 caracteres; usar segredo aleatório persistente |
+| APP_URL | Obrigatória; URL cuja origem deve coincidir com a do navegador |
+| NODE_ENV | production no Railway para cookie seguro e exigência de HTTPS |
+| PORT | Porta injetada pelo Railway; padrão local 3000 |
+| BOOTSTRAP_NAME | Nome do primeiro usuário, obrigatório somente se users estiver vazia |
+| BOOTSTRAP_EMAIL | E-mail válido do primeiro usuário; normalizado para minúsculas |
+| BOOTSTRAP_PASSWORD | Senha inicial com pelo menos 12 caracteres e no máximo 72 bytes UTF-8 |
+
+Exemplo apenas para desenvolvimento; substituir os marcadores por valores locais:
+
+```dotenv
+NODE_ENV=development
+PORT=3000
+APP_URL=http://localhost:3000
+DATABASE_URL=postgresql://USUARIO:SENHA@localhost:5432/meta_ads_ai_dev
+SESSION_SECRET=SUBSTITUA_POR_UM_SEGREDO_ALEATORIO
+BOOTSTRAP_NAME=Administrador de desenvolvimento
+BOOTSTRAP_EMAIL=admin@example.com
+BOOTSTRAP_PASSWORD=SUBSTITUA_POR_UMA_SENHA_FORTE
+```
+
+Os marcadores não são credenciais utilizáveis. Para gerar SESSION_SECRET localmente:
+
+```sh
+node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
+```
+
+Não publicar .env, conexão, senha ou tokens em commits, logs ou documentação.
+
+## Bootstrap
+
+Quando não há usuários, valida a configuração, calcula hash bcrypt de custo 12 e abre transação com advisory lock 7241902. Reconfere users dentro da transação, cria um usuário, Sorriso de Campinas e Alps Oral Clinic (Campinas/SP), vinculando-o como owner em ambas.
+
+Se já existe qualquer usuário, retorna sem recriar ou atualizar os dados. As variáveis de bootstrap não servem para alterar senha, criar novos usuários ou reparar vínculos parcialmente removidos.
+
+Depois de confirmar o login inicial, remover BOOTSTRAP_PASSWORD do serviço é recomendado; em banco já inicializado ela não é necessária. Manter SESSION_SECRET entre deploys. A remoção efetiva da senha do ambiente não foi verificada nesta documentação.
+
+## Migrations
+
+O executor:
+1. Abre transação e adquire advisory lock 7241901.
+2. Cria schema_migrations se necessário.
+3. Lê arquivos no padrão numérico seguido de nome e extensão .sql, ordenados por nome.
+4. Ignora nomes já registrados.
+5. Executa SQL e registra o nome.
+6. Confirma a transação; se falhar, faz rollback e encerra com erro.
+
+| Arquivo | Resultado |
+|---|---|
+| 001_initial.sql | users, companies, company_members e índice |
+| 002_sessions.sql | Histórico vazio, sem DDL |
+| 003_fix_user_sessions.sql | user_sessions e índice de expiração |
+| 004_campaigns.sql | campaigns e índice por clínica/data |
+
+Não apagar registros de schema_migrations nem reescrever migrations aplicadas para forçar reexecução. Criar nova migration corretiva. Não há ferramenta de rollback automático ou checksum.
+
+O executor atual aceita arquivo vazio. Ao implementar validação contra vazios, considerar explicitamente a exceção histórica 002 em um banco novo; uma rejeição indiscriminada quebraria a instalação do zero.
+
+Consultas de diagnóstico sem dados sensíveis:
+
+```sql
+SELECT name, applied_at
+FROM schema_migrations
+ORDER BY name;
+
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
+ORDER BY table_name;
+```
+
+## Deploy Railway
+
+Configuração versionada em railway.json:
+- Pré-deploy: npm run db:migrate.
+- Início: npm start.
+- Health check: /health.
+
+No histórico, foi necessário conferir os comandos também no painel Railway. Ao retomar, verificar o serviço da aplicação, a conexão do PostgreSQL e o deploy correspondente ao commit pretendido. Não confundir logs do banco com logs do processo Node.
+
+Sequência esperada: instalação de dependências → migration → inicialização do Node → bootstrap → porta disponível → health check.
+
+Logs esperados:
+- Ja aplicada: ... ou Aplicada: ...
+- Migrations concluidas.
+- Usuario inicial ja configurado. ou Configuracao do usuario inicial concluida.
+- Meta Ads AI iniciado na porta ...
+
+dotenv informando zero variáveis de .env não significa ausência das variáveis injetadas pelo Railway.
+
+## Verificação antes de enviar
+
+Salvar todos os arquivos. Na raiz do projeto:
+
+```sh
+node --check src/server.js
+node --check src/bootstrap.js
+node --check src/campaigns.js
+node --check src/migrate.js
+node --check public/app.js
+node --check public/login.js
+git diff --check
+git status
+git diff --stat
+```
+
+Esses comandos verificam sintaxe/diff, não conexão, migrations ou comportamento. Conferir conteúdo de novos SQLs. npm test ainda é o placeholder que termina com erro; não existe suíte automatizada versionada.
+
+Após selecionar os arquivos de uma entrega:
+```sh
+git diff --cached --stat
+git diff --cached
+git commit -m "feat: descreve a entrega"
+git push
+```
+
+Evitar incluir .env ou arquivos não relacionados.
+
+## Roteiro manual de regressão
+
+| Cenário | Resultado esperado |
+|---|---|
+| Acessar / sem sessão | Redireciona a /login |
+| Login válido e logout | Entra no painel e depois encerra sessão |
+| Credencial inválida | Mensagem genérica, sem acesso |
+| Selecionar clínica | Carrega somente seus rascunhos |
+| Criar rascunho | Salva e atualiza indicadores |
+| Recarregar e entrar novamente | Registro permanece |
+| Editar nome/objetivo/orçamento | Mesmo registro atualizado; persiste após recarregar |
+| Nova campanha após editar | Modal limpo; cria outro registro |
+| Cancelar edição | Não grava alterações |
+| Excluir e recarregar | Registro continua ausente |
+| Buscar | Filtra por nome/objetivo |
+| Trocar clínica | Não mostra registros da clínica anterior |
+| Perfil member | Consulta permitida; escrita negada também pela API |
+| Sem vínculo com clínica | API retorna 403 |
+| UUID inválido | API retorna 400 |
+| ID de campanha de outra clínica autorizada | UPDATE/DELETE não alteram registro fora da clínica da URL |
+| Orçamento fora do limite | API rejeita |
+| Sessão expirada | Frontend retorna ao login |
+
+Testes negativos de permissões precisam de usuários/vínculos de teste em ambiente de desenvolvimento. Não realizar experimentos destrutivos em produção. Para chamadas manuais de escrita, respeitar cookie, Origin e JSON exigidos pelo servidor.
+
+## Diagnóstico dos problemas já observados
+
+| Sintoma | Causa/encaminhamento |
+|---|---|
+| Build conclui mas /health não fica disponível | Ver logs de execução: processo pode falhar antes de abrir porta |
+| bootstrap is not a function | Implementação/exportação do bootstrap ausente no arquivo enviado; corrigida |
+| BOOTSTRAP_CONFIG_INVALID | Em banco sem usuários, revisar nome, e-mail e limites da senha; corrigido na configuração durante a implantação |
+| relation users does not exist | Conferir migrations e banco selecionado |
+| relation user_sessions does not exist, 42P01 | 002 estava vazia; 003 criou a tabela esperada pelo session store |
+| pg_stat_statements ausente em consulta railway:dataui | Erro observado em consulta de estatísticas do painel; não é a tabela de sessões nem parte do SQL da aplicação |
+| Origem da solicitação não permitida | Comparar origem do navegador com APP_URL |
+| Cookie não funciona localmente | Conferir NODE_ENV, HTTPS e uso consistente de localhost/host |
+| LF será substituído por CRLF | Aviso de finais de linha do Git, não falha de commit |
+| /health ok mas operações falham | Ver /health/db, migrations e logs; /health não consulta banco |
+
+## Continuidade, backup e restauração
+
+A aplicação não implementa backup próprio. Política de backup do PostgreSQL/Railway, retenção e restauração precisam ser verificadas e documentadas; não foram confirmadas aqui.
+
+Reverter código não reverte banco. Antes de migrations destrutivas futuras, estabelecer backup verificado e plano de compatibilidade. Preferir correções incrementais. Registrar incidente, commit, migration e resultado da recuperação.
+
+Para incorporar alterações de documentação feitas diretamente no GitHub, com árvore local limpa:
+
+```sh
+git pull --ff-only
+```
