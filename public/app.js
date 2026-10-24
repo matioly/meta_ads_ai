@@ -5,8 +5,11 @@ const dialog = $("#campaign-dialog");
 const form = $("#campaign-form");
 const search = $("#search");
 
-const drafts = [];
-let currentView = "overview";
+let drafts = [];
+let companies = [];
+let busy = false;
+let loaded = false;
+let loadMessage = "Carregando rascunhos…";
 let toastTimer;
 
 const money = new Intl.NumberFormat("pt-BR", {
@@ -29,19 +32,68 @@ const pages = {
   }
 };
 
+const formError = document.createElement("p");
+formError.setAttribute("role", "alert");
+formError.hidden = true;
+form.querySelector(".dialog-actions").before(formError);
+
+async function api(url, method = "GET", body) {
+  const options = {
+    method,
+    credentials: "same-origin",
+    cache: "no-store"
+  };
+
+  if (body !== undefined) {
+    options.headers = { "Content-Type": "application/json" };
+    options.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(url, options);
+
+  if (response.status === 401) {
+    window.location.replace("/login");
+    throw new Error("Sua sessão expirou.");
+  }
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Não foi possível concluir.");
+  }
+
+  return data;
+}
+
+function canWrite() {
+  const company = companies.find(
+    (item) => item.id === companySelect.value
+  );
+
+  return ["owner", "admin"].includes(company?.role);
+}
+
+function endpoint() {
+  return (
+    "/api/companies/" +
+    encodeURIComponent(companySelect.value) +
+    "/campaigns"
+  );
+}
+
 function notify(message) {
   const toast = $("#toast");
+
   clearTimeout(toastTimer);
   toast.textContent = message;
   toast.hidden = false;
+
   toastTimer = setTimeout(() => {
     toast.hidden = true;
   }, 4500);
 }
 
 function changeView(view) {
-  currentView = view;
-
   $("#page-title").textContent = pages[view].title;
   $("#page-description").textContent = pages[view].description;
 
@@ -72,8 +124,10 @@ function addCell(row, text) {
 }
 
 function render() {
-  const company = companySelect.value;
-  const companyDrafts = drafts.filter((draft) => draft.company === company);
+  const companyDrafts = drafts.filter(
+    (draft) => draft.company === companySelect.value
+  );
+
   const query = search.value.trim().toLocaleLowerCase("pt-BR");
 
   const visible = companyDrafts.filter((draft) =>
@@ -83,16 +137,39 @@ function render() {
   );
 
   $("#company-name").textContent =
-    companySelect.selectedOptions[0].textContent;
+    companySelect.selectedOptions[0]?.textContent || "Suas clínicas";
 
-  $("#draft-count").textContent = companyDrafts.length;
-  $("#planned-budget").textContent = money.format(
-    companyDrafts.reduce((total, draft) => total + draft.budgetCents, 0) / 100
-  );
+  $("#draft-count").textContent = loaded ? companyDrafts.length : "—";
 
-  $("#empty-state").hidden = companyDrafts.length > 0;
+  $("#planned-budget").textContent = loaded
+    ? money.format(
+        companyDrafts.reduce(
+          (total, draft) => total + draft.budgetCents,
+          0
+        ) / 100
+      )
+    : "—";
+
+  $("#empty-state").hidden = !loaded || companyDrafts.length > 0;
   $("#table-wrapper").hidden = visible.length === 0;
-  $("#no-results").hidden = companyDrafts.length === 0 || visible.length > 0;
+
+  $("#no-results").hidden =
+    loaded && (companyDrafts.length === 0 || visible.length > 0);
+
+  $("#no-results").textContent = loaded
+    ? "Nenhum rascunho corresponde à busca."
+    : loadMessage;
+
+  companySelect.disabled = busy || companies.length === 0;
+  $("#logout").disabled = busy;
+
+  for (const id of ["#new-campaign", "#hero-create", "#empty-create"]) {
+    $(id).disabled = busy || !loaded || !canWrite();
+  }
+
+  form.querySelectorAll("input, select, button").forEach((control) => {
+    control.disabled = busy;
+  });
 
   const rows = $("#campaign-rows");
   rows.replaceChildren();
@@ -114,24 +191,68 @@ function render() {
     const remove = document.createElement("button");
     remove.className = "remove-button";
     remove.textContent = "Excluir";
+    remove.disabled = busy || !canWrite();
     remove.setAttribute("aria-label", `Excluir rascunho ${draft.name}`);
-
-    remove.addEventListener("click", () => {
-      const index = drafts.findIndex((item) => item.id === draft.id);
-
-      if (index >= 0) {
-        drafts.splice(index, 1);
-        render();
-        notify("Rascunho removido desta prévia.");
-      }
-    });
+    remove.addEventListener("click", () => removeDraft(draft));
 
     actionCell.append(remove);
     rows.append(row);
   }
 }
 
+async function loadDrafts() {
+  drafts = [];
+  loaded = false;
+  busy = true;
+  loadMessage = "Carregando rascunhos…";
+  render();
+
+  try {
+    if (!companySelect.value) {
+      loadMessage = "Seu usuário ainda não tem uma clínica vinculada.";
+      return;
+    }
+
+    const data = await api(endpoint());
+    drafts = data.campaigns;
+    loaded = true;
+  } catch (error) {
+    loadMessage = error.message + " Atualize a página para tentar novamente.";
+  } finally {
+    busy = false;
+    render();
+  }
+}
+
+async function removeDraft(draft) {
+  if (busy || !canWrite()) return;
+
+  if (!window.confirm(`Excluir o rascunho "${draft.name}"?`)) return;
+
+  busy = true;
+  render();
+
+  try {
+    await api(
+      endpoint() + "/" + encodeURIComponent(draft.id),
+      "DELETE",
+      {}
+    );
+
+    drafts = drafts.filter((item) => item.id !== draft.id);
+    notify("Rascunho excluído.");
+  } catch (error) {
+    notify(error.message);
+  } finally {
+    busy = false;
+    render();
+  }
+}
+
 function openDialog() {
+  if (busy || !loaded || !canWrite()) return;
+
+  formError.hidden = true;
   form.reset();
   $("#campaign-name").setCustomValidity("");
   dialog.showModal();
@@ -145,12 +266,18 @@ $("#empty-create").addEventListener("click", openDialog);
 $("#close-dialog").addEventListener("click", () => dialog.close());
 $("#cancel-dialog").addEventListener("click", () => dialog.close());
 
+dialog.addEventListener("cancel", (event) => {
+  if (busy) event.preventDefault();
+});
+
 $("#campaign-name").addEventListener("input", (event) => {
   event.target.setCustomValidity("");
 });
 
-form.addEventListener("submit", (event) => {
+form.addEventListener("submit", async (event) => {
   event.preventDefault();
+
+  if (busy || !loaded || !canWrite()) return;
 
   const nameInput = $("#campaign-name");
   const name = nameInput.value.trim();
@@ -164,20 +291,34 @@ form.addEventListener("submit", (event) => {
   if (!form.reportValidity()) return;
 
   const budget = Number($("#campaign-budget").value);
+
   if (!Number.isFinite(budget) || budget < 1 || budget > 100000) return;
 
-  drafts.push({
-    id: crypto.randomUUID(),
-    company: companySelect.value,
+  const payload = {
     name,
     objective: $("#campaign-objective").value,
     budgetCents: Math.round(budget * 100)
-  });
+  };
 
-  dialog.close();
-  search.value = "";
-  changeView("campaigns");
-  notify("Rascunho criado nesta prévia. Ele não foi salvo no banco.");
+  busy = true;
+  formError.hidden = true;
+  render();
+
+  try {
+    const data = await api(endpoint(), "POST", payload);
+
+    drafts.unshift(data.campaign);
+    dialog.close();
+    search.value = "";
+    changeView("campaigns");
+    notify("Rascunho salvo.");
+  } catch (error) {
+    formError.textContent = error.message;
+    formError.hidden = false;
+  } finally {
+    busy = false;
+    render();
+  }
 });
 
 document.querySelectorAll("[data-view]").forEach((button) => {
@@ -186,64 +327,34 @@ document.querySelectorAll("[data-view]").forEach((button) => {
 
 companySelect.addEventListener("change", () => {
   search.value = "";
-  render();
+  loadDrafts();
 });
 
 search.addEventListener("input", render);
 
 async function loadProfile() {
-  const createButtons = [
-    $("#new-campaign"),
-    $("#hero-create"),
-    $("#empty-create")
-  ];
-
-  createButtons.forEach((button) => {
-    button.disabled = true;
-  });
+  busy = true;
+  render();
 
   try {
-    const response = await fetch("/api/me", {
-      credentials: "same-origin",
-      cache: "no-store"
-    });
-
-    if (response.status === 401) {
-      window.location.replace("/login");
-      return;
-    }
-
-    if (!response.ok) throw new Error("Falha ao carregar seu acesso.");
-
-    const data = await response.json();
-
+    const data = await api("/api/me");
+    companies = data.companies;
     $("#user-name").textContent = data.user.name;
     companySelect.replaceChildren();
 
-    for (const company of data.companies) {
+    for (const company of companies) {
       const option = document.createElement("option");
       option.value = company.id;
       option.textContent = company.name;
       companySelect.append(option);
     }
 
-    if (data.companies.length === 0) {
-      const option = document.createElement("option");
-      option.value = "";
-      option.textContent = "Nenhuma clínica vinculada";
-      companySelect.append(option);
-      notify("Seu usuário ainda não tem uma clínica vinculada.");
-    }
-
-    companySelect.disabled = data.companies.length === 0;
-
-    createButtons.forEach((button) => {
-      button.disabled = data.companies.length === 0;
-    });
-
-    changeView(currentView);
-  } catch {
-    notify("Não foi possível carregar seu acesso. Atualize a página.");
+    await loadDrafts();
+  } catch (error) {
+    loadMessage = error.message + " Atualize a página para tentar novamente.";
+  } finally {
+    busy = false;
+    render();
   }
 }
 

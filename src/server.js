@@ -182,6 +182,8 @@ function requireLogin(req, res, next) {
   next();
 }
 
+app.use("/api/companies", requireLogin, require("./campaigns"));
+
 app.get("/api/me", requireLogin, async (req, res) => {
   const result = await pool.query(
     "SELECT id, name, email FROM users WHERE id = $1",
