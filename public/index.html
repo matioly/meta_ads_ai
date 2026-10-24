@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171b2e">
+  <title>Meta Ads AI | Painel</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="/">
+      <span class="brand-symbol">ai</span>
+      <span>Meta Ads <strong>AI</strong></span>
+    </a>
+
+    <div class="workspace">
+      <label for="company">ESPAÇO DE TRABALHO · PRÉVIA</label>
+      <select id="company">
+        <option value="sorriso">Sorriso de Campinas</option>
+        <option value="alps">Alps Oral Clinic</option>
+      </select>
+    </div>
+
+    <p class="nav-label">GERENCIAR</p>
+    <nav aria-label="Navegação principal">
+      <button class="nav-button active" data-view="overview"
+        aria-current="page">
+        <span aria-hidden="true">◈</span> Visão geral
+      </button>
+      <button class="nav-button" data-view="campaigns">
+        <span aria-hidden="true">◎</span> Campanhas
+      </button>
+      <button class="nav-button" data-view="integrations">
+        <span aria-hidden="true">⇄</span> Integrações
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="avatar">AI</span>
+      <div>
+        <strong>Seu centro de campanhas</strong>
+        <small>Planeje. Revise. Publique.</small>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <span>Workspace <span class="separator">/</span>
+        <strong id="company-name">Sorriso de Campinas</strong>
+      </span>
+      <span class="preview-badge">Prévia do painel</span>
+    </header>
+
+    <main>
+      <div class="notice">
+        <strong>Modo demonstração</strong>
+        Sem login ou conexão com anúncios. Rascunhos temporários:
+        atualizar a página apaga os dados desta prévia.
+      </div>
+
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">META ADS AI</p>
+          <h1 id="page-title">Visão geral</h1>
+          <p id="page-description">
+            Organize suas próximas campanhas em um só lugar.
+          </p>
+        </div>
+        <button class="primary" id="new-campaign">
+          <span aria-hidden="true">＋</span> Nova campanha
+        </button>
+      </div>
+
+      <section id="overview-section">
+        <div class="hero">
+          <div>
+            <span class="hero-tag">DO PLANEJAMENTO AO RESULTADO</span>
+            <h2>Sua próxima campanha<br>começa com uma boa ideia.</h2>
+            <p>
+              Escolha a clínica, defina o objetivo e prepare o rascunho.
+              Você mantém o controle de cada etapa.
+            </p>
+            <button class="light-button" id="hero-create">
+              Criar primeiro rascunho <span aria-hidden="true">↗</span>
+            </button>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+            <span class="art-center">ai</span>
+            <span class="art-note">IDEIA → CAMPANHA</span>
+          </div>
+        </div>
+
+        <div class="metrics">
+          <article class="metric">
+            <span>Rascunhos nesta prévia</span>
+            <strong id="draft-count">0</strong>
+            <small>Da clínica selecionada</small>
+          </article>
+          <article class="metric">
+            <span>Orçamento diário planejado</span>
+            <strong id="planned-budget">R$ 0,00</strong>
+            <small>Soma dos rascunhos · não é gasto real</small>
+          </article>
+          <article class="metric">
+            <span>Campanhas no Meta</span>
+            <strong>—</strong>
+            <small>Conecte uma conta para consultar</small>
+          </article>
+          <article class="metric">
+            <span>Conversas geradas</span>
+            <strong>—</strong>
+            <small>Resultados ainda não disponíveis</small>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" id="campaign-section">
+        <div class="panel-heading">
+          <div>
+            <h2>Seus rascunhos</h2>
+            <p>Planejamento temporário da clínica selecionada.</p>
+          </div>
+          <label class="search">
+            <span class="sr-only">Buscar rascunhos</span>
+            <input id="search" type="search"
+              placeholder="Buscar campanha…" maxlength="120">
+          </label>
+        </div>
+
+        <div id="empty-state" class="empty-state">
+          <span class="empty-icon" aria-hidden="true">◎</span>
+          <h3>Nenhum rascunho por aqui</h3>
+          <p>Comece pelo nome, objetivo e orçamento da campanha.</p>
+          <button class="secondary" id="empty-create">
+            Criar rascunho
+          </button>
+        </div>
+
+        <div class="table-wrapper" id="table-wrapper" hidden>
+          <table>
+            <caption class="sr-only">Rascunhos de campanhas</caption>
+            <thead>
+              <tr>
+                <th>Campanha</th>
+                <th>Objetivo</th>
+                <th>Orçamento/dia</th>
+                <th>Status</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+            <tbody id="campaign-rows"></tbody>
+          </table>
+        </div>
+        <p class="no-results" id="no-results" hidden>
+          Nenhum rascunho corresponde à busca.
+        </p>
+      </section>
+
+      <section id="integrations-section" hidden>
+        <div class="integration-grid">
+          <article class="panel integration-card">
+            <span class="integration-logo meta-logo">∞</span>
+            <span class="status">Não conectado</span>
+            <h2>Meta Ads</h2>
+            <p>
+              Campanhas, contas de anúncios e resultados do
+              Facebook e Instagram em um único painel.
+            </p>
+            <button class="secondary" disabled>
+              Conexão disponível em uma próxima etapa
+            </button>
+          </article>
+
+          <article class="panel integration-card">
+            <span class="integration-logo ai-logo">AI</span>
+            <span class="status">Não configurado no aplicativo</span>
+            <h2>Assistente de campanhas</h2>
+            <p>
+              Apoio para preparar textos e variações de anúncios,
+              com revisão antes da publicação.
+            </p>
+            <button class="secondary" disabled>
+              Integração disponível em uma próxima etapa
+            </button>
+          </article>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        Meta Ads AI <span>Seu planejamento, sob seu controle.</span>
+      </footer>
+    </main>
+  </div>
+
+  <dialog id="campaign-dialog" aria-labelledby="dialog-title">
+    <form id="campaign-form">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">PLANEJAMENTO</p>
+          <h2 id="dialog-title">Nova campanha</h2>
+        </div>
+        <button type="button" class="close-button"
+          id="close-dialog" aria-label="Fechar">×</button>
+      </div>
+
+      <p class="form-note">
+        Crie um rascunho de demonstração. Nada será enviado ao Meta
+        ou salvo no banco.
+      </p>
+
+      <label for="campaign-name">Nome da campanha</label>
+      <input id="campaign-name" name="name" required
+        maxlength="120" placeholder="Ex.: Avaliação de ortodontia">
+
+      <label for="campaign-objective">Objetivo</label>
+      <select id="campaign-objective" name="objective">
+        <option value="Conversas no WhatsApp">Conversas no WhatsApp</option>
+        <option value="Geração de leads">Geração de leads</option>
+        <option value="Reconhecimento">Reconhecimento</option>
+      </select>
+
+      <label for="campaign-budget">Orçamento diário planejado (R$)</label>
+      <input id="campaign-budget" name="budget" type="number"
+        min="1" max="100000" step="0.01" value="30" required>
+
+      <div class="dialog-actions">
+        <button type="button" class="secondary" id="cancel-dialog">
+          Cancelar
+        </button>
+        <button class="primary" type="submit">Adicionar rascunho</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"
+    aria-live="polite" hidden></div>
+</body>
+</html>
