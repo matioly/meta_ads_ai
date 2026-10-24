@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/matioly/meta_ads_ai/issues"
   },
-  "homepage": "https://github.com/matioly/meta_ads_ai#readme"
+  "homepage": "https://github.com/matioly/meta_ads_ai#readme",
+  "dependencies": {
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0"
+  }
 }
