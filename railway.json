@@ -1,0 +1,8 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "deploy": {
+    "preDeployCommand": ["npm run db:migrate"],
+    "startCommand": "npm start",
+    "healthcheckPath": "/health"
+  }
+}
