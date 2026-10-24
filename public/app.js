@@ -1,384 +1,413 @@
-const $ = (selector) => document.querySelector(selector);
+const $ = selector => document.querySelector(selector)
 
-const companySelect = $("#company");
-const dialog = $("#campaign-dialog");
-const form = $("#campaign-form");
-const search = $("#search");
+const companySelect = $('#company')
+const dialog = $('#campaign-dialog')
+const form = $('#campaign-form')
+const search = $('#search')
 
-let drafts = [];
-let companies = [];
-let busy = false;
-let loaded = false;
-let loadMessage = "Carregando rascunhos…";
-let toastTimer;
+let drafts = []
+let editingId = null
+let companies = []
+let busy = false
+let loaded = false
+let loadMessage = 'Carregando rascunhos…'
+let toastTimer
 
-const money = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL"
-});
+const money = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL'
+})
 
 const pages = {
   overview: {
-    title: "Visão geral",
-    description: "Organize suas próximas campanhas em um só lugar."
+    title: 'Visão geral',
+    description: 'Organize suas próximas campanhas em um só lugar.'
   },
   campaigns: {
-    title: "Campanhas",
-    description: "Prepare os rascunhos antes de conectar sua conta de anúncios."
+    title: 'Campanhas',
+    description: 'Prepare os rascunhos antes de conectar sua conta de anúncios.'
   },
   integrations: {
-    title: "Integrações",
-    description: "As conexões que vão dar vida ao seu painel."
+    title: 'Integrações',
+    description: 'As conexões que vão dar vida ao seu painel.'
   }
-};
+}
 
-const formError = document.createElement("p");
-formError.setAttribute("role", "alert");
-formError.hidden = true;
-form.querySelector(".dialog-actions").before(formError);
+const formError = document.createElement('p')
+formError.setAttribute('role', 'alert')
+formError.hidden = true
+form.querySelector('.dialog-actions').before(formError)
 
-async function api(url, method = "GET", body) {
+async function api (url, method = 'GET', body) {
   const options = {
     method,
-    credentials: "same-origin",
-    cache: "no-store"
-  };
+    credentials: 'same-origin',
+    cache: 'no-store'
+  }
 
   if (body !== undefined) {
-    options.headers = { "Content-Type": "application/json" };
-    options.body = JSON.stringify(body);
+    options.headers = { 'Content-Type': 'application/json' }
+    options.body = JSON.stringify(body)
   }
 
-  const response = await fetch(url, options);
+  const response = await fetch(url, options)
 
   if (response.status === 401) {
-    window.location.replace("/login");
-    throw new Error("Sua sessão expirou.");
+    window.location.replace('/login')
+    throw new Error('Sua sessão expirou.')
   }
 
-  const data = await response.json();
+  const data = await response.json()
 
   if (!response.ok) {
-    throw new Error(data.error || "Não foi possível concluir.");
+    throw new Error(data.error || 'Não foi possível concluir.')
   }
 
-  return data;
+  return data
 }
 
-function canWrite() {
-  const company = companies.find(
-    (item) => item.id === companySelect.value
-  );
+function canWrite () {
+  const company = companies.find(item => item.id === companySelect.value)
 
-  return ["owner", "admin"].includes(company?.role);
+  return ['owner', 'admin'].includes(company?.role)
 }
 
-function endpoint() {
+function endpoint () {
   return (
-    "/api/companies/" +
-    encodeURIComponent(companySelect.value) +
-    "/campaigns"
-  );
+    '/api/companies/' + encodeURIComponent(companySelect.value) + '/campaigns'
+  )
 }
 
-function notify(message) {
-  const toast = $("#toast");
+function notify (message) {
+  const toast = $('#toast')
 
-  clearTimeout(toastTimer);
-  toast.textContent = message;
-  toast.hidden = false;
+  clearTimeout(toastTimer)
+  toast.textContent = message
+  toast.hidden = false
 
   toastTimer = setTimeout(() => {
-    toast.hidden = true;
-  }, 4500);
+    toast.hidden = true
+  }, 4500)
 }
 
-function changeView(view) {
-  $("#page-title").textContent = pages[view].title;
-  $("#page-description").textContent = pages[view].description;
+function changeView (view) {
+  $('#page-title').textContent = pages[view].title
+  $('#page-description').textContent = pages[view].description
 
-  $("#overview-section").hidden = view !== "overview";
-  $("#campaign-section").hidden = view === "integrations";
-  $("#integrations-section").hidden = view !== "integrations";
-  $("#new-campaign").hidden = view === "integrations";
+  $('#overview-section').hidden = view !== 'overview'
+  $('#campaign-section').hidden = view === 'integrations'
+  $('#integrations-section').hidden = view !== 'integrations'
+  $('#new-campaign').hidden = view === 'integrations'
 
-  document.querySelectorAll("[data-view]").forEach((button) => {
-    const active = button.dataset.view === view;
-    button.classList.toggle("active", active);
+  document.querySelectorAll('[data-view]').forEach(button => {
+    const active = button.dataset.view === view
+    button.classList.toggle('active', active)
 
     if (active) {
-      button.setAttribute("aria-current", "page");
+      button.setAttribute('aria-current', 'page')
     } else {
-      button.removeAttribute("aria-current");
+      button.removeAttribute('aria-current')
     }
-  });
+  })
 
-  render();
+  render()
 }
 
-function addCell(row, text) {
-  const cell = document.createElement("td");
-  cell.textContent = text;
-  row.append(cell);
-  return cell;
+function addCell (row, text) {
+  const cell = document.createElement('td')
+  cell.textContent = text
+  row.append(cell)
+  return cell
 }
 
-function render() {
+function render () {
   const companyDrafts = drafts.filter(
-    (draft) => draft.company === companySelect.value
-  );
+    draft => draft.company === companySelect.value
+  )
 
-  const query = search.value.trim().toLocaleLowerCase("pt-BR");
+  const query = search.value.trim().toLocaleLowerCase('pt-BR')
 
-  const visible = companyDrafts.filter((draft) =>
+  const visible = companyDrafts.filter(draft =>
     `${draft.name} ${draft.objective}`
-      .toLocaleLowerCase("pt-BR")
+      .toLocaleLowerCase('pt-BR')
       .includes(query)
-  );
+  )
 
-  $("#company-name").textContent =
-    companySelect.selectedOptions[0]?.textContent || "Suas clínicas";
+  $('#company-name').textContent =
+    companySelect.selectedOptions[0]?.textContent || 'Suas clínicas'
 
-  $("#draft-count").textContent = loaded ? companyDrafts.length : "—";
+  $('#draft-count').textContent = loaded ? companyDrafts.length : '—'
 
-  $("#planned-budget").textContent = loaded
+  $('#planned-budget').textContent = loaded
     ? money.format(
-        companyDrafts.reduce(
-          (total, draft) => total + draft.budgetCents,
-          0
-        ) / 100
+        companyDrafts.reduce((total, draft) => total + draft.budgetCents, 0) /
+          100
       )
-    : "—";
+    : '—'
 
-  $("#empty-state").hidden = !loaded || companyDrafts.length > 0;
-  $("#table-wrapper").hidden = visible.length === 0;
+  $('#empty-state').hidden = !loaded || companyDrafts.length > 0
+  $('#table-wrapper').hidden = visible.length === 0
 
-  $("#no-results").hidden =
-    loaded && (companyDrafts.length === 0 || visible.length > 0);
+  $('#no-results').hidden =
+    loaded && (companyDrafts.length === 0 || visible.length > 0)
 
-  $("#no-results").textContent = loaded
-    ? "Nenhum rascunho corresponde à busca."
-    : loadMessage;
+  $('#no-results').textContent = loaded
+    ? 'Nenhum rascunho corresponde à busca.'
+    : loadMessage
 
-  companySelect.disabled = busy || companies.length === 0;
-  $("#logout").disabled = busy;
+  companySelect.disabled = busy || companies.length === 0
+  $('#logout').disabled = busy
 
-  for (const id of ["#new-campaign", "#hero-create", "#empty-create"]) {
-    $(id).disabled = busy || !loaded || !canWrite();
+  for (const id of ['#new-campaign', '#hero-create', '#empty-create']) {
+    $(id).disabled = busy || !loaded || !canWrite()
   }
 
-  form.querySelectorAll("input, select, button").forEach((control) => {
-    control.disabled = busy;
-  });
+  form.querySelectorAll('input, select, button').forEach(control => {
+    control.disabled = busy
+  })
 
-  const rows = $("#campaign-rows");
-  rows.replaceChildren();
+  const rows = $('#campaign-rows')
+  rows.replaceChildren()
 
   for (const draft of visible) {
-    const row = document.createElement("tr");
+    const row = document.createElement('tr')
 
-    addCell(row, draft.name);
-    addCell(row, draft.objective);
-    addCell(row, money.format(draft.budgetCents / 100));
+    addCell(row, draft.name)
+    addCell(row, draft.objective)
+    addCell(row, money.format(draft.budgetCents / 100))
 
-    const statusCell = addCell(row, "");
-    const status = document.createElement("span");
-    status.className = "status";
-    status.textContent = "Rascunho";
-    statusCell.append(status);
+    const statusCell = addCell(row, '')
+    const status = document.createElement('span')
+    status.className = 'status'
+    status.textContent = 'Rascunho'
+    statusCell.append(status)
 
-    const actionCell = addCell(row, "");
-    const remove = document.createElement("button");
-    remove.className = "remove-button";
-    remove.textContent = "Excluir";
-    remove.disabled = busy || !canWrite();
-    remove.setAttribute("aria-label", `Excluir rascunho ${draft.name}`);
-    remove.addEventListener("click", () => removeDraft(draft));
+    const actionCell = addCell(row, '')
+    const edit = document.createElement('button')
+    edit.type = 'button'
+    edit.className = 'secondary'
+    edit.textContent = 'Editar'
+    edit.disabled = busy || !canWrite()
+    edit.setAttribute('aria-label', `Editar rascunho ${draft.name}`)
+    edit.addEventListener('click', () => openDialog(draft))
+    actionCell.append(edit, document.createTextNode(' '))
+    const remove = document.createElement('button')
+    remove.className = 'remove-button'
+    remove.textContent = 'Excluir'
+    remove.disabled = busy || !canWrite()
+    remove.setAttribute('aria-label', `Excluir rascunho ${draft.name}`)
+    remove.addEventListener('click', () => removeDraft(draft))
 
-    actionCell.append(remove);
-    rows.append(row);
+    actionCell.append(remove)
+    rows.append(row)
   }
 }
 
-async function loadDrafts() {
-  drafts = [];
-  loaded = false;
-  busy = true;
-  loadMessage = "Carregando rascunhos…";
-  render();
+async function loadDrafts () {
+  drafts = []
+  loaded = false
+  busy = true
+  loadMessage = 'Carregando rascunhos…'
+  render()
 
   try {
     if (!companySelect.value) {
-      loadMessage = "Seu usuário ainda não tem uma clínica vinculada.";
-      return;
+      loadMessage = 'Seu usuário ainda não tem uma clínica vinculada.'
+      return
     }
 
-    const data = await api(endpoint());
-    drafts = data.campaigns;
-    loaded = true;
+    const data = await api(endpoint())
+    drafts = data.campaigns
+    loaded = true
   } catch (error) {
-    loadMessage = error.message + " Atualize a página para tentar novamente.";
+    loadMessage = error.message + ' Atualize a página para tentar novamente.'
   } finally {
-    busy = false;
-    render();
+    busy = false
+    render()
   }
 }
 
-async function removeDraft(draft) {
-  if (busy || !canWrite()) return;
+async function removeDraft (draft) {
+  if (busy || !canWrite()) return
 
-  if (!window.confirm(`Excluir o rascunho "${draft.name}"?`)) return;
+  if (!window.confirm(`Excluir o rascunho "${draft.name}"?`)) return
 
-  busy = true;
-  render();
+  busy = true
+  render()
 
   try {
-    await api(
-      endpoint() + "/" + encodeURIComponent(draft.id),
-      "DELETE",
-      {}
-    );
+    await api(endpoint() + '/' + encodeURIComponent(draft.id), 'DELETE', {})
 
-    drafts = drafts.filter((item) => item.id !== draft.id);
-    notify("Rascunho excluído.");
+    drafts = drafts.filter(item => item.id !== draft.id)
+    notify('Rascunho excluído.')
   } catch (error) {
-    notify(error.message);
+    notify(error.message)
   } finally {
-    busy = false;
-    render();
+    busy = false
+    render()
   }
 }
 
-function openDialog() {
-  if (busy || !loaded || !canWrite()) return;
+function openDialog (draft = null) {
+  if (busy || !loaded || !canWrite()) return
 
-  formError.hidden = true;
-  form.reset();
-  $("#campaign-name").setCustomValidity("");
-  dialog.showModal();
-  $("#campaign-name").focus();
+  editingId = draft ? draft.id : null
+
+  formError.hidden = true
+  form.reset()
+  $('#campaign-name').setCustomValidity('')
+
+  $('#dialog-title').textContent = draft ? 'Editar campanha' : 'Nova campanha'
+
+  form.querySelector('button[type="submit"]').textContent = draft
+    ? 'Salvar alterações'
+    : 'Salvar rascunho'
+
+  if (draft) {
+    $('#campaign-name').value = draft.name
+    $('#campaign-objective').value = draft.objective
+    $('#campaign-budget').value = (draft.budgetCents / 100).toFixed(2)
+  }
+
+  dialog.showModal()
+  $('#campaign-name').focus()
 }
 
-$("#new-campaign").addEventListener("click", openDialog);
-$("#hero-create").addEventListener("click", openDialog);
-$("#empty-create").addEventListener("click", openDialog);
+$('#new-campaign').addEventListener('click', () => openDialog())
+$('#hero-create').addEventListener('click', () => openDialog())
+$('#empty-create').addEventListener('click', () => openDialog())
 
-$("#close-dialog").addEventListener("click", () => dialog.close());
-$("#cancel-dialog").addEventListener("click", () => dialog.close());
+$('#close-dialog').addEventListener('click', () => dialog.close())
+$('#cancel-dialog').addEventListener('click', () => dialog.close())
 
-dialog.addEventListener("cancel", (event) => {
-  if (busy) event.preventDefault();
-});
+dialog.addEventListener('cancel', event => {
+  if (busy) event.preventDefault()
+})
 
-$("#campaign-name").addEventListener("input", (event) => {
-  event.target.setCustomValidity("");
-});
+$('#campaign-name').addEventListener('input', event => {
+  event.target.setCustomValidity('')
+})
 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
+form.addEventListener('submit', async event => {
+  event.preventDefault()
 
-  if (busy || !loaded || !canWrite()) return;
+  if (busy || !loaded || !canWrite()) return
 
-  const nameInput = $("#campaign-name");
-  const name = nameInput.value.trim();
+  const nameInput = $('#campaign-name')
+  const name = nameInput.value.trim()
 
   if (!name) {
-    nameInput.setCustomValidity("Informe um nome para a campanha.");
-    nameInput.reportValidity();
-    return;
+    nameInput.setCustomValidity('Informe um nome para a campanha.')
+    nameInput.reportValidity()
+    return
   }
 
-  if (!form.reportValidity()) return;
+  if (!form.reportValidity()) return
 
-  const budget = Number($("#campaign-budget").value);
+  const budget = Number($('#campaign-budget').value)
 
-  if (!Number.isFinite(budget) || budget < 1 || budget > 100000) return;
+  if (!Number.isFinite(budget) || budget < 1 || budget > 100000) return
 
   const payload = {
     name,
-    objective: $("#campaign-objective").value,
+    objective: $('#campaign-objective').value,
     budgetCents: Math.round(budget * 100)
-  };
-
-  busy = true;
-  formError.hidden = true;
-  render();
-
-  try {
-    const data = await api(endpoint(), "POST", payload);
-
-    drafts.unshift(data.campaign);
-    dialog.close();
-    search.value = "";
-    changeView("campaigns");
-    notify("Rascunho salvo.");
-  } catch (error) {
-    formError.textContent = error.message;
-    formError.hidden = false;
-  } finally {
-    busy = false;
-    render();
   }
-});
 
-document.querySelectorAll("[data-view]").forEach((button) => {
-  button.addEventListener("click", () => changeView(button.dataset.view));
-});
-
-companySelect.addEventListener("change", () => {
-  search.value = "";
-  loadDrafts();
-});
-
-search.addEventListener("input", render);
-
-async function loadProfile() {
-  busy = true;
-  render();
+  busy = true
+  formError.hidden = true
+  render()
 
   try {
-    const data = await api("/api/me");
-    companies = data.companies;
-    $("#user-name").textContent = data.user.name;
-    companySelect.replaceChildren();
+    const isEditing = editingId !== null
 
-    for (const company of companies) {
-      const option = document.createElement("option");
-      option.value = company.id;
-      option.textContent = company.name;
-      companySelect.append(option);
+    const url = isEditing
+      ? endpoint() + '/' + encodeURIComponent(editingId)
+      : endpoint()
+
+    const data = await api(url, isEditing ? 'PUT' : 'POST', payload)
+
+    if (isEditing) {
+      drafts = drafts.map(draft =>
+        draft.id === data.campaign.id ? data.campaign : draft
+      )
+    } else {
+      drafts.unshift(data.campaign)
     }
 
-    await loadDrafts();
+    editingId = null
+    dialog.close()
+    search.value = ''
+    changeView('campaigns')
+
+    notify(isEditing ? 'Alterações salvas.' : 'Rascunho salvo.')
   } catch (error) {
-    loadMessage = error.message + " Atualize a página para tentar novamente.";
+    formError.textContent = error.message
+    formError.hidden = false
   } finally {
-    busy = false;
-    render();
+    busy = false
+    render()
+  }
+})
+
+document.querySelectorAll('[data-view]').forEach(button => {
+  button.addEventListener('click', () => changeView(button.dataset.view))
+})
+
+companySelect.addEventListener('change', () => {
+  search.value = ''
+  loadDrafts()
+})
+
+search.addEventListener('input', render)
+
+async function loadProfile () {
+  busy = true
+  render()
+
+  try {
+    const data = await api('/api/me')
+    companies = data.companies
+    $('#user-name').textContent = data.user.name
+    companySelect.replaceChildren()
+
+    for (const company of companies) {
+      const option = document.createElement('option')
+      option.value = company.id
+      option.textContent = company.name
+      companySelect.append(option)
+    }
+
+    await loadDrafts()
+  } catch (error) {
+    loadMessage = error.message + ' Atualize a página para tentar novamente.'
+  } finally {
+    busy = false
+    render()
   }
 }
 
-$("#logout").addEventListener("click", async () => {
-  const button = $("#logout");
-  button.disabled = true;
+$('#logout').addEventListener('click', async () => {
+  const button = $('#logout')
+  button.disabled = true
 
   try {
-    const response = await fetch("/api/logout", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: "{}"
-    });
+    const response = await fetch('/api/logout', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}'
+    })
 
     if (!response.ok && response.status !== 401) {
-      throw new Error("Falha ao sair.");
+      throw new Error('Falha ao sair.')
     }
 
-    window.location.replace("/login");
+    window.location.replace('/login')
   } catch {
-    notify("Não foi possível sair. Tente novamente.");
-    button.disabled = false;
+    notify('Não foi possível sair. Tente novamente.')
+    button.disabled = false
   }
-});
+})
 
-loadProfile();
+loadProfile()

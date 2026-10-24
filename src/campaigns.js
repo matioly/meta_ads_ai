@@ -137,4 +137,55 @@ router.delete(
   }
 );
 
+router.put(
+  "/:companyId/campaigns/:campaignId",
+  access,
+  async (req, res) => {
+    const name =
+      typeof req.body?.name === "string" ? req.body.name.trim() : "";
+
+    const objective = req.body?.objective;
+    const budgetCents = req.body?.budgetCents;
+
+    if (
+      !name ||
+      name.length > 120 ||
+      !objectives.has(objective) ||
+      !Number.isInteger(budgetCents) ||
+      budgetCents < 100 ||
+      budgetCents > 10000000
+    ) {
+      return res.status(400).json({
+        error: "Informe nome, objetivo válido e orçamento entre R$ 1 e R$ 100.000."
+      });
+    }
+
+    const result = await pool.query(
+      `UPDATE campaigns
+       SET name = $1,
+           objective = $2,
+           budget_cents = $3
+       WHERE id = $4
+         AND company_id = $5
+         AND status = 'draft'
+       RETURNING ${fields}`,
+      [
+        name,
+        objective,
+        budgetCents,
+        req.params.campaignId,
+        req.params.companyId
+      ]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({
+        error: "Rascunho não encontrado nesta clínica."
+      });
+    }
+
+    res.json({ campaign: result.rows[0] });
+  }
+);
+
 module.exports = router;
