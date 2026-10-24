@@ -15,7 +15,7 @@ Data-base: 24/10/2026. Este é um plano proposto, não uma lista de funcionalida
 - [x] Validação de campos e autorização no servidor.
 - [x] Documentação de arquitetura, operação, histórico e retomada.
 
-Os testes funcionais foram confirmados manualmente pelo operador. Isso não marca testes automatizados, auditoria de segurança ou integração externa como concluídos.
+Os testes funcionais anteriores ao briefing foram confirmados manualmente pelo operador. B01 tem implementação versionada; seu aceite operacional específico ainda está pendente. Isso não marca testes automatizados, auditoria de segurança ou integração externa como concluídos.
 
 ## Ordem de produto recomendada
 
@@ -27,7 +27,7 @@ A preparação da conexão Meta pode avançar antes da IA, conforme disponibilid
 
 | ID | Prioridade | Trabalho | Dependências | Critério de aceite |
 |---|---|---|---|---|
-| B01 | Alta / próxima proposta | Briefing: serviço, oferta, público, região, mensagem, destino e observações | Definir campos com operador | Criar/editar/persistir briefing por clínica; rascunhos antigos continuam válidos; validação e limites no servidor |
+| B01 | Implementado; aceite operacional pendente | Briefing opcional com sete campos, JSONB, validação e consulta por member (8860d6e) | Migration 005 no ambiente | Confirmar persistência, limpeza, compatibilidade e isolamento no Railway; roteiro em OPERACAO.md |
 | T01 | Alta | Testes de API e PostgreSQL de teste | Ambiente isolado | Cobrir login, papéis, acesso entre clínicas, CRUD, limites e migrations em banco novo |
 | T02 | Alta | Validar migrations novas não vazias | Preservar exceção histórica 002 | Falhar com nome claro em SQL novo vazio; instalação do zero funciona |
 | T03 | Alta | Fixar versões suportadas de Node/npm e configurar CI | Escolha de versões | Instalação reproduzível, sintaxe e testes executados em PR |
@@ -41,14 +41,14 @@ A preparação da conexão Meta pode avançar antes da IA, conforme disponibilid
 
 | ID | Prioridade | Trabalho | Dependências | Critério de aceite |
 |---|---|---|---|---|
-| M01 | Alta após B01 | Upload de vídeos/imagens e biblioteca por clínica | Escolher armazenamento de objetos | Validar tipo/tamanho, separar acesso por clínica, mostrar progresso/erro e recuperar arquivo após novo login |
+| M01 | Próxima feature proposta após aceite B01 | Upload de vídeos/imagens e biblioteca por clínica | Escolher armazenamento de objetos | Validar tipo/tamanho, separar acesso por clínica, mostrar progresso/erro e recuperar arquivo após novo login |
 | M02 | Média | Vincular mídias ao rascunho e pré-visualizar | M01 | Escolher/substituir mídia sem expor arquivos de outras clínicas |
 | M03 | Média | Processamento assíncrono, miniaturas e metadados | M01 e avaliação de volume | Estado pendente/pronto/erro; reprocessamento controlado sem bloquear API |
 | A01 | Alta após B01 | Geração assistida de texto/títulos/variações | Escolher provedor/modelo, credenciais e orçamento | Gerar a partir do briefing; resultado editável e salvo; limites de custo; erros claros; sem publicação automática |
 | A02 | Média | Histórico de geração e versionamento de textos | A01 | Rastrear parâmetros e versão; recuperar variações e registrar revisão humana |
 | A03 | Média | Revisão de conteúdo odontológico | Definir critérios com responsável da clínica | Checklist editorial e aprovação registrados; revisar políticas vigentes antes de publicar, sem prometer conformidade automática |
 
-Provedor, modelo, armazenamento e formato final do briefing ainda precisam ser escolhidos. Não há segredo de IA exigido pelo código atual.
+Provedor, modelo e armazenamento ainda precisam ser escolhidos. O briefing inicial já tem sete campos opcionais; regras de obrigatoriedade para publicação serão definidas antes da integração. Não há segredo de IA exigido pelo código atual.
 
 ## Integração Meta
 
@@ -77,7 +77,7 @@ Permissões, revisão do aplicativo, tipos de token e versão da API devem ser v
 
 ## Decisões abertas
 
-- Quais campos do briefing serão obrigatórios?
+- Quais campos do briefing deverão ser obrigatórios na futura revisão/publicação? No rascunho atual todos são opcionais.
 - Qual clínica e conta de anúncios serão piloto?
 - Qual armazenamento de mídia e seus limites?
 - Qual provedor/modelo de IA e teto de custo?

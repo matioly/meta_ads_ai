@@ -1,6 +1,6 @@
 # Arquitetura atual
 
-Referência: 24/10/2026, código até 0cd2c6d. Este documento descreve o que existe; propostas futuras ficam no [backlog](BACKLOG.md).
+Referência: 24/10/2026, código até 8860d6e. Este documento descreve o que existe; propostas futuras ficam no [backlog](BACKLOG.md).
 
 ## Visão geral
 
@@ -27,11 +27,13 @@ Não existe conexão do navegador diretamente ao banco. Não existem chamadas ao
 | src/db.js | Pool compartilhado de conexões PostgreSQL |
 | src/bootstrap.js | Primeiro usuário e clínicas iniciais |
 | src/campaigns.js | Rotas de rascunhos e autorização por clínica |
+| src/briefing.js | Validação e normalização do briefing; middleware de POST/PUT |
 | src/migrate.js | Execução transacional das migrations e controle de aplicação |
 | src/migrations/001_initial.sql | Usuários, empresas e vínculos |
 | src/migrations/002_sessions.sql | Arquivo histórico vazio; não cria tabela |
 | src/migrations/003_fix_user_sessions.sql | Criação efetiva de user_sessions e índice de expiração |
 | src/migrations/004_campaigns.sql | Rascunhos e índice por clínica/data |
+| src/migrations/005_campaign_briefing.sql | Coluna briefing JSONB, padrão vazio e restrição de objeto |
 | public/index.html | Estrutura do painel e formulário modal |
 | public/app.js | Perfil, seleção de clínica, navegação, busca e operações da API |
 | public/styles.css | Estilos compartilhados e layout aprovado |
@@ -67,13 +69,33 @@ erDiagram
 | users | UUID id; name até 120; email até 254, único, normalizado em minúsculas/sem espaços externos; password_hash; created_at |
 | companies | UUID id; name até 160; city até 120; state até 2; created_at |
 | company_members | PK composta company_id/user_id; role owner/admin/member; created_at; FKs com cascata; índice por user_id |
-| campaigns | UUID id; company_id obrigatório; created_by opcional; name até 120; objective; budget_cents inteiro; status; created_at |
+| campaigns | UUID id; company_id obrigatório; created_by opcional; name até 120; objective; budget_cents inteiro; status; created_at; briefing JSONB não nulo, padrão {} |
 | user_sessions | sid como PK; sess JSON; expire TIMESTAMP(6); índice em expire |
 | schema_migrations | name como PK; applied_at; criada pelo executor |
 
 Exclusão de empresa remove vínculos e campanhas por cascata. Exclusão de usuário remove vínculos e deixa created_by das campanhas como NULL. Não há endpoints administrativos para essas exclusões.
 
 Sessões não têm uma FK de usuário: o identificador fica dentro do JSON da sessão. Campanhas possuem created_by para autoria inicial, mas ainda não registram autor ou horário de cada edição.
+
+### Briefing de campanha
+
+A migration 005 adiciona campaigns.briefing como JSONB NOT NULL DEFAULT '{}', com CHECK para garantir que seja objeto. Registros antigos recebem objeto vazio. A estrutura dos campos é validada na aplicação, não individualmente pelo CHECK do banco.
+
+| Chave JSON | Campo | Limite de caracteres |
+|---|---|---|
+| service | Serviço/procedimento | 120 |
+| offer | Oferta/proposta | 500 |
+| audience | Público desejado | 300 |
+| region | Cidade/região | 200 |
+| message | Mensagem principal | 500 |
+| destination | Destino desejado | 200 |
+| notes | Observações | 500 |
+
+Todos são opcionais enquanto rascunho. Valores enviados precisam ser strings dentro do limite; espaços externos são removidos. Chaves desconhecidas, arrays, null e tipos incorretos são rejeitados com 400.
+
+Sem a propriedade briefing, POST usa {} e PUT mantém o valor anterior por COALESCE. Quando briefing é enviado, substitui o objeto inteiro: campos omitidos dentro dele viram strings vazias. Enviar {} limpa todos os campos; não é uma operação de merge parcial. Clientes devem enviar o objeto completo ao editar.
+
+GET, POST e PUT devolvem briefing junto dos demais campos. destination é texto de planejamento: não é validado como URL, não é acessado pelo servidor e não configura automaticamente um destino Meta.
 
 ### Regras de campanhas
 
@@ -83,7 +105,7 @@ Sessões não têm uma FK de usuário: o identificador fica dentro do JSON da se
 - Apenas status draft existe, inclusive com restrição no banco.
 - São rascunhos internos. Os objetivos ainda não são mapeamentos validados dos enums da API Meta.
 - GET ordena por created_at DESC e id DESC.
-- PUT altera nome, objetivo e orçamento; preserva id, clínica e autoria inicial.
+- PUT altera nome, objetivo, orçamento e briefing enviado; preserva id, clínica e autoria inicial.
 - DELETE é exclusão física, sem lixeira.
 - Não existem updated_at, histórico de versões ou bloqueio contra edição concorrente. Hoje a última gravação pode sobrescrever uma anterior.
 
@@ -141,11 +163,16 @@ Payload completo para POST e PUT:
 {
   "name": "Avaliação de ortodontia",
   "objective": "Conversas no WhatsApp",
-  "budgetCents": 3000
+  "budgetCents": 3000,
+  "briefing": {
+    "service": "Ortodontia infantil",
+    "region": "Campinas",
+    "destination": "WhatsApp da clínica"
+  }
 }
 ```
 
-campaign devolve id, company (alias de company_id), name, objective, budgetCents e status. GET devolve { "campaigns": [...] }; POST/PUT devolvem { "campaign": {...} }; exclusão devolve { "ok": true }.
+campaign devolve id, company (alias de company_id), name, objective, budgetCents, status e briefing. GET devolve { "campaigns": [...] }; POST/PUT devolvem { "campaign": {...} }; exclusão devolve { "ok": true }.
 
 Erros de campanhas: 400 para UUID ou dados inválidos; 401 para sessão ausente; 403 para vínculo/papel insuficiente; 404 para rascunho inexistente naquela clínica em edição/exclusão. Middleware de escrita também pode retornar 403 por origem e 415 por formato. Falhas não tratadas chegam ao handler 500.
 
@@ -156,3 +183,5 @@ loadProfile chama /api/me e preenche o seletor com dados reais. loadDrafts limpa
 O modal é compartilhado: editingId nulo cria via POST; preenchido edita via PUT. Ao abrir nova campanha, o formulário é reiniciado. Durante requisições o estado busy desabilita ações e a troca de clínica. Falhas de gravação aparecem no formulário; falhas de carga não são apresentadas como uma lista vazia bem-sucedida. Respostas 401 encaminham para /login.
 
 A busca é local sobre todos os rascunhos carregados. Não há paginação nem persistência da última clínica selecionada. Os cards de campanhas Meta e resultados ainda não possuem dados reais.
+
+O formulário inclui uma seção expansível de briefing, preenchida ao editar e limpa ao criar. Para member, o botão Ver abre o formulário com campos desabilitados e sem botão de salvar; POST/PUT/DELETE continuam bloqueados no servidor. A busca atual continua por nome/objetivo, sem pesquisar o briefing.

@@ -1,6 +1,6 @@
 # Operação e desenvolvimento
 
-Referência: 24/10/2026. Configuração de código verificada até 0cd2c6d. O estado das variáveis e serviços no Railway não foi inspecionado nesta atualização; o histórico de deploy e testes foi informado pelo operador.
+Referência: 24/10/2026. Configuração de código verificada até 8860d6e. O estado das variáveis e serviços no Railway não foi inspecionado nesta atualização; o histórico de deploy e testes foi informado pelo operador.
 
 ## Ambiente local
 
@@ -77,6 +77,7 @@ O executor:
 | 002_sessions.sql | Histórico vazio, sem DDL |
 | 003_fix_user_sessions.sql | user_sessions e índice de expiração |
 | 004_campaigns.sql | campaigns e índice por clínica/data |
+| 005_campaign_briefing.sql | campaigns.briefing JSONB; registros anteriores recebem {} |
 
 Não apagar registros de schema_migrations nem reescrever migrations aplicadas para forçar reexecução. Criar nova migration corretiva. Não há ferramenta de rollback automático ou checksum.
 
@@ -122,6 +123,7 @@ Salvar todos os arquivos. Na raiz do projeto:
 node --check src/server.js
 node --check src/bootstrap.js
 node --check src/campaigns.js
+node --check src/briefing.js
 node --check src/migrate.js
 node --check public/app.js
 node --check public/login.js
@@ -193,3 +195,22 @@ Para incorporar alterações de documentação feitas diretamente no GitHub, com
 ```sh
 git pull --ff-only
 ```
+
+## Verificação da entrega de briefing (005)
+
+O commit 8860d6e contém código e migration. A presença no GitHub não confirma aplicação no banco Railway. Conferir o pré-deploy e a entrada 005_campaign_briefing.sql em schema_migrations.
+
+1. Abrir rascunho anterior à migration; deve funcionar com briefing vazio.
+2. Preencher os sete campos, salvar, atualizar e abrir de novo.
+3. Apagar uma observação, salvar e conferir que permanece vazia.
+4. Abrir Nova campanha após editar; não deve herdar o briefing anterior.
+5. Trocar de clínica e confirmar a separação.
+6. Usar member de teste: Ver deve permitir consulta sem edição; escrita direta na API deve retornar 403.
+7. Em desenvolvimento, confirmar limites, tipos inválidos e chaves desconhecidas: resposta 400.
+8. Em desenvolvimento, enviar PUT sem briefing: deve preservar o anterior. Enviar briefing {}: deve limpar os campos.
+
+Sintaxe dos três JavaScripts envolvidos e testes isolados do validador passaram nesta atualização documental. Testes com PostgreSQL, navegador e Railway não foram executados por esta atualização. A confirmação operacional específica do briefing segue pendente.
+
+Se ocorrer erro de coluna briefing ausente, verificar se a aplicação e o banco usam o mesmo ambiente e se a migration 005 foi executada. Não recriar tabela nem remover dados para resolver.
+
+Nenhuma variável de ambiente ou dependência npm nova é necessária para esta entrega.

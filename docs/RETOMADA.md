@@ -1,10 +1,10 @@
 # Retomada do projeto
 
-Atualizado em 24/10/2026. Código de referência: 0cd2c6d.
+Atualizado em 24/10/2026. Código de referência: 8860d6e.
 
 ## Onde paramos
 
-O painel permite fazer login, escolher a clínica e criar, consultar, editar e excluir rascunhos persistidos no PostgreSQL. Evandro confirmou os testes manuais após as entregas de persistência e edição. O último incremento funcional foi **editar rascunhos**.
+O painel permite fazer login, escolher a clínica e criar, consultar, editar e excluir rascunhos persistidos no PostgreSQL. Evandro confirmou os testes manuais após as entregas de persistência e edição. O último incremento funcional é **briefing opcional de campanha**, versionado em 8860d6e, com a migration 005. Sintaxe e validação isolada foram verificadas; o teste ponta a ponta específico do briefing no Railway ainda precisa ser registrado.
 
 Esta atualização registra a documentação. Não adiciona integração Meta, IA, publicação, novos endpoints ou migrations.
 
@@ -34,13 +34,13 @@ Se houver mudanças locais, preservá-las em commit ou stash antes de sincroniza
 
 ## Próximo incremento recomendado
 
-**Briefing completo do rascunho (B01):** preparar os dados de campanha antes de conectar serviços externos.
+Primeiro concluir o aceite operacional de **B01**: migration 005 aplicada, briefing salvo e recarregado, campos apagados persistindo vazios, rascunhos antigos funcionando e consulta por member sem escrita.
 
-Proposta: procedimento/serviço, descrição da oferta, público desejado, cidade/região, mensagem principal, destino e observações. Definir campos obrigatórios com o operador, limites e armazenamento; evoluir formulário e API; usar uma nova migration, provavelmente 005 se nenhuma outra tiver sido adicionada.
+Depois, **upload de vídeos/imagens e biblioteca por clínica (M01)**. Escolher armazenamento de objetos e limites, definir acesso privado por clínica, implementar upload com validação e estados de progresso/erro. O vínculo da mídia ao rascunho é M02.
 
-Aceite: criar e editar o briefing, atualizar a página e conferir persistência; garantir isolamento por clínica; manter compatibilidade dos rascunhos existentes; não publicar anúncios.
+O briefing já tem serviço, oferta, público, região, mensagem, destino e observações, todos opcionais. Não refazer essa feature. A API preserva o briefing se PUT não enviar a propriedade; se enviar, substitui o objeto inteiro.
 
-Essa prioridade é uma recomendação registrada, não uma funcionalidade implementada nem uma especificação já aprovada em todos os detalhes. Testes de autorização e prevenção de migrations vazias devem acompanhar a evolução.
+A escolha do provedor de mídia ainda está aberta. Testes de autorização e prevenção de migrations vazias continuam no backlog técnico.
 
 ## Cuidados para não repetir problemas
 
@@ -55,7 +55,7 @@ Essa prioridade é uma recomendação registrada, não uma funcionalidade implem
 
 ## Texto para iniciar outra sessão de trabalho
 
-> Continuar o projeto matioly/meta_ads_ai. Leia README.md, docs/RETOMADA.md, CHANGELOG.md, docs/ARQUITETURA.md e docs/BACKLOG.md e confira o código atual antes de alterar. Já temos Node/Express, PostgreSQL, deploy Railway, login com sessões e CRUD de rascunhos por clínica, inclusive edição. Meta Ads, mídia e IA ainda não estão integrados. Preservar o layout aprovado e o isolamento por clínica. Próximo incremento recomendado: briefing completo do rascunho, seguindo B01. Atualizar a documentação após a entrega e registrar o que foi efetivamente testado.
+> Continuar o projeto matioly/meta_ads_ai. Leia README.md, docs/RETOMADA.md, CHANGELOG.md, docs/ARQUITETURA.md e docs/BACKLOG.md e confira o código atual antes de alterar. Já temos Node/Express, PostgreSQL, deploy Railway, login com sessões e CRUD de rascunhos por clínica, inclusive edição. Meta Ads, mídia e IA ainda não estão integrados. Preservar o layout aprovado e o isolamento por clínica. Briefing opcional já implementado em 8860d6e com migration 005; confirmar seu aceite operacional. Próxima feature proposta: upload/biblioteca de mídia por clínica (M01), escolhendo armazenamento e limites antes de implementar. Atualizar a documentação após a entrega e registrar o que foi efetivamente testado.
 
 ## Como manter este ponto de retomada
 

@@ -1,5 +1,31 @@
 # Release notes — Meta Ads AI
 
+## 24/10/2026 — Briefing opcional de campanha (B01)
+
+Commit funcional: [8860d6e](https://github.com/matioly/meta_ads_ai/commit/8860d6e4867b565c53d4c2c9c2ece22bb49d7e13).
+
+### Implementado
+
+- Sete campos opcionais: serviço, oferta, público, região, mensagem, destino e observações.
+- Migration 005_campaign_briefing.sql: coluna JSONB não nula, padrão {} e restrição para objeto. Rascunhos anteriores permanecem válidos.
+- src/briefing.js valida tipos, tamanho e chaves permitidas; remove espaços externos.
+- GET devolve briefing; POST grava; PUT atualiza. Sem a propriedade no PUT, o conteúdo anterior é preservado.
+- Objeto enviado substitui integralmente o briefing: campos internos omitidos ficam vazios; {} limpa o conteúdo.
+- Seção expansível no formulário, reaproveitada para criação/edição.
+- Membros podem abrir Ver em modo de consulta; responsáveis e administradores mantêm edição.
+- Nenhuma dependência ou variável de ambiente adicional; nenhuma publicação no Meta.
+
+### Verificações e pendências
+
+Código conferido no GitHub, incluindo SQL, rotas, HTML, CSS e JavaScript. node --check passou para src/briefing.js, src/campaigns.js e public/app.js. Testes isolados do validador passaram para ausência de briefing, strings normalizadas, campos vazios, limites, tipos inválidos e chaves desconhecidas.
+
+Esses testes foram executados fora da suíte do repositório e não constituem teste de integração. Aplicação da migration no Railway e teste ponta a ponta do briefing ainda não foram verificados nesta atualização. Não registrar B01 como homologado até confirmar o roteiro em docs/OPERACAO.md.
+
+### Próximo passo
+
+Concluir aceite operacional B01 e avançar para M01: upload e biblioteca de mídia por clínica. Provedor de armazenamento e limites ainda serão definidos.
+
+
 ## Marco funcional de 24/10/2026 — painel autenticado e rascunhos persistentes
 
 Código de referência: [0cd2c6d](https://github.com/matioly/meta_ads_ai/commit/0cd2c6d1972ae8424fec1ca4e29bc9dbb57499ab).

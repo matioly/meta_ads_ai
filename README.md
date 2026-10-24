@@ -2,7 +2,7 @@
 
 Painel próprio para planejar campanhas de anúncios por clínica, com evolução prevista para integração ao Meta Ads e assistência de IA.
 
-**Estado em 24/10/2026:** autenticação e gerenciamento de rascunhos persistentes implementados. Criação, edição e exclusão são restritas a responsáveis e administradores da clínica. O usuário confirmou os testes manuais de login e dos fluxos de rascunhos durante o desenvolvimento.
+**Estado em 24/10/2026:** autenticação, rascunhos persistentes e briefing opcional implementados. O briefing está versionado; a validação ponta a ponta dessa etapa no Railway ainda precisa ser registrada. Criação, edição e exclusão são restritas a responsáveis e administradores da clínica. O usuário confirmou os testes manuais de login e dos fluxos de rascunhos durante o desenvolvimento.
 
 **O aplicativo ainda não publica anúncios, não consulta resultados do Meta e não gera conteúdo com IA.** O orçamento exibido é planejamento, não gasto real.
 
@@ -30,6 +30,8 @@ O fluxo desejado inclui vídeos enviados pelo operador, assistência na criaçã
 - Painel com navegação de visão geral, campanhas e integrações.
 - Criar, listar, buscar no navegador, editar e excluir rascunhos.
 - Nome, objetivo e orçamento diário planejado por rascunho.
+- Briefing opcional com serviço, oferta, público, região, mensagem, destino e observações.
+- Consulta do formulário em modo somente leitura para membros.
 - Contagem e soma dos orçamentos por clínica.
 - Persistência após atualizar a página ou entrar novamente.
 - Validação no servidor e controle de acesso por vínculo com a clínica.
@@ -55,7 +57,7 @@ Abrir http://localhost:3000. O bootstrap exige suas variáveis somente quando a 
 
 ## Situação da documentação
 
-Base de código revisada: commit [0cd2c6d](https://github.com/matioly/meta_ads_ai/commit/0cd2c6d1972ae8424fec1ca4e29bc9dbb57499ab), de 24/10/2026. Esta documentação registra o código e o histórico da implementação; não é uma auditoria independente do ambiente Railway.
+Base de código revisada: commit [8860d6e](https://github.com/matioly/meta_ads_ai/commit/8860d6e4867b565c53d4c2c9c2ece22bb49d7e13), de 24/10/2026. Esta documentação registra o código e o histórico da implementação; não é uma auditoria independente do ambiente Railway.
 
 A versão 1.0.0 do package.json é a versão inicial do pacote, não uma declaração de conclusão de todas as funcionalidades do produto. Não foram criadas tags ou releases formais por esta atualização.
 
