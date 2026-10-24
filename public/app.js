@@ -162,7 +162,11 @@ function render () {
     $(id).disabled = busy || !loaded || !canWrite()
   }
 
-  form.querySelectorAll('input, select, button').forEach(control => {
+  form.querySelectorAll('input, select, textarea').forEach(control => {
+    control.disabled = busy || !canWrite()
+  })
+
+  form.querySelectorAll('button').forEach(control => {
     control.disabled = busy
   })
 
@@ -186,9 +190,12 @@ function render () {
     const edit = document.createElement('button')
     edit.type = 'button'
     edit.className = 'secondary'
-    edit.textContent = 'Editar'
-    edit.disabled = busy || !canWrite()
-    edit.setAttribute('aria-label', `Editar rascunho ${draft.name}`)
+    edit.textContent = canWrite() ? 'Editar' : 'Ver'
+    edit.disabled = busy
+    edit.setAttribute(
+      'aria-label',
+      `${canWrite() ? 'Editar' : 'Ver'} rascunho ${draft.name}`
+    )
     edit.addEventListener('click', () => openDialog(draft))
     actionCell.append(edit, document.createTextNode(' '))
     const remove = document.createElement('button')
@@ -249,19 +256,27 @@ async function removeDraft (draft) {
 }
 
 function openDialog (draft = null) {
-  if (busy || !loaded || !canWrite()) return
+  if (busy || !loaded) return
+  if (!draft && !canWrite()) return
 
+  const readOnly = !canWrite()
   editingId = draft ? draft.id : null
 
   formError.hidden = true
   form.reset()
   $('#campaign-name').setCustomValidity('')
 
-  $('#dialog-title').textContent = draft ? 'Editar campanha' : 'Nova campanha'
+  $('#dialog-title').textContent = readOnly
+    ? 'Consultar campanha'
+    : draft
+    ? 'Editar campanha'
+    : 'Nova campanha'
 
-  form.querySelector('button[type="submit"]').textContent = draft
-    ? 'Salvar alterações'
-    : 'Salvar rascunho'
+  const submitButton = form.querySelector('button[type="submit"]')
+  submitButton.hidden = readOnly
+  submitButton.textContent = draft ? 'Salvar alterações' : 'Salvar rascunho'
+
+  $('#cancel-dialog').textContent = readOnly ? 'Fechar' : 'Cancelar'
 
   if (draft) {
     $('#campaign-name').value = draft.name
@@ -269,8 +284,20 @@ function openDialog (draft = null) {
     $('#campaign-budget').value = (draft.budgetCents / 100).toFixed(2)
   }
 
+  form.querySelectorAll('[data-briefing]').forEach(control => {
+    control.value = draft?.briefing?.[control.dataset.briefing] ?? ''
+  })
+
+  $('#campaign-briefing').open = true
+
+  render()
   dialog.showModal()
-  $('#campaign-name').focus()
+
+  if (readOnly) {
+    $('#close-dialog').focus()
+  } else {
+    $('#campaign-name').focus()
+  }
 }
 
 $('#new-campaign').addEventListener('click', () => openDialog())
@@ -308,10 +335,17 @@ form.addEventListener('submit', async event => {
 
   if (!Number.isFinite(budget) || budget < 1 || budget > 100000) return
 
+  const briefing = {}
+
+  form.querySelectorAll('[data-briefing]').forEach(control => {
+    briefing[control.dataset.briefing] = control.value.trim()
+  })
+
   const payload = {
     name,
     objective: $('#campaign-objective').value,
-    budgetCents: Math.round(budget * 100)
+    budgetCents: Math.round(budget * 100),
+    briefing
   }
 
   busy = true

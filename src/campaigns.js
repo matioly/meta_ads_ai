@@ -1,16 +1,16 @@
-const express = require("express");
-const pool = require("./db");
+const express = require('express')
+const pool = require('./db')
+const { briefingMiddleware } = require('./briefing')
 
-const router = express.Router();
+const router = express.Router()
 
-const uuid =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 const objectives = new Set([
-  "Conversas no WhatsApp",
-  "Geração de leads",
-  "Reconhecimento"
-]);
+  'Conversas no WhatsApp',
+  'Geração de leads',
+  'Reconhecimento'
+])
 
 const fields = `
   id,
@@ -18,14 +18,15 @@ const fields = `
   name,
   objective,
   budget_cents AS "budgetCents",
-  status
-`;
+  status,
+  briefing
+`
 
-async function access(req, res, next) {
+async function access (req, res, next) {
   if (!req.session?.userId) {
     return res.status(401).json({
-      error: "Faça login para continuar."
-    });
+      error: 'Faça login para continuar.'
+    })
   }
 
   if (
@@ -33,8 +34,8 @@ async function access(req, res, next) {
     (req.params.campaignId && !uuid.test(req.params.campaignId))
   ) {
     return res.status(400).json({
-      error: "Identificador inválido."
-    });
+      error: 'Identificador inválido.'
+    })
   }
 
   const result = await pool.query(
@@ -42,110 +43,46 @@ async function access(req, res, next) {
      FROM company_members
      WHERE company_id = $1 AND user_id = $2`,
     [req.params.companyId, req.session.userId]
-  );
+  )
 
-  const membership = result.rows[0];
+  const membership = result.rows[0]
 
   if (!membership) {
     return res.status(403).json({
-      error: "Você não tem acesso a esta clínica."
-    });
+      error: 'Você não tem acesso a esta clínica.'
+    })
   }
 
-  if (
-    req.method !== "GET" &&
-    !["owner", "admin"].includes(membership.role)
-  ) {
+  if (req.method !== 'GET' && !['owner', 'admin'].includes(membership.role)) {
     return res.status(403).json({
-      error: "Seu acesso permite apenas consultar."
-    });
+      error: 'Seu acesso permite apenas consultar.'
+    })
   }
 
-  next();
+  next()
 }
 
-router.get("/:companyId/campaigns", access, async (req, res) => {
+router.get('/:companyId/campaigns', access, async (req, res) => {
   const result = await pool.query(
     `SELECT ${fields}
      FROM campaigns
      WHERE company_id = $1 AND status = 'draft'
      ORDER BY created_at DESC, id DESC`,
     [req.params.companyId]
-  );
+  )
 
-  res.json({ campaigns: result.rows });
-});
+  res.json({ campaigns: result.rows })
+})
 
-router.post("/:companyId/campaigns", access, async (req, res) => {
-  const name =
-    typeof req.body?.name === "string" ? req.body.name.trim() : "";
-
-  const objective = req.body?.objective;
-  const budgetCents = req.body?.budgetCents;
-
-  if (
-    !name ||
-    name.length > 120 ||
-    !objectives.has(objective) ||
-    !Number.isInteger(budgetCents) ||
-    budgetCents < 100 ||
-    budgetCents > 10000000
-  ) {
-    return res.status(400).json({
-      error: "Informe nome, objetivo válido e orçamento entre R$ 1 e R$ 100.000."
-    });
-  }
-
-  const result = await pool.query(
-    `INSERT INTO campaigns (
-       company_id, created_by, name, objective, budget_cents
-     )
-     VALUES ($1, $2, $3, $4, $5)
-     RETURNING ${fields}`,
-    [
-      req.params.companyId,
-      req.session.userId,
-      name,
-      objective,
-      budgetCents
-    ]
-  );
-
-  res.status(201).json({ campaign: result.rows[0] });
-});
-
-router.delete(
-  "/:companyId/campaigns/:campaignId",
+router.post(
+  '/:companyId/campaigns',
   access,
+  briefingMiddleware,
   async (req, res) => {
-    const result = await pool.query(
-      `DELETE FROM campaigns
-       WHERE id = $1
-         AND company_id = $2
-         AND status = 'draft'
-       RETURNING id`,
-      [req.params.campaignId, req.params.companyId]
-    );
+    const name = typeof req.body?.name === 'string' ? req.body.name.trim() : ''
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({
-        error: "Rascunho não encontrado nesta clínica."
-      });
-    }
-
-    res.json({ ok: true });
-  }
-);
-
-router.put(
-  "/:companyId/campaigns/:campaignId",
-  access,
-  async (req, res) => {
-    const name =
-      typeof req.body?.name === "string" ? req.body.name.trim() : "";
-
-    const objective = req.body?.objective;
-    const budgetCents = req.body?.budgetCents;
+    const objective = req.body?.objective
+    const budgetCents = req.body?.budgetCents
 
     if (
       !name ||
@@ -156,15 +93,85 @@ router.put(
       budgetCents > 10000000
     ) {
       return res.status(400).json({
-        error: "Informe nome, objetivo válido e orçamento entre R$ 1 e R$ 100.000."
-      });
+        error:
+          'Informe nome, objetivo válido e orçamento entre R$ 1 e R$ 100.000.'
+      })
+    }
+
+    const result = await pool.query(
+      `INSERT INTO campaigns (
+       company_id,
+       created_by,
+       name,
+       objective,
+       budget_cents,
+       briefing
+     )
+     VALUES ($1, $2, $3, $4, $5, $6::jsonb)
+     RETURNING ${fields}`,
+      [
+        req.params.companyId,
+        req.session.userId,
+        name,
+        objective,
+        budgetCents,
+        JSON.stringify(req.briefing ?? {})
+      ]
+    )
+
+    res.status(201).json({ campaign: result.rows[0] })
+  }
+)
+
+router.delete('/:companyId/campaigns/:campaignId', access, async (req, res) => {
+  const result = await pool.query(
+    `DELETE FROM campaigns
+       WHERE id = $1
+         AND company_id = $2
+         AND status = 'draft'
+       RETURNING id`,
+    [req.params.campaignId, req.params.companyId]
+  )
+
+  if (result.rowCount === 0) {
+    return res.status(404).json({
+      error: 'Rascunho não encontrado nesta clínica.'
+    })
+  }
+
+  res.json({ ok: true })
+})
+
+router.put(
+  '/:companyId/campaigns/:campaignId',
+  access,
+  briefingMiddleware,
+  async (req, res) => {
+    const name = typeof req.body?.name === 'string' ? req.body.name.trim() : ''
+
+    const objective = req.body?.objective
+    const budgetCents = req.body?.budgetCents
+
+    if (
+      !name ||
+      name.length > 120 ||
+      !objectives.has(objective) ||
+      !Number.isInteger(budgetCents) ||
+      budgetCents < 100 ||
+      budgetCents > 10000000
+    ) {
+      return res.status(400).json({
+        error:
+          'Informe nome, objetivo válido e orçamento entre R$ 1 e R$ 100.000.'
+      })
     }
 
     const result = await pool.query(
       `UPDATE campaigns
        SET name = $1,
            objective = $2,
-           budget_cents = $3
+           budget_cents = $3,
+           briefing = COALESCE($6::jsonb, briefing)
        WHERE id = $4
          AND company_id = $5
          AND status = 'draft'
@@ -174,18 +181,19 @@ router.put(
         objective,
         budgetCents,
         req.params.campaignId,
-        req.params.companyId
+        req.params.companyId,
+        req.briefing === null ? null : JSON.stringify(req.briefing)
       ]
-    );
+    )
 
     if (result.rowCount === 0) {
       return res.status(404).json({
-        error: "Rascunho não encontrado nesta clínica."
-      });
+        error: 'Rascunho não encontrado nesta clínica.'
+      })
     }
 
-    res.json({ campaign: result.rows[0] });
+    res.json({ campaign: result.rows[0] })
   }
-);
+)
 
-module.exports = router;
+module.exports = router

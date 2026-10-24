@@ -452,3 +452,57 @@ main.login-card {
 @media (max-width: 500px) {
   main.login-card { padding: 28px 24px; }
 }
+
+.briefing-section {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.briefing-section summary {
+  cursor: pointer;
+  color: var(--purple);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.briefing-section summary:focus-visible {
+  outline: 3px solid #b9a4ff;
+  outline-offset: 4px;
+}
+
+.briefing-section label {
+  display: block;
+  margin: 18px 0 7px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.briefing-section input,
+.briefing-section textarea {
+  display: block;
+  width: 100%;
+}
+
+.briefing-section textarea {
+  padding: 11px 12px;
+  border: 1px solid #dfe2ec;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+  resize: vertical;
+  min-height: 85px;
+}
+
+.briefing-section textarea:focus {
+  outline: 2px solid #b9a4ff;
+  outline-offset: 2px;
+}
+
+.briefing-section input:disabled,
+.briefing-section textarea:disabled {
+  background: #f5f6fa;
+  color: var(--text);
+  opacity: 1;
+}
