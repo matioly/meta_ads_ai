@@ -191,4 +191,83 @@ companySelect.addEventListener("change", () => {
 
 search.addEventListener("input", render);
 
-changeView(currentView);
+async function loadProfile() {
+  const createButtons = [
+    $("#new-campaign"),
+    $("#hero-create"),
+    $("#empty-create")
+  ];
+
+  createButtons.forEach((button) => {
+    button.disabled = true;
+  });
+
+  try {
+    const response = await fetch("/api/me", {
+      credentials: "same-origin",
+      cache: "no-store"
+    });
+
+    if (response.status === 401) {
+      window.location.replace("/login");
+      return;
+    }
+
+    if (!response.ok) throw new Error("Falha ao carregar seu acesso.");
+
+    const data = await response.json();
+
+    $("#user-name").textContent = data.user.name;
+    companySelect.replaceChildren();
+
+    for (const company of data.companies) {
+      const option = document.createElement("option");
+      option.value = company.id;
+      option.textContent = company.name;
+      companySelect.append(option);
+    }
+
+    if (data.companies.length === 0) {
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "Nenhuma clínica vinculada";
+      companySelect.append(option);
+      notify("Seu usuário ainda não tem uma clínica vinculada.");
+    }
+
+    companySelect.disabled = data.companies.length === 0;
+
+    createButtons.forEach((button) => {
+      button.disabled = data.companies.length === 0;
+    });
+
+    changeView(currentView);
+  } catch {
+    notify("Não foi possível carregar seu acesso. Atualize a página.");
+  }
+}
+
+$("#logout").addEventListener("click", async () => {
+  const button = $("#logout");
+  button.disabled = true;
+
+  try {
+    const response = await fetch("/api/logout", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: "{}"
+    });
+
+    if (!response.ok && response.status !== 401) {
+      throw new Error("Falha ao sair.");
+    }
+
+    window.location.replace("/login");
+  } catch {
+    notify("Não foi possível sair. Tente novamente.");
+    button.disabled = false;
+  }
+});
+
+loadProfile();

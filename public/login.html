@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar | Meta Ads AI</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/login.js" defer></script>
+</head>
+<body class="login-page">
+  <main class="login-card">
+    <div class="login-brand">
+      <span class="brand-symbol">ai</span>
+      <strong>Meta Ads AI</strong>
+    </div>
+
+    <p class="eyebrow">SEU CENTRO DE CAMPANHAS</p>
+    <h1>Bem-vindo de volta.</h1>
+    <p>Entre para acessar suas clínicas e preparar suas campanhas.</p>
+
+    <form id="login-form">
+      <label for="email">E-mail</label>
+      <input id="email" type="email" autocomplete="username"
+        maxlength="254" required placeholder="voce@empresa.com">
+
+      <label for="password">Senha</label>
+      <input id="password" type="password"
+        autocomplete="current-password" required>
+
+      <p id="login-error" class="login-error"
+        role="alert" hidden></p>
+
+      <button id="login-submit" class="primary login-submit">
+        Entrar no painel
+      </button>
+    </form>
+
+    <p class="login-footnote">
+      Acesso restrito a usuários cadastrados.
+    </p>
+  </main>
+</body>
+</html>

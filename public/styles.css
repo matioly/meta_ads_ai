@@ -400,3 +400,55 @@ form > input, form > select { width: 100%; }
   .metric strong { font-size: 23px; overflow-wrap: anywhere; }
   .page-footer { flex-direction: column; }
 }
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 15% 20%, #7450e826, transparent 40%),
+    radial-gradient(circle at 85% 80%, #b9a4ff26, transparent 40%),
+    #f5f6fa;
+}
+
+main.login-card {
+  width: 100%;
+  max-width: 460px;
+  margin: 0;
+  padding: 40px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 20px 80px #2024380d;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 36px;
+  font-size: 20px;
+}
+
+.login-brand .brand-symbol { color: #fff; }
+.login-card h1 { font-size: 28px; }
+.login-card > p { font-size: 13px; }
+.login-submit { width: 100%; margin-top: 26px; }
+.login-error {
+  margin: 16px 0 0;
+  padding: 12px;
+  border-radius: 8px;
+  color: #a02f48;
+  background: #fff0f3;
+  font-size: 13px;
+}
+.login-footnote {
+  margin: 24px 0 0;
+  text-align: center;
+  font-size: 11px !important;
+}
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+
+@media (max-width: 500px) {
+  main.login-card { padding: 28px 24px; }
+}

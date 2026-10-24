@@ -16,10 +16,9 @@
     </a>
 
     <div class="workspace">
-      <label for="company">ESPAÇO DE TRABALHO · PRÉVIA</label>
+      <label for="company">ESPAÇO DE TRABALHO</label>
       <select id="company">
-        <option value="sorriso">Sorriso de Campinas</option>
-        <option value="alps">Alps Oral Clinic</option>
+        <option value="">Carregando clínicas…</option>
       </select>
     </div>
 
@@ -51,14 +50,17 @@
       <span>Workspace <span class="separator">/</span>
         <strong id="company-name">Sorriso de Campinas</strong>
       </span>
-      <span class="preview-badge">Prévia do painel</span>
+      <div class="topbar-actions">
+        <span class="preview-badge" id="user-name">Carregando…</span>
+        <button class="secondary" id="logout" type="button">Sair</button>
+      </div>
     </header>
 
     <main>
       <div class="notice">
-        <strong>Modo demonstração</strong>
-        Sem login ou conexão com anúncios. Rascunhos temporários:
-        atualizar a página apaga os dados desta prévia.
+        <strong>Campanhas em demonstração</strong>
+        Login ativo. Os rascunhos ainda são temporários e desaparecem
+        ao atualizar a página. Nenhum anúncio será publicado.
       </div>
 
       <div class="page-heading">
