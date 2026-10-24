@@ -20,6 +20,7 @@
   "homepage": "https://github.com/matioly/meta_ads_ai#readme",
   "dependencies": {
     "dotenv": "^18.0.9",
-    "express": "^5.3.0"
+    "express": "^5.3.0",
+    "pg": "^8.23.1"
   }
 }
