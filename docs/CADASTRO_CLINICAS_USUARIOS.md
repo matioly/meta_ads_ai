@@ -39,7 +39,7 @@ JSON: `{"name":"Ana Souza","email":"ana@example.com","password":"uma-senha-forte
 
 ## Atenção ao modelo de papéis
 
-O schema histórico e documentos antigos citam `member`; a nova UI e endpoint criam `viewer`. Confirmar as restrições efetivas da migration de `company_members` antes de cadastrar usuário viewer em produção: a API pode aceitar `viewer`, mas um CHECK SQL antigo pode rejeitar. **Esse ponto exige teste real e, se necessário, migration corretiva**. O middleware `company-access.js` permite leitura a qualquer membro e escrita somente a owner/admin, portanto o papel viewer funciona logicamente se persistido. Documentar explicitamente essa diferença e não afirmar que o cadastro viewer foi homologado.
+O schema histórico e documentos antigos citam `member`; a nova UI e endpoint criam `viewer`. **INCOMPATIBILIDADE CONFIRMADA NO CÓDIGO:** `src/migrations/001_initial.sql` define `CHECK (role IN ('owner', 'admin', 'member'))`, enquanto `src/workspace-admin.js` tenta inserir `viewer`. Sem alteração posterior do CHECK, o PostgreSQL rejeitará a criação de viewer (violação `23514`), e a rota poderá retornar erro genérico. **Pendência de correção funcional:** criar migration que inclua `viewer` ou alinhar o papel persistido a `member`, com testes. Não tratar cadastro de viewer como funcional até resolver. O middleware `company-access.js` permite leitura a qualquer membro e escrita somente a owner/admin, portanto o papel viewer funciona logicamente se persistido. Documentar explicitamente essa diferença e não afirmar que o cadastro viewer foi homologado.
 
 ## Segurança e isolamento
 
@@ -57,7 +57,7 @@ Convites por e-mail, associação de usuário existente a outra clínica, ediç�
 
 1. Owner logado cria clínica de teste; HTTP 201; ela aparece após recarga; vínculo owner confirmado.
 2. Owner cria admin novo com e-mail único; login do novo usuário; acesso apenas à clínica vinculada; escrita permitida onde apropriado.
-3. Owner cria viewer novo; login; leitura permitida; tentativas de POST/PUT/DELETE retornam 403. **Verificar CHECK do banco antes**.
+3. Owner cria viewer novo; login; leitura permitida; tentativas de POST/PUT/DELETE retornam 403. **Corrigir CHECK SQL primeiro**.
 4. Admin tenta criar usuário: 403. Usuário sem vínculo tenta listar usuários de outra clínica: 403.
 5. E-mail repetido: 409. Nome/cidade/UF/senha/e-mail inválidos: 400. Não aceitar senha fraca.
 6. Troca de clínica atualiza lista de membros; logout/login preservam dados.
