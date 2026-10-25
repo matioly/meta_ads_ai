@@ -1,3 +1,12 @@
+## Atualização vigente — 25/10/2026
+
+- **META04.1 CONCLUÍDA e validada em produção:** campanha real `Teste Integracao API`, ID `120249780034580576`, objetivo Engajamento, status PAUSED, criada e consultada no painel da Alps. Sem conjuntos ou anúncios. Parâmetro exigido pela Meta: `is_adset_budget_sharing_enabled=false` (erro 100/subcódigo 4834011).
+- **META04.2A em PR:** prévia de conjunto sem qualquer chamada de escrita à Meta; campanha pausada, nome, Brasil, idades e orçamento diário; validação de campos e escopo da clínica.
+- **META04.2B a fazer:** definir optimization_goal/billing_event/destination_type e promoted_object conforme objetivo e conta; confirmar disponibilidade de página e destino WhatsApp; seleção de regiões (Campinas/raio) e posicionamentos; orçamento e datas; criação PAUSED somente após aprovação, proteção durável contra duplicações e testes.
+- **META04.3:** criativos/anúncios a partir de mídia autorizada (links Drive por si só não dão acesso binário à Meta).
+- **Pendência paralela:** consultas `meta-connection` e `meta-insights` exibiram HTTP 400 em uma sessão; diagnosticar separadamente, sem comprometer a criação validada.
+- **Segurança:** não habilitar veiculação automática; nenhuma automação de gastos autorizada. As seções históricas abaixo preservam o planejamento anterior.
+
 # Backlog e evolução
 
 Data-base: 24/10/2026. Este é um plano proposto, não uma lista de funcionalidades prontas. Prioridades podem mudar; os IDs permanecem estáveis.
