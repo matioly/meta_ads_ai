@@ -1,3 +1,7 @@
+## META03.2 — validação pendente
+
+PR META03.2 adiciona endpoint GET /api/companies/:companyId/meta-insights e cards na página /meta-campaigns.html. Testar no Railway após merge/deploy com Alps: 7 dias, 30 dias, hoje e intervalo personalizado. Comparar gastos, alcance e cliques com Gerenciador de Anúncios no mesmo período/fuso. Ausência do evento de conversa é exibida como indisponível, não zero. Nenhum anúncio é alterado. META03.1 já validada manualmente pelo operador: 1 campanha, 1 conjunto com R$30/dia e 5 anúncios.
+
 ## META03.1 — próximo teste operacional
 
 PR META03.1 implementa abas Campanhas, Conjuntos e Anúncios em /meta-campaigns.html, com status/objetivos traduzidos e consulta read-only. Depois de merge/deploy, conferir três abas na Alps, comparando com Gerenciador de Anúncios. O acesso a criativos ou campos de segmentação pode variar conforme permissões; erro da API será mostrado sem revelar token. Não há paginação nem métricas de desempenho nesta etapa.

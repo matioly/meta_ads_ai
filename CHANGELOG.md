@@ -1,3 +1,7 @@
+## 24/10/2026 — META03.2: indicadores de desempenho (PR em revisão)
+
+Consulta read-only ao Insights da conta de anúncios, com filtros hoje, 7 dias, 30 dias e intervalo personalizado (máximo 366 dias). Indicadores: gasto, alcance, impressões, cliques, cliques no link, CPC calculado e evento de conversas iniciadas quando retornado. Fonte e datas mostradas no painel; token exclusivo no servidor; nenhuma alteração de anúncios. Teste real em produção ainda pendente. Limitações: agregação no nível da conta, sem breakdown por campanha, atribuição conforme Meta, evento de conversas pode não estar disponível.
+
 ## 24/10/2026 — META03.1: campanhas, conjuntos e anúncios
 
 Implementação em PR: três abas na tela de campanhas reais, consulta somente leitura por clínica a /campaigns, /adsets e /ads da Graph API, tradução de status/objetivos, resumo de regiões, orçamento, programação e referência ao criativo. Não altera Meta, não publica anúncios e não expõe token. Primeiros 100 itens por nível; paginação e métricas permanecem pendentes. Teste em produção após merge/deploy ainda necessário.
