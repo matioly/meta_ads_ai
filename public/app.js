@@ -15,6 +15,7 @@ let loaded = false
 let loadMessage = 'Carregando rascunhos…'
 let toastTimer
 let userSelectedView = null
+let currentView = null
 
 const money = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -99,6 +100,7 @@ function notify (message) {
 
 function changeView (view) {
   if (!pages[view]) view = 'overview'
+  currentView = view
   // Apply route state before updating any visible section to avoid intermediate overview frames.
   document.documentElement.dataset.activeView = view
   $('#page-title').textContent = pages[view].title
@@ -428,6 +430,11 @@ companySelect.addEventListener('change', () => {
 search.addEventListener('input', render)
 
 async function loadProfile () {
+  // Establish the requested view before the first network request, not after drafts load.
+  // This prevents the default overview state from surviving during initialization.
+  if (currentView === null) {
+    changeView(new URLSearchParams(location.search).get('view') || 'overview')
+  }
   busy = true
   render()
 
@@ -445,8 +452,8 @@ async function loadProfile () {
     }
 
     await loadDrafts()
-    // A late profile response must not override a view already chosen by the user.
-    changeView(userSelectedView || new URLSearchParams(location.search).get('view') || 'overview')
+    // Initialization updates data only: it must never reset an already-selected view.
+    // The route was established synchronously before the first await.
   } catch (error) {
     loadMessage = error.message + ' Atualize a página para tentar novamente.'
   } finally {
