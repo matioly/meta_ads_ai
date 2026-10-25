@@ -14,6 +14,7 @@ let busy = false
 let loaded = false
 let loadMessage = 'Carregando rascunhos…'
 let toastTimer
+let userSelectedView = null
 
 const money = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -122,7 +123,8 @@ function changeView (view) {
   })
 
   render()
-  if (typeof window.loadHomeMeta === 'function') window.loadHomeMeta()
+  // Meta overview refresh is independent from menu navigation.
+  if (view === 'overview' && typeof window.loadHomeMeta === 'function') window.loadHomeMeta()
 }
 
 function addCell (row, text) {
@@ -411,7 +413,10 @@ form.addEventListener('submit', async event => {
 })
 
 document.querySelectorAll('[data-view]').forEach(button => {
-  button.addEventListener('click', () => changeView(button.dataset.view))
+  button.addEventListener('click', () => {
+    userSelectedView = button.dataset.view
+    changeView(userSelectedView)
+  })
 })
 
 companySelect.addEventListener('change', () => {
@@ -440,8 +445,8 @@ async function loadProfile () {
     }
 
     await loadDrafts()
-    changeView(new URLSearchParams(location.search).get('view') || 'overview')
-    if (typeof window.loadHomeMeta === 'function') window.loadHomeMeta()
+    // A late profile response must not override a view already chosen by the user.
+    changeView(userSelectedView || new URLSearchParams(location.search).get('view') || 'overview')
   } catch (error) {
     loadMessage = error.message + ' Atualize a página para tentar novamente.'
   } finally {
