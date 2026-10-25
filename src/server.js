@@ -192,6 +192,7 @@ app.use("/api/companies", requireLogin, require("./meta-create-campaign"));
 app.use("/api/companies", requireLogin, require("./meta-interests"));
 app.use("/api/companies", requireLogin, require("./meta-adset-preview"));
 app.use("/api/companies", requireLogin, require("./meta-create-adset"));
+app.use("/api/companies", requireLogin, require("./meta-activate-ads"));
 app.use("/api/companies", requireLogin, require("./creative-drafts"));
 app.use("/api/companies", requireLogin, require("./meta-video-ads"));
 
