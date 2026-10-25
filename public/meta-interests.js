@@ -8,13 +8,13 @@
   if(q.length<2)return;
   timer=setTimeout(async()=>{
    try{
-    const company=document.querySelector("#company")?.value||new URLSearchParams(location.search).get("companyId");
+    const company=document.querySelector("#company-select")?.value||document.querySelector("#company")?.value||window.select?.value;
     if(!company){results.textContent="Selecione uma clínica.";return;}
     const response=await fetch("/api/companies/"+encodeURIComponent(company)+"/meta-interests?q="+encodeURIComponent(q),{credentials:"same-origin"});
     const data=await response.json();if(seq!==sequence)return;
     if(!response.ok)throw Error(data.error||"Falha na busca");
     results.replaceChildren();
-    for(const item of data.items||[]){if(chosen.has(item.id))continue;const button=document.createElement("button");button.type="button";button.className="secondary";button.style.margin="4px";button.textContent="+ "+item.name;button.addEventListener("click",()=>{chosen.set(item.id,item.name);render();button.remove()});results.append(button);}
+    for(const item of data.items||[]){if(chosen.has(item.id))continue;const button=document.createElement("button");button.type="button";button.className="secondary";button.style.margin="4px";button.textContent="+ "+item.name;button.addEventListener("click",()=>{chosen.set(item.id,item.name);render();button.remove();document.querySelector("#adset-preview-form").dispatchEvent(new Event("input",{bubbles:true}))});results.append(button);}
     if(!results.children.length)results.textContent="Nenhum interesse disponível para esta busca.";
    }catch(e){if(seq===sequence)results.textContent=e.message;}
   },350);
