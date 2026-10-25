@@ -4,8 +4,8 @@
  function reset(){window.benchmarkAiReset?.();request++;$("benchmark-auto-refresh").hidden=true;window.benchmarkSelectedCompetitor=null;$("benchmark-auto-results").replaceChildren();}
  window.benchmarkAutoReset=reset;
  window.benchmarkAutoSearch=async competitor=>{
-  window.benchmarkSelectedCompetitor=competitor;
   window.benchmarkAdsOpen(competitor,true);
+  window.benchmarkSelectedCompetitor=competitor;
   $("benchmark-auto-refresh").hidden=false;
   const current=++request;
   const root=$("benchmark-auto-results");root.replaceChildren();
