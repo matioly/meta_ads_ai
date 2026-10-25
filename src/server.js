@@ -189,6 +189,7 @@ app.use("/api/companies", requireLogin, require("./meta-connection"));
 app.use("/api/companies", requireLogin, require("./meta-campaigns"));
 app.use("/api/companies", requireLogin, require("./meta-insights"));
 app.use("/api/companies", requireLogin, require("./meta-create-campaign"));
+app.use("/api/companies", requireLogin, require("./meta-adset-preview"));
 
 app.get("/api/me", requireLogin, async (req, res) => {
   const result = await pool.query(

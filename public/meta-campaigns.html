@@ -1,7 +1,7 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Campanhas reais | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><script src="/meta-campaigns.js" defer></script><script src="/meta-create-campaign.js" defer></script></head>
+<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Campanhas reais | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><script src="/meta-campaigns.js" defer></script><script src="/meta-create-campaign.js" defer></script><script src="/meta-adset-preview.js" defer></script></head>
 <body><main style="max-width:1250px;margin:32px auto;padding:20px">
-<p><a href="/">← Voltar ao painel</a></p><p class="eyebrow">META03.2 · CONSULTA SOMENTE LEITURA</p>
-<h1>Campanhas reais da Meta</h1><p>Consulte campanhas, conjuntos e anúncios existentes. Nenhuma alteração é enviada à Meta.</p>
+<p><a href="/">← Voltar ao painel</a></p><p class="eyebrow">META04 · CONSULTA E CRIAÇÃO CONTROLADA</p>
+<h1>Campanhas reais da Meta</h1><p>Consulte campanhas, conjuntos e anúncios. A criação de campanhas pausadas exige confirmação; o planejamento de conjuntos não envia alterações à Meta.</p>
 <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:18px 0">
 <label for="meta-company">Clínica</label><select id="meta-company"><option>Carregando…</option></select>
 <button id="refresh" class="primary" type="button">Atualizar dados</button></div>
@@ -35,6 +35,21 @@
 <input id="meta-create-name" required maxlength="120" placeholder="Ex.: TESTE Alps - Integração API">
 <button type="submit" class="primary" id="meta-create-button">Revisar e criar pausada</button>
 </form><p id="meta-create-feedback" role="status" aria-live="polite"></p>
+</section>
+<section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="adset-preview-title">
+<h2 id="adset-preview-title">META04.2A · Planejar conjunto de anúncios</h2>
+<p>Simulação local: valida os campos e mostra o plano. <strong>Não cria conjunto nem altera a Meta.</strong> Região inicial: Brasil. Público: 18 a 65 anos.</p>
+<form id="adset-preview-form">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
+<label>Campanha pausada<select id="adset-campaign" required><option value="">Carregando campanhas…</option></select></label>
+<label>Nome do conjunto<input id="adset-name" maxlength="120" required placeholder="Ex.: Alps · Brasil · 25–55"></label>
+<label>Idade mínima<input id="adset-age-min" type="number" min="18" max="65" value="25" required></label>
+<label>Idade máxima<input id="adset-age-max" type="number" min="18" max="65" value="55" required></label>
+<label>Orçamento diário (R$)<input id="adset-budget" type="number" min="10" max="10000" step="0.01" value="30" required></label>
+</div>
+<button type="submit" class="secondary" id="adset-preview-button" style="margin-top:12px">Revisar configuração (sem criar)</button>
+</form><p id="adset-preview-feedback" role="status" aria-live="polite"></p>
+<pre id="adset-preview-result" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
 </section>
 <p id="feedback" role="status" aria-live="polite">Carregando…</p>
 <div class="table-wrapper"><table><caption id="table-caption">Campanhas da Meta</caption><thead><tr id="headers"></tr></thead><tbody id="campaigns"></tbody></table></div>

@@ -25,7 +25,7 @@ if(result.hasMore)note.textContent="Existem mais de 100 registros. A paginação
 }catch(e){if(current===requestId)feedback.textContent=e.message;}finally{if(current===requestId){refresh.disabled=false;select.disabled=false;}}}
 refresh.addEventListener("click",load);select.addEventListener("change",load);
 document.querySelectorAll("[data-type]").forEach(button=>button.addEventListener("click",()=>{if(button.dataset.type===type)return;type=button.dataset.type;load();}));
-(async()=>{try{const profile=await get("/api/me");select.replaceChildren();for(const company of profile.companies){const option=document.createElement("option");option.value=company.id;option.textContent=company.name;select.append(option);}const alps=profile.companies.find(c=>c.name.toLowerCase().includes("alps"));if(alps)select.value=alps.id;if(!select.value){feedback.textContent="Nenhuma clínica vinculada.";return;}await load();}catch(e){feedback.textContent=e.message;}})();
+(async()=>{try{const profile=await get("/api/me");select.replaceChildren();for(const company of profile.companies){const option=document.createElement("option");option.value=company.id;option.textContent=company.name;select.append(option);}const alps=profile.companies.find(c=>c.name.toLowerCase().includes("alps"));if(alps)select.value=alps.id;if(!select.value){feedback.textContent="Nenhuma clínica vinculada.";return;}select.dispatchEvent(new Event("meta-company-ready"));await load();}catch(e){feedback.textContent=e.message;}})();
 
 const periodSelect=document.querySelector("#insights-period");
 const sinceInput=document.querySelector("#insights-since");
