@@ -1,3 +1,9 @@
+## Estado atual — META02 validada / META03 aguardando deploy
+
+Em 24/10/2026, o operador confirmou merge e deploy do PR #2; chamada autenticada `GET /api/companies/:companyId/meta-connection` retornou HTTP 200 e `connected: true` para Alps. Token exclusivo `META_ACCESS_TOKEN` configurado no serviço meta_ads_ai do Railway; nunca expor em logs, prints, commits ou frontend. Não alterar o bot de WhatsApp.
+
+META03 implementa a primeira consulta de campanhas existentes, somente leitura, em `/meta-campaigns.html` e `GET /api/companies/:companyId/meta-campaigns`. Após merge e deploy, entrar no painel, selecionar Alps, ir a Integrações → Consultar campanhas reais e conferir dados com o Gerenciador de Anúncios. Teste de produção META03 ainda pendente. Exibe até 100 registros, sem paginação. Não cria, edita, pausa nem publica anúncios; não fornece métricas de performance.
+
 # Retomada do projeto
 
 Atualizado em 24/10/2026. Código de referência: 8860d6e.
