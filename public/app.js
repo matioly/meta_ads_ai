@@ -323,7 +323,7 @@ function openDialog (draft = null) {
 }
 
 $('#new-campaign').addEventListener('click', () => openDialog())
-$('#hero-create').addEventListener('click', () => openDialog())
+$('#hero-create')?.addEventListener('click', () => openDialog())
 $('#empty-create').addEventListener('click', () => openDialog())
 
 $('#close-dialog').addEventListener('click', () => dialog.close())
