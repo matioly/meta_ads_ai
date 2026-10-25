@@ -26,6 +26,7 @@
    library.searchParams.set("active_status","active");library.searchParams.set("ad_type","all");library.searchParams.set("country","BR");library.searchParams.set("q",c.name);
    link("Ver anúncios ↗",library.toString());
    const analyze=document.createElement("button");analyze.className="secondary";analyze.type="button";analyze.textContent="Analisar anúncios";analyze.onclick=()=>window.benchmarkAdsOpen(c,canWrite());actions.append(analyze);
+   if(canWrite()){const auto=document.createElement("button");auto.type="button";auto.className="primary";auto.textContent="🔄 Buscar anúncios";auto.onclick=()=>window.benchmarkAutoSearch(c);actions.append(auto);}
    if(canWrite()){
     const edit=document.createElement("button");edit.className="secondary";edit.textContent="Editar";edit.onclick=()=>open(c);
     const del=document.createElement("button");del.className="remove-button";del.textContent="Excluir";del.onclick=()=>remove(c);
