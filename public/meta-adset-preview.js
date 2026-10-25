@@ -11,6 +11,7 @@ async function refreshAdsetCampaigns(){
   resetAdsetApproval();
   adsetCampaign.replaceChildren();
   adsetResult.textContent="";
+  adsetFeedback.textContent="";
   if(!select.value)return;
   try{
     const r=await fetch("/api/companies/"+encodeURIComponent(select.value)+"/meta-campaigns?type=campaigns",{credentials:"same-origin"});
