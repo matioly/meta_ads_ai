@@ -12,7 +12,7 @@
  function diagnosticText(d){
   if(!d||!Array.isArray(d.checks))return "";
   return ["Campanha: "+d.campaignId+" | Conjunto: "+d.adsetId,
-   ...d.checks.map(c=>(c.ok?"OK":"AJUSTAR")+" — "+c.label+": "+(c.actual??"não informado")+"; esperado: "+c.expected),
+   ...d.checks.map(c=>(c.warning?"ATENÇÃO":c.ok?"OK":"AJUSTAR")+" — "+c.label+": "+(c.actual??"não informado")+"; esperado: "+c.expected+(c.warning?"\n"+c.warning:"")),
    d.compatible?"Configuração de campanha/conjunto compatível. Isso não valida vídeo, Página ou criativo.":"Corrija os campos marcados AJUSTAR e confira os vínculos salvos na etapa 3."
   ].join("\n");
  }
