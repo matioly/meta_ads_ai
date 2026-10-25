@@ -42,4 +42,4 @@ adsetForm.addEventListener("submit",async e=>{
   }catch(e){adsetFeedback.textContent=e.message;}finally{adsetButton.disabled=false;}
 });
 select.addEventListener("change",refreshAdsetCampaigns);
-window.addEventListener("load",refreshAdsetCampaigns);
+select.addEventListener("meta-company-ready",refreshAdsetCampaigns);
