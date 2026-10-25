@@ -120,7 +120,14 @@ function changeView (view) {
   })
 
   render()
-  if (typeof window.loadHomeMeta === 'function') window.loadHomeMeta()
+  if (view === 'overview' || view === 'campaigns') {
+    if (typeof window.loadHomeMeta === 'function') window.loadHomeMeta()
+  }
+  const url = new URL(window.location.href)
+  if (url.searchParams.get('view') !== view) {
+    url.searchParams.set('view', view)
+    window.history.replaceState(null, '', url)
+  }
 }
 
 function addCell (row, text) {
@@ -437,8 +444,8 @@ async function loadProfile () {
       companySelect.append(option)
     }
 
-    await loadDrafts()
     changeView(new URLSearchParams(location.search).get('view') || 'overview')
+    await loadDrafts()
     if (typeof window.loadHomeMeta === 'function') window.loadHomeMeta()
   } catch (error) {
     loadMessage = error.message + ' Atualize a página para tentar novamente.'
@@ -471,5 +478,7 @@ $('#logout').addEventListener('click', async () => {
   }
 })
 
+// Set the requested view before asynchronous profile and clinic loading.
+changeView(new URLSearchParams(location.search).get('view') || 'overview')
 // Initialization runs from media-library.js after both scripts have loaded.
 
