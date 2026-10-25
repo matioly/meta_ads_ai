@@ -39,10 +39,11 @@
    window.benchmarkAiLoad?.(competitor,data.ads);
   }catch(e){if(current===request)status.textContent="Não foi possível carregar os anúncios salvos: "+e.message+" Use Atualizar anúncios ou tente novamente."; }
  };
+ $("benchmark-auto-refresh").addEventListener("click",()=>window.benchmarkAutoRefresh());
  window.benchmarkAutoRefresh=async()=>{
   const root=$("benchmark-auto-results");
   const refresh=$("benchmark-auto-refresh");
-  if(!window.benchmarkSelectedCompetitor)return;
+  if(!window.benchmarkSelectedCompetitor){root.prepend(document.createTextNode("Selecione Ver anúncios salvos antes de atualizar."));return;}
   const c=window.benchmarkSelectedCompetitor;
   refresh.disabled=true;refresh.textContent="Consultando Apify…";
   const status=document.createElement("p");status.textContent="Atualizando anúncios na Apify. Aguarde; esta operação pode gerar cobrança.";root.prepend(status);
