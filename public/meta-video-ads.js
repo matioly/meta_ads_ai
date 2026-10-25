@@ -1,43 +1,60 @@
-// Two explicit confirmation gates. Never sends ACTIVE to Meta.
+// Publishing controls driven by server-side video readiness. All writes remain PAUSED.
 (function(){
  const $=id=>document.getElementById(id);
- const saved=$("creative-saved"),company=$("meta-company"),status=$("meta-video-status");
- const upload=$("meta-video-upload"),create=$("meta-ad-create");
- const publish=$("meta-publish-draft");
+ const company=$("meta-company"),status=$("meta-video-status"),upload=$("meta-video-upload"),create=$("meta-ad-create"),publish=$("meta-publish-draft");
  status.style.whiteSpace="pre-line";
- let busy=false;
- function selected(){return publish.value;}
- function refresh(){
-  const id=selected();
-  upload.disabled=busy||!id;create.disabled=busy||!id;
-  if(!id){status.textContent="Selecione um anúncio preparado acima para continuar.";return;}
-  if(!busy)status.textContent="Anúncio selecionado. Envie o vídeo e depois crie o anúncio pausado.";
+ let busy=false,state="loading",timer=null,requestId=0;
+ const selected=()=>publish.value;
+ const url=(id,kind)=>"/api/companies/"+encodeURIComponent(company.value)+"/creative-drafts/"+encodeURIComponent(id)+"/"+kind;
+ function buttons(){
+  const valid=Boolean(selected()&&company.value);
+  upload.disabled=busy||!valid||state!=="not_uploaded";
+  create.disabled=busy||!valid||state!=="ready";
+ }
+ function label(data){
+  if(data.state==="not_uploaded")return "Vídeo ainda não enviado. Envie para a Meta antes de criar o anúncio.";
+  if(data.state==="processing")return "Vídeo enviado (ID: "+data.videoId+"). A Meta está processando a capa. Verificando automaticamente…";
+  if(data.state==="ready")return "Vídeo pronto (ID: "+data.videoId+"). Você já pode criar o anúncio pausado.";
+  if(data.state==="ad_created")return "Anúncio já criado na Meta com status PAUSADO! ID: "+data.adId+". Não é necessário criar novamente.";
+  return "Consultando o estado do vídeo…";
+ }
+ async function refresh(){
+  clearTimeout(timer);const seq=++requestId,id=selected(),cid=company.value;
+  state="loading";buttons();
+  if(!id||!cid){status.textContent="Selecione um anúncio preparado para continuar.";return;}
+  status.textContent="Verificando o vídeo na Meta…";
+  try{
+   const r=await fetch(url(id,"meta-video-status"),{credentials:"same-origin",cache:"no-store"});
+   const data=await r.json();
+   if(seq!==requestId)return;
+   if(!r.ok)throw Error(data.error||"Não foi possível verificar o vídeo.");
+   state=data.state;status.textContent=label(data);buttons();
+   if(state==="processing")timer=setTimeout(refresh,10000);
+  }catch(e){
+   if(seq!==requestId)return;
+   state="error";status.textContent=e.message+" Atualize a seleção para tentar novamente.";buttons();
+  }
  }
  async function action(kind){
   const id=selected(),cid=company.value;
-  if(!id||!cid||busy){refresh();return;}
-  const readOnly=false;
+  if(!id||!cid||busy||(kind==="meta-video"&&state!=="not_uploaded")||(kind==="meta-paused-ad"&&state!=="ready"))return;
   const question=kind==="meta-video"?
-   "Enviar o vídeo deste rascunho para a biblioteca de vídeos da Meta? O vídeo será armazenado na Meta, mas nenhum anúncio será ativado.":
-   "Criar um anúncio PAUSADO na Meta usando o vídeo, campanha, público e texto deste rascunho? Nenhum anúncio será ativado.";
-  if(!readOnly&&!confirm(question))return;
-  busy=true;upload.disabled=true;create.disabled=true;status.textContent="Processando na Meta. Aguarde; não clique novamente.";
+   "Enviar este vídeo para a Meta? Nenhum anúncio será ativado.":
+   "Criar anúncio PAUSADO na Meta? Nenhum anúncio será ativado.";
+  if(!confirm(question))return;
+  busy=true;buttons();status.textContent="Processando na Meta. Aguarde; não clique novamente.";
   try{
-   const r=await fetch("/api/companies/"+encodeURIComponent(cid)+"/creative-drafts/"+encodeURIComponent(id)+"/"+kind,{
-    method:readOnly?"GET":"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},...(readOnly?{}:{body:JSON.stringify({confirm:true})})
-   });
+   const r=await fetch(url(id,kind),{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({confirm:true})});
    const ct=r.headers.get("content-type")||"";
-   if(!ct.includes("application/json"))throw Error("Resposta inesperada. Confira a Meta antes de tentar novamente.");
+   if(!ct.includes("application/json"))throw Error("Resposta inesperada. Confira a Meta antes de repetir.");
    const data=await r.json();
    if(!r.ok)throw Error([data.error,data.metaErrorDetail].filter(Boolean).join("\n"));
-   
-   if(kind==="meta-video")status.textContent="Vídeo registrado na Meta! ID: "+data.videoId+(data.reused?" (já enviado)":"")+". Agora você pode criar o anúncio pausado.";
-   else status.textContent="Anúncio criado na Meta com status PAUSADO! ID: "+data.adId+(data.reused?" (já existente)":"")+". Confira na aba Anúncios.";
-  }catch(e){status.textContent="Não foi possível concluir: "+e.message+" Se houver dúvida sobre o resultado, confira a Meta antes de repetir.";}
-  finally{busy=false;upload.disabled=!selected();create.disabled=!selected();}
+   status.textContent=kind==="meta-video"?"Vídeo enviado! Verificando processamento…":"Anúncio criado PAUSADO! ID: "+data.adId;
+  }catch(e){status.textContent="Não foi possível concluir: "+e.message+" Confira a Meta antes de repetir.";}
+  finally{busy=false;await refresh();}
  }
  publish.addEventListener("change",refresh);
- company.addEventListener("change",()=>{status.textContent="Selecione um rascunho da clínica.";refresh();});
+ company.addEventListener("change",refresh);
  upload.addEventListener("click",()=>action("meta-video"));
  create.addEventListener("click",()=>action("meta-paused-ad"));
  refresh();
