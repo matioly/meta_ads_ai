@@ -26,3 +26,42 @@ if(result.hasMore)note.textContent="Existem mais de 100 registros. A paginação
 refresh.addEventListener("click",load);select.addEventListener("change",load);
 document.querySelectorAll("[data-type]").forEach(button=>button.addEventListener("click",()=>{if(button.dataset.type===type)return;type=button.dataset.type;load();}));
 (async()=>{try{const profile=await get("/api/me");select.replaceChildren();for(const company of profile.companies){const option=document.createElement("option");option.value=company.id;option.textContent=company.name;select.append(option);}const alps=profile.companies.find(c=>c.name.toLowerCase().includes("alps"));if(alps)select.value=alps.id;if(!select.value){feedback.textContent="Nenhuma clínica vinculada.";return;}await load();}catch(e){feedback.textContent=e.message;}})();
+
+const periodSelect=document.querySelector("#insights-period");
+const sinceInput=document.querySelector("#insights-since");
+const untilInput=document.querySelector("#insights-until");
+const insightsFeedback=document.querySelector("#insights-feedback");
+const insightsRefresh=document.querySelector("#insights-refresh");
+const numberFormat=new Intl.NumberFormat("pt-BR");
+let insightsRequestId=0;
+function resetInsights(){for(const id of ["spend","reach","impressions","clicks","link-clicks","cpc","conversations"])document.querySelector("#insights-"+id).textContent="—";}
+periodSelect.addEventListener("change",()=>{const custom=periodSelect.value==="custom";sinceInput.disabled=!custom;untilInput.disabled=!custom;});
+async function loadInsights(){
+  if(!select.value)return;
+  const current=++insightsRequestId;
+  insightsRefresh.disabled=true;
+  resetInsights();
+  insightsFeedback.textContent="Consultando resultados…";
+  try{
+    const params=new URLSearchParams({period:periodSelect.value});
+    if(periodSelect.value==="custom"){if(!sinceInput.value||!untilInput.value)throw Error("Escolha as duas datas.");params.set("since",sinceInput.value);params.set("until",untilInput.value);}
+    const base="/api/companies/"+encodeURIComponent(select.value);
+    const [account,result]=await Promise.all([get(base+"/meta-connection"),get(base+"/meta-insights?"+params)]);
+    if(current!==insightsRequestId)return;
+    const curr=account.account?.currency||"BRL";
+    const moneyFormat=new Intl.NumberFormat("pt-BR",{style:"currency",currency:curr});
+    const set=(id,value)=>document.querySelector("#insights-"+id).textContent=value;
+    set("spend",moneyFormat.format(result.spend));
+    set("reach",numberFormat.format(result.reach));
+    set("impressions",numberFormat.format(result.impressions));
+    set("clicks",numberFormat.format(result.clicks));
+    set("link-clicks",numberFormat.format(result.linkClicks));
+    set("cpc",result.cpc===null?"—":moneyFormat.format(result.cpc));
+    set("conversations",result.messagingConversationsStarted===null?"Não disponível":numberFormat.format(result.messagingConversationsStarted));
+    insightsFeedback.textContent=(result.hasData?"Dados carregados":"Nenhum registro retornado")+" · "+(result.dates?result.dates.since+" a "+result.dates.until:"Período selecionado")+" · Fonte: "+result.source;
+  }catch(error){if(current===insightsRequestId)insightsFeedback.textContent=error.message;}
+  finally{if(current===insightsRequestId)insightsRefresh.disabled=false;}
+}
+insightsRefresh.addEventListener("click",loadInsights);
+select.addEventListener("change",()=>{resetInsights();loadInsights();});
+window.addEventListener("load",()=>{if(select.value)loadInsights();});
