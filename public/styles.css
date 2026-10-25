@@ -521,3 +521,16 @@ main.login-card {
   .media-actions { width: 100%; }
 }
 
+
+/* Unified sidebar navigation */
+.sidebar nav,.sidebar-shortcuts{display:grid;gap:6px}
+.sidebar .nav-button{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;padding:11px 12px;border:0;border-radius:10px;background:transparent;color:#cbd1e4;text-decoration:none;font:500 13px/1.4 Inter,"Segoe UI",Arial,sans-serif;text-align:left;letter-spacing:0;white-space:normal;cursor:pointer}
+.sidebar .nav-button:hover{background:#252a41;color:white;text-decoration:none}
+.sidebar .nav-button.active,.sidebar .nav-button[aria-current="page"]{background:#7450e8;color:white}
+.sidebar .nav-icon{width:20px;min-width:20px;text-align:center;font:500 19px/1 Inter,"Segoe UI",Arial,sans-serif}
+.sidebar .nav-label{margin:18px 12px 10px}
+.sidebar-shortcuts{margin-top:0}
+.meta-home-feedback{padding:12px 22px;color:#747b90;font-size:12px}
+#meta-real-campaigns{margin-bottom:24px}
+#meta-real-campaigns .secondary{display:inline-flex;align-items:center;text-decoration:none}
+@media(max-width:650px){.sidebar nav,.sidebar-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}.sidebar .nav-button{min-height:50px;padding:9px;gap:7px;font-size:12px}.sidebar .nav-icon{min-width:18px;width:18px}.sidebar .nav-label{display:block;margin:14px 0 8px}}
