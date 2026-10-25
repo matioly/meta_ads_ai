@@ -174,7 +174,7 @@ router.post("/:companyId/creative-drafts/:draftId/meta-paused-ad",access,async(r
   ]);
   const diagnostic=diagnose(d,campaign,adset);
   if(!diagnostic.compatible)return res.status(422).json({
-   error:"Configuração incompatível para anúncio de site. Confira os campos abaixo.",
+   error:"Configuração incompatível entre campanha, conjunto e destino. Confira o diagnóstico.",
    diagnostic
   });
   const destination=(process.env.META_WEBSITE_URL || "https://alpsclinic.com").trim();
@@ -196,8 +196,9 @@ router.post("/:companyId/creative-drafts/:draftId/meta-paused-ad",access,async(r
     selected=images.find(t=>t.is_preferred&&typeof t.uri==="string"&&t.uri.startsWith("https://"))||images.find(t=>typeof t.uri==="string"&&t.uri.startsWith("https://"));
    }
    if(!selected)return res.status(422).json({error:"A Meta ainda está processando a capa do vídeo. Aguarde alguns minutos e tente criar o anúncio novamente. O vídeo já enviado será reutilizado; não é necessário reenviar.",code:"VIDEO_THUMBNAIL_PENDING",retryable:true});
-   const spec={page_id:d.facebook_page_id,video_data:{video_id:d.meta_video_id,image_url:selected.uri,message:d.primary_text,title:d.headline,call_to_action:{type:"LEARN_MORE",value:{link:site.href}}}};
-   // Website video creative: explicit CTA destination, with no link_description.
+   const cta=isWhatsApp?{type:"WHATSAPP_MESSAGE",value:{app_destination:"WHATSAPP"}}:{type:"LEARN_MORE",value:{link:site.href}};
+    const spec={page_id:d.facebook_page_id,video_data:{video_id:d.meta_video_id,image_url:selected.uri,message:d.primary_text,title:d.headline,call_to_action:cta}};
+   // WhatsApp engagement uses a message CTA without a website URL; traffic retains the HTTPS site CTA.
    // Never assume an inventory Instagram ID is a valid advertising actor.
    // Meta can expose different IDs for an Instagram profile and its ad actor.
    if(d.instagram_id){
@@ -224,4 +225,9 @@ router.post("/:companyId/creative-drafts/:draftId/meta-paused-ad",access,async(r
  }catch(e){return failure(res,e,"de criação do anúncio pausado");}
  finally{if(locked)await client.query("SELECT pg_advisory_unlock(hashtext($1),hashtext($2))",[req.params.companyId,req.params.draftId]);client.release();}
 });
-module.exports=router;
+module.exports=router;   const isWhatsApp=diagnostic.destination==="WHATSAPP";
+   let site=null;
+   if(!isWhatsApp){
+
+   }
+
