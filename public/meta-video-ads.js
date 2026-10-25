@@ -5,11 +5,11 @@
  status.style.whiteSpace="pre-line";
  let busy=false,state="loading",timer=null,requestId=0,creationOutcome=null;
  const selected=()=>publish.value;
- const debug=document.getElementById("meta-publish-debug"),logs=[];
+ const logs=[];
  function trace(event,details={}){
   logs.push({time:new Date().toLocaleTimeString("pt-BR"),event,...details});
   if(logs.length>25)logs.shift();
-  debug.textContent=JSON.stringify(logs,null,2);
+
  }
  const url=(id,kind)=>"/api/companies/"+encodeURIComponent(company.value)+"/creative-drafts/"+encodeURIComponent(id)+"/"+kind;
  function buttons(){
