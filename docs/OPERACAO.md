@@ -1,3 +1,5 @@
+> **ATUALIZAÇÃO DE OPERAÇÃO — 25/10/2026:** Consulte [Guia principal](GUIA_DE_RETOMADA_2026-10-25.md) e [Telas/navegação](TELAS_E_NAVEGACAO.md). Após merge dos PRs #55–#62, confirmar deploy Railway e fazer recarga sem cache. Validar login/logout, menu lateral em todas as páginas, cadastro de clínica e usuário, biblioteca, Meta Insights e anúncio PAUSADO. **Bug confirmado no código:** o CHECK de `company_members.role` em `001_initial.sql` não admite `viewer`, embora a nova API admita; corrigir por migration antes de testar viewer. **Não executar scripts de criação/ativação em produção sem confirmação do operador.** Para segurança, verificar `META_ACCESS_TOKEN` somente no Railway e nunca copiar credenciais para docs. Os passos antigos abaixo são históricos.
+
 # Operação e desenvolvimento
 
 Referência: 24/10/2026. Configuração de código verificada até 8860d6e. O estado das variáveis e serviços no Railway não foi inspecionado nesta atualização; o histórico de deploy e testes foi informado pelo operador.
