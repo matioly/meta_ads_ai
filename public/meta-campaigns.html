@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gerenciar anúncios | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><script src="/meta-campaigns.js" defer></script><script src="/meta-create-campaign.js" defer></script><script src="/meta-adset-preview.js" defer></script><script src="/meta-create-adset.js" defer></script></head>
+<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gerenciar anúncios | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><script src="/meta-campaigns.js" defer></script><script src="/meta-create-campaign.js" defer></script><script src="/meta-adset-preview.js" defer></script><script src="/meta-create-adset.js" defer></script><script src="/meta-creative-plan.js" defer></script></head>
 <body><main style="max-width:1250px;margin:32px auto;padding:20px">
 <p><a href="/">← Voltar ao painel</a></p><p class="eyebrow">GERENCIAR ANÚNCIOS</p>
 <h1>Gerenciar anúncios</h1><p>Acompanhe seus resultados e prepare campanhas para a clínica. Tudo que for criado nesta etapa fica pausado até sua decisão.</p>
@@ -49,8 +49,25 @@
 </div>
 <button type="submit" class="secondary" id="adset-preview-button" style="margin-top:12px">Conferir configurações</button>
 </form><p id="adset-preview-feedback" role="status" aria-live="polite"></p>
-<div style="margin-top:10px;font-weight:600">3. Adicionar vídeo e texto <span style="font-weight:400">(em breve)</span></div><div style="margin-top:8px;font-weight:600">4. Revisar e publicar <span style="font-weight:400">(em breve; nunca automático)</span></div>
+<p style="margin-top:14px">3. Adicionar vídeo e texto: configure abaixo, em modo de planejamento.</p><p>4. Revisar e publicar: em breve, sempre com confirmação manual.</p>
 <div id="adset-create-actions" hidden><button type="button" id="adset-create-button" class="primary">Criar público pausado na Meta</button><p id="adset-create-feedback" role="status"></p></div><pre id="adset-preview-result" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+</section>
+<section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="creative-title">
+<h2 id="creative-title">3. Preparar vídeo e texto</h2>
+<p>Escolha um vídeo da biblioteca da clínica e prepare a mensagem. <strong>Esta etapa é apenas uma prévia local: nada é enviado à Meta.</strong> O link do Google Drive ainda não equivale a um vídeo enviado à Meta.</p>
+<form id="creative-plan-form">
+<label for="creative-media">Vídeo da biblioteca</label><select id="creative-media" required><option value="">Carregando vídeos…</option></select>
+<label for="creative-primary-text">Texto principal</label><textarea id="creative-primary-text" maxlength="2200" rows="4" required placeholder="Escreva a mensagem do anúncio"></textarea>
+<label for="creative-headline">Título do anúncio</label><input id="creative-headline" maxlength="255" required placeholder="Ex.: Conheça a Alps Oral Clinic">
+<label for="creative-description">Descrição (opcional)</label><input id="creative-description" maxlength="255" placeholder="Informação complementar">
+<button type="submit" class="secondary">Conferir prévia</button>
+</form>
+<p id="creative-feedback" role="status" aria-live="polite"></p>
+<div id="creative-preview" hidden style="border:1px solid #ddd;border-radius:12px;padding:16px;margin-top:12px">
+<h3 id="creative-preview-headline"></h3><p id="creative-preview-text"></p><p id="creative-preview-description"></p>
+<p id="creative-preview-media"></p><a id="creative-preview-link" target="_blank" rel="noopener noreferrer">Abrir vídeo no Drive</a>
+<p><small>Prévia de conteúdo, não uma simulação fiel do anúncio no Instagram ou Facebook.</small></p>
+</div>
 </section>
 <p id="feedback" role="status" aria-live="polite">Carregando…</p>
 <div class="table-wrapper"><table><caption id="table-caption">Campanhas da Meta</caption><thead><tr id="headers"></tr></thead><tbody id="campaigns"></tbody></table></div>
