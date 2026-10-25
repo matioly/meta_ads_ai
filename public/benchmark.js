@@ -25,6 +25,7 @@
    const library=new URL("https://www.facebook.com/ads/library/");
    library.searchParams.set("active_status","active");library.searchParams.set("ad_type","all");library.searchParams.set("country","BR");library.searchParams.set("q",c.name);
    link("Ver anúncios ↗",library.toString());
+   const analyze=document.createElement("button");analyze.className="secondary";analyze.type="button";analyze.textContent="Analisar anúncios";analyze.onclick=()=>window.benchmarkAdsOpen(c,canWrite());actions.append(analyze);
    if(canWrite()){
     const edit=document.createElement("button");edit.className="secondary";edit.textContent="Editar";edit.onclick=()=>open(c);
     const del=document.createElement("button");del.className="remove-button";del.textContent="Excluir";del.onclick=()=>remove(c);
@@ -69,7 +70,7 @@
    if(!data.companies.length){say("Nenhuma clínica vinculada.",true);return;}
    const selected=sessionStorage.getItem("benchmark-company");
    if(data.companies.some(c=>c.id===selected))company.value=selected;
-   function update(){const c=data.companies.find(c=>c.id===company.value);role=c?.role||"member";$("company-name").textContent=c?.name||"";sessionStorage.setItem("benchmark-company",company.value);load();}
+   function update(){window.benchmarkAdsReset?.();const c=data.companies.find(c=>c.id===company.value);role=c?.role||"member";$("company-name").textContent=c?.name||"";sessionStorage.setItem("benchmark-company",company.value);load();}
    company.addEventListener("change",update);update();
   }catch(e){say(e.message,true);}
  }
