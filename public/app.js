@@ -166,10 +166,11 @@ function render () {
     : loadMessage
 
   companySelect.disabled = busy || companies.length === 0
-  $('#logout').disabled = busy
+  // Sair deve permanecer acessível durante carregamentos e falhas da API.
+  $('#logout').disabled = false
 
   for (const id of ['#new-campaign', '#hero-create', '#empty-create']) {
-    $(id).disabled = busy || !loaded || !canWrite()
+    if ($(id)) $(id).disabled = busy || !loaded || !canWrite()
   }
 
   form.querySelectorAll('input, select, textarea').forEach(control => {
