@@ -8,7 +8,7 @@
   if(q.length<2)return;
   timer=setTimeout(async()=>{
    try{
-    const company=document.querySelector("#company-select")?.value||document.querySelector("#company")?.value||window.select?.value;
+    const company=document.querySelector("#meta-company")?.value;
     if(!company){results.textContent="Selecione uma clínica.";return;}
     const response=await fetch("/api/companies/"+encodeURIComponent(company)+"/meta-interests?q="+encodeURIComponent(q),{credentials:"same-origin"});
     const data=await response.json();if(seq!==sequence)return;
