@@ -1,0 +1,9 @@
+/* Meta manager embedded in the same visual shell as the dashboard. */
+.meta-manager-main{width:100%;max-width:1500px;margin:0 auto;padding:28px 38px 60px;min-width:0}
+.main{min-width:0}.meta-manager-main .table-wrapper{max-width:100%;overflow-x:auto}
+.meta-manager-main .workflow-accordion{max-width:100%}
+.meta-manager-main .workflow-content{min-width:0}
+.meta-manager-main input,.meta-manager-main select,.meta-manager-main textarea{max-width:100%}
+.meta-manager-main h1{font-size:30px}
+@media(max-width:900px){.meta-manager-main{padding:24px}}
+@media(max-width:650px){.meta-manager-main{padding:20px}.meta-manager-main h1{font-size:25px}}
