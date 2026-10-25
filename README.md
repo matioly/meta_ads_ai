@@ -1,3 +1,5 @@
+> **Atualização 25/10/2026:** as seções históricas abaixo estão desatualizadas. O painel já consulta a Marketing API, cria campanha e conjunto PAUSADOS e salva rascunhos de criativos no PostgreSQL. O operador confirmou campanha/conjunto pausados e recuperação dos campos de um rascunho após recarregar. As fases 5A/5B (upload de vídeo e criação de anúncio pausado) foram codificadas no PR #20; homologação com a Meta ainda pendente. Leia docs/RETOMADA.md e docs/FASE_5_VIDEO_ANUNCIO.md antes de continuar. Nenhuma ativação automática autorizada.
+
 # Meta Ads AI
 
 Painel próprio para planejar campanhas de anúncios por clínica, com evolução prevista para integração ao Meta Ads e assistência de IA.
