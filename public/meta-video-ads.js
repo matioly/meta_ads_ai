@@ -34,7 +34,7 @@
    if(kind==="meta-video")status.textContent="Vídeo registrado na Meta! ID: "+data.videoId+(data.reused?" (já enviado)":"")+". Agora você pode criar o anúncio pausado.";
    else status.textContent="Anúncio criado na Meta com status PAUSADO! ID: "+data.adId+(data.reused?" (já existente)":"")+". Confira na aba Anúncios.";
   }catch(e){status.textContent="Não foi possível concluir: "+e.message+" Se houver dúvida sobre o resultado, confira a Meta antes de repetir.";}
-  finally{busy=false;refresh();}
+  finally{busy=false;upload.disabled=!selected();create.disabled=!selected();}
  }
  publish.addEventListener("change",refresh);
  company.addEventListener("change",()=>{status.textContent="Selecione um rascunho da clínica.";refresh();});
