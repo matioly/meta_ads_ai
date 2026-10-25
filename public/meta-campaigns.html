@@ -54,13 +54,17 @@
 </section>
 <section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="creative-title">
 <h2 id="creative-title">3. Preparar vídeo e texto</h2>
-<p>Escolha um vídeo da biblioteca da clínica e prepare a mensagem. <strong>Esta etapa é apenas uma prévia local: nada é enviado à Meta.</strong> O link do Google Drive ainda não equivale a um vídeo enviado à Meta.</p>
+<p>Escolha um vídeo da biblioteca da clínica e prepare a mensagem. <strong>O conteúdo pode ser salvo no banco, mas nenhum anúncio ou vídeo é enviado à Meta.</strong> O link do Google Drive ainda não equivale a um vídeo enviado à Meta.</p>
 <form id="creative-plan-form">
+<label for="creative-saved">Rascunhos salvos</label><select id="creative-saved"><option value="">Novo rascunho</option></select>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button type="button" class="secondary" id="creative-new">Novo</button><button type="button" class="secondary" id="creative-delete">Excluir rascunho selecionado</button></div>
+<label for="creative-campaign">Campanha da Meta (opcional)</label><select id="creative-campaign"><option value="">Sem vínculo por enquanto</option></select>
+<label for="creative-adset">Público da Meta (opcional)</label><select id="creative-adset"><option value="">Sem vínculo por enquanto</option></select>
 <label for="creative-media">Vídeo da biblioteca</label><select id="creative-media" required><option value="">Carregando vídeos…</option></select>
 <label for="creative-primary-text">Texto principal</label><textarea id="creative-primary-text" maxlength="2200" rows="4" required placeholder="Escreva a mensagem do anúncio"></textarea>
 <label for="creative-headline">Título do anúncio</label><input id="creative-headline" maxlength="255" required placeholder="Ex.: Conheça a Alps Oral Clinic">
 <label for="creative-description">Descrição (opcional)</label><input id="creative-description" maxlength="255" placeholder="Informação complementar">
-<button type="submit" class="secondary">Conferir prévia</button>
+<button type="submit" class="secondary">Conferir prévia</button> <button type="button" class="primary" id="creative-save">Salvar rascunho</button>
 </form>
 <p id="creative-feedback" role="status" aria-live="polite"></p>
 <div id="creative-preview" hidden style="border:1px solid #ddd;border-radius:12px;padding:16px;margin-top:12px">
