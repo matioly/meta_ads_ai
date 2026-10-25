@@ -14,8 +14,10 @@ createButton.addEventListener("click",async()=>{
   });
   const data=await response.json();
   if(!response.ok)throw Error([data.error,data.metaErrorCode?"Código "+data.metaErrorCode:null,data.metaErrorSubcode?"Subcódigo "+data.metaErrorSubcode:null,data.metaErrorDetail].filter(Boolean).join(" | "));
-  resetAdsetApproval();
-  createFeedback.textContent="Público criado e pausado! ID Meta: "+data.id;
+  approvedAdsetPreview=null;
+  createButton.disabled=true;
+  adsetFeedback.textContent="Público criado e pausado! ID Meta: "+data.id;
+  document.querySelector("#adset-create-actions").hidden=true;
   await load();
  }catch(error){createFeedback.textContent=error.message;}
  finally{createButton.disabled=false;}
