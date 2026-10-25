@@ -27,7 +27,7 @@ const pages = {
   },
   overview: {
     title: 'Visão geral',
-    description: 'Organize suas próximas campanhas em um só lugar.'
+    description: 'Acompanhe os resultados reais das campanhas nos últimos 30 dias.'
   },
   campaigns: {
     title: 'Campanhas',
@@ -35,7 +35,7 @@ const pages = {
   },
   integrations: {
     title: 'Integrações',
-    description: 'As conexões que vão dar vida ao seu painel.'
+    description: 'Consulte e configure as integrações de cada clínica.'
   }
 }
 
@@ -97,15 +97,16 @@ function notify (message) {
 }
 
 function changeView (view) {
+  if (!pages[view]) view = 'overview'
   $('#page-title').textContent = pages[view].title
   $('#page-description').textContent = pages[view].description
 
   $('#overview-section').hidden = view !== 'overview'
-  $('#campaign-section').hidden = !['overview', 'campaigns'].includes(view)
-  $('#meta-real-campaigns').hidden = !['overview', 'campaigns'].includes(view)
+  $('#campaign-section').hidden = view !== 'campaigns'
+  $('#meta-real-campaigns').hidden = view !== 'campaigns'
   $('#media-section').hidden = view !== 'media'
   $('#integrations-section').hidden = view !== 'integrations'
-  $('#new-campaign').hidden = !['overview', 'campaigns'].includes(view)
+  $('#new-campaign').hidden = true
 
   document.querySelectorAll('[data-view]').forEach(button => {
     const active = button.dataset.view === view
@@ -436,6 +437,7 @@ async function loadProfile () {
     }
 
     await loadDrafts()
+    changeView(new URLSearchParams(location.search).get('view') || 'overview')
     if (typeof window.loadHomeMeta === 'function') window.loadHomeMeta()
   } catch (error) {
     loadMessage = error.message + ' Atualize a página para tentar novamente.'

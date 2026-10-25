@@ -15,14 +15,24 @@
   status("meta-campaigns-feedback","Consultando campanhas…");
   try{
    const base="/api/companies/"+encodeURIComponent(company)+"/meta-campaigns?type=";
-   const results=await Promise.allSettled(["campaigns","ads"].map(async type=>{
-    const response=await fetch(base+type,{credentials:"same-origin",cache:"no-store"});
+   const results=await Promise.allSettled(["campaigns","ads","insights"].map(async type=>{
+    const response=await fetch(type==="insights"?"/api/companies/"+encodeURIComponent(company)+"/meta-insights?period=last_30d":base+type,{credentials:"same-origin",cache:"no-store"});
     const data=await response.json();
     if(!response.ok)throw Error(data.error||"Falha na consulta à Meta");
     return data;
    }));
    if($("company").value!==company)return;
-   const [campaigns,ads]=results;
+   const [campaigns,ads,insights]=results;
+   if(insights.status==="fulfilled"){
+    const d=insights.value;const n=new Intl.NumberFormat("pt-BR");
+    $("dashboard-spend").textContent=new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(d.spend);
+    $("dashboard-reach").textContent=n.format(d.reach);
+    $("dashboard-impressions").textContent=n.format(d.impressions);
+    $("dashboard-links").textContent=n.format(d.linkClicks);
+    $("dashboard-conversations").textContent=d.messagingConversationsStarted===null?"Não disponível":n.format(d.messagingConversationsStarted);
+   }else{
+    for(const id of ["dashboard-spend","dashboard-reach","dashboard-impressions","dashboard-links","dashboard-conversations"])$(id).textContent="—";
+   }
    const rows=$("meta-home-rows");rows.replaceChildren();
    if(campaigns.status==="fulfilled"){
     const items=campaigns.value.items||[];
@@ -39,7 +49,7 @@
    }
    if(ads.status==="fulfilled")$("meta-ad-count").textContent=(ads.value.items||[]).length+(ads.value.hasMore?"+":"");
    else $("meta-ad-count").textContent="—";
-   status("meta-home-feedback",campaigns.status==="fulfilled"&&ads.status==="fulfilled"?"Dados consultados diretamente na Meta. Indicadores de quantidade, não de desempenho.":"Alguns dados da Meta estão indisponíveis. Confira a conexão e tente novamente.");
+   status("meta-home-feedback",insights.status==="fulfilled"?"Desempenho dos últimos 30 dias · Fonte: Meta Marketing API.":"Resultados de 30 dias indisponíveis: "+insights.reason.message);
    lastCompany=company;loadedAt=Date.now();
   }catch(e){status("meta-home-feedback","Não foi possível carregar a Meta: "+e.message);}
   finally{if(pending===company)pending=null;}
