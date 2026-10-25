@@ -2,6 +2,24 @@
 
 Atualizado em 24/10/2026. Código de referência: 8860d6e.
 
+## Atualização operacional — 24/10/2026: META01 concluída
+
+**Estado mais recente:** META01 entregue pelo PR [#1](https://github.com/matioly/meta_ads_ai/pull/1), merge feito pelo operador, deploy Railway confirmado visualmente e gravação na tabela `meta_assets` confirmada por print. Tela `/meta-assets.html` carregou e mostrou “Inventário carregado”; após salvar, a tabela apresentou WABA, telefone, observações e horário de atualização. Não foram executados testes automatizados específicos da META01 nem auditoria de segurança.
+
+**Inventário piloto Alps Oral Clinic (IDs informados a partir das telas Meta):**
+- Portfólio empresarial: `1101618809710897` (conferir no painel Meta antes de depender dele: transcrição manual).
+- Conta de anúncios: `4017397088397476` (API usa `act_4017397088397476`).
+- Instagram: `@alpsoralclinic`; ID `17841450939932628`.
+- Página Facebook: `105234548794783`; **acesso solicitado, ainda pendente**. Usuário decidiu resolver depois.
+- WABA: `28627247860246737`; telefone comercial cadastrado. `phone_number_id` não foi levantado.
+- O inventário é cadastro manual; IDs e permissões não são verificados pela Meta API.
+
+**Biblioteca L01:** operador confirmou registro `Pamela ADS2` na tabela `media` e associação a um rascunho. São links/metadados Google Drive, não upload ao Railway/Meta.
+
+**Próximo incremento acordado: META02.** Primeiro conferir token disponível e permissões para Marketing API (pode ser token do bot de WhatsApp), definir credenciais exclusivamente no servidor, vínculo por clínica e botão de teste somente leitura. Não adicionar token ao GitHub, não publicar campanhas e não criar gastos. Verificar documentação atual da Meta antes de implementar. Depois META03 consulta de campanhas.
+
+**Para retomar:** ler README, esta atualização, BACKLOG e OPERACAO; conferir branch main e migrations 006/007 no Railway. Preservar fluxo atual e página pendente. A seção histórica abaixo descreve o estado anterior à META01 e não substitui esta atualização.
+
 ## Último incremento: biblioteca do Drive
 
 Implementada biblioteca de links com cadastro de contas por apelido/e-mail, vídeos/imagens por clínica e uma mídia opcional por campanha. Migration nova: 006_drive_library.sql. Não criar bucket nem solicitar senha Google: esta etapa guarda apenas metadados e links. Detalhes em BIBLIOTECA_DRIVE.md. Aceite no Railway pendente.
