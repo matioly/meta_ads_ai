@@ -120,14 +120,7 @@ function changeView (view) {
   })
 
   render()
-  if (view === 'overview' || view === 'campaigns') {
-    if (typeof window.loadHomeMeta === 'function') window.loadHomeMeta()
-  }
-  const url = new URL(window.location.href)
-  if (url.searchParams.get('view') !== view) {
-    url.searchParams.set('view', view)
-    window.history.replaceState(null, '', url)
-  }
+  if (typeof window.loadHomeMeta === 'function') window.loadHomeMeta()
 }
 
 function addCell (row, text) {
@@ -444,8 +437,8 @@ async function loadProfile () {
       companySelect.append(option)
     }
 
-    changeView(new URLSearchParams(location.search).get('view') || 'overview')
     await loadDrafts()
+    changeView(new URLSearchParams(location.search).get('view') || 'overview')
     if (typeof window.loadHomeMeta === 'function') window.loadHomeMeta()
   } catch (error) {
     loadMessage = error.message + ' Atualize a página para tentar novamente.'
