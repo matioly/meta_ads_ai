@@ -25,7 +25,7 @@ router.post("/:companyId/meta-create-adset",access,async(req,res,next)=>{
   const {campaignId,name,ageMin,ageMax,dailyBudgetBrl,confirm,city,latitude,longitude,radiusKm,gender,interests=[]}=req.body||{};
   const key=req.get("Idempotency-Key");
   if(typeof city!=="string"||!city.trim()||city.length>100||!Number.isFinite(latitude)||!Number.isFinite(longitude)||latitude < -90||latitude > 90||longitude < -180||longitude > 180||![3,5,10,15,20].includes(radiusKm)||!["all","male","female"].includes(gender))return res.status(400).json({error:"Localização ou gênero inválido. A segmentação não será ampliada para o Brasil."});
-  if(!Array.isArray(interests)||interests.length>20||interests.some(i=>!i||!/^\\d{1,30}$/.test(String(i.id))||typeof i.name!=="string"||i.name.length>120))return res.status(400).json({error:"Interesses inválidos."});
+  if(!Array.isArray(interests)||interests.length>20||interests.some(i=>!i||!/^\d{1,30}$/.test(String(i.id))||typeof i.name!=="string"||i.name.length>120))return res.status(400).json({error:"Interesses inválidos."});
   if(!digits(campaignId)||typeof name!=="string"||!name.trim()||name.trim().length>120||
     !Number.isInteger(ageMin)||!Number.isInteger(ageMax)||ageMin<18||ageMax>65||ageMin>ageMax||
     typeof dailyBudgetBrl!=="number"||!Number.isFinite(dailyBudgetBrl)||dailyBudgetBrl<10||dailyBudgetBrl>10000||
