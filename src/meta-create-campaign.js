@@ -36,7 +36,7 @@ router.post("/:companyId/meta-create-campaign", access, async (req,res,next)=>{
     if (!id || !/^[0-9]{1,30}$/.test(id)) return res.status(422).json({error:"Conta de anúncios não cadastrada."});
     const version = /^v\d+\.\d+$/.test(process.env.META_API_VERSION||"")?process.env.META_API_VERSION:"v24.0";
     const url = `https://graph.facebook.com/${version}/act_${id}/campaigns`;
-    const body = new URLSearchParams({name,objective,status:"PAUSED",special_ad_categories:"[]"});
+    const body = new URLSearchParams({name,objective,status:"PAUSED",special_ad_categories:"[]",is_adset_budget_sharing_enabled:"false"});
     let response;
     try {
       response = await fetch(url,{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/x-www-form-urlencoded"},body,signal:AbortSignal.timeout(15000)});
