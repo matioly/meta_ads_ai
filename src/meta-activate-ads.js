@@ -20,7 +20,7 @@ router.get("/:companyId/meta-paused-ads",access,async(req,res)=>{
   const token=process.env.META_ACCESS_TOKEN;if(!token)return res.status(503).json({error:"Conexão Meta não configurada."});
   const id=await account(req);
   const result=await meta("act_"+id+"/ads?fields=id,name,status,effective_status,campaign{id,name,status},adset{id,name,status}&limit=100",token);
-  const items=(result.data||[]).filter(a=>a.status==="PAUSED").map(a=>({id:a.id,name:a.name,campaign:a.campaign?.name||"—",adset:a.adset?.name||"—",eligible:a.campaign?.status==="ACTIVE"&&a.adset?.status==="ACTIVE",campaignStatus:a.campaign?.status,adsetStatus:a.adset?.status}));
+  const items=(result.data||[]).filter(a=>a.status==="PAUSED").map(a=>({id:a.id,name:a.name,campaign:a.campaign?.name||"—",adset:a.adset?.name||"—",eligible:["ACTIVE","PAUSED"].includes(a.campaign?.status)&&["ACTIVE","PAUSED"].includes(a.adset?.status),campaignStatus:a.campaign?.status,adsetStatus:a.adset?.status}));
   return res.json({items,hasMore:Boolean(result.paging?.next)});
  }catch(e){return res.status(502).json({error:e.message==="Conta Meta não configurada."?e.message:"Não foi possível consultar anúncios na Meta."});}
 });
@@ -33,7 +33,11 @@ router.post("/:companyId/meta-activate-ad",access,async(req,res)=>{
   const ad=await meta(id+"?fields=id,name,status,account_id,campaign{id,name,status},adset{id,name,status}",token);
   if(String(ad.account_id||"").replace(/^act_/,"")!==accountId)return res.status(403).json({error:"Anúncio não pertence à conta selecionada."});
   if(ad.status!=="PAUSED")return res.status(409).json({error:"Anúncio não está pausado. Atualize a lista."});
-  if(ad.campaign?.status!=="ACTIVE"||ad.adset?.status!=="ACTIVE")return res.status(409).json({error:"Ative primeiro a campanha e o conjunto no Gerenciador da Meta. Nenhuma alteração foi feita."});
+  if(!["ACTIVE","PAUSED"].includes(ad.campaign?.status)||!["ACTIVE","PAUSED"].includes(ad.adset?.status))return res.status(409).json({error:"Campanha ou conjunto indisponível para ativação."});
+  // Revalidado imediatamente antes das alterações. A ativação do anúncio requer pais ativos.
+  for(const parent of [ad.campaign,ad.adset]){
+   if(parent.status==="PAUSED")await meta(parent.id,token,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({status:"ACTIVE"})});
+  }
   await meta(id,token,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({status:"ACTIVE"})});
   return res.json({id,activated:true});
  }catch(e){return res.status(502).json({error:"Não foi possível confirmar a ativação na Meta. Verifique o status antes de repetir.",metaErrorCode:e.code||null});}
