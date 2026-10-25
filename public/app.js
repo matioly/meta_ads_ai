@@ -478,7 +478,5 @@ $('#logout').addEventListener('click', async () => {
   }
 })
 
-// Set the requested view before asynchronous profile and clinic loading.
-changeView(new URLSearchParams(location.search).get('view') || 'overview')
 // Initialization runs from media-library.js after both scripts have loaded.
 
