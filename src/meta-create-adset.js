@@ -58,7 +58,7 @@ router.post("/:companyId/meta-create-adset",access,async(req,res,next)=>{
     const body=new URLSearchParams({
       name:name.trim(),campaign_id:campaignId,status:"PAUSED",
       billing_event:"IMPRESSIONS",optimization_goal:"POST_ENGAGEMENT",
-      destination_type:"ON_AD",
+      destination_type:"UNDEFINED",
       daily_budget:String(Math.round(dailyBudgetBrl*100)),
       targeting:JSON.stringify({geo_locations:{countries:["BR"]},age_min:ageMin,age_max:ageMax})
     });
