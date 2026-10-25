@@ -2,6 +2,15 @@
 
 Data-base: 24/10/2026. Este é um plano proposto, não uma lista de funcionalidades prontas. Prioridades podem mudar; os IDs permanecem estáveis.
 
+## Estado atualizado — 24/10/2026
+
+- **META01: implementada e validada manualmente em produção** (PR #1, migration 007, formulário `/meta-assets.html`, persistência em `meta_assets`). Não confundir com verificação automática dos IDs na Meta. Página Facebook da Alps ainda com acesso pendente.
+- **L01: cadastro e vínculo de mídia confirmados manualmente em produção** para vídeo Pamela ADS2; testes de autorização por papéis e múltiplas clínicas em produção não foram confirmados.
+- **META02: próximo incremento prioritário** — autenticação segura no servidor, checagem de permissões e conexão de leitura com conta de anúncios da Alps. Nenhum token deve ser salvo no PostgreSQL em texto aberto ou no repositório; avaliar gestão de credenciais por clínica e revogação.
+- META03 e posteriores continuam pendentes. Nenhuma publicação nem gasto real autorizado.
+
+A tabela histórica abaixo foi escrita antes dessas validações; para o status vigente prevalece esta seção.
+
 ## Entregue
 
 - [x] Repositório separado, servidor Node/Express e deploy Railway.
