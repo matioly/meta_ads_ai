@@ -1,5 +1,14 @@
 # Release notes — Meta Ads AI
 
+## 24/10/2026 — META01: inventário de ativos Meta por clínica
+
+PR [#1](https://github.com/matioly/meta_ads_ai/pull/1) incorporado à main pelo operador. Migration 007 cria `meta_assets`, com IDs do portfólio, conta de anúncios, Instagram, página Facebook, WABA, telefone e observações. API GET/PUT protegida por sessão, escopo da clínica e permissões; formulário em `/meta-assets.html` com acesso pelo painel Integrações.
+
+**Aceite manual relatado:** deploy Railway carregou a página; cadastro Alps foi salvo e registro conferido no PostgreSQL (`whatsapp_business_id`, `whatsapp_phone`, `notes`, `updated_at` visíveis). Testes automatizados META01 e checagem de todos os IDs não realizados. Acesso à página Facebook segue pendente. Nenhuma conexão à Marketing API, upload à Meta ou publicação foi implementada.
+
+Também confirmado pelo operador: L01 cadastrou vídeo Pamela ADS2 no banco e permitiu vinculá-lo a um rascunho. Próximo passo META02 (conexão segura, somente leitura).
+
+
 ## 24/10/2026 — Biblioteca de links do Google Drive (L01)
 
 Implementados cadastro/edição/exclusão de contas identificadas por apelido e e-mail opcional, biblioteca de vídeos/imagens por clínica e vínculo opcional de uma mídia ao rascunho. Botão Abrir no Drive; membros consultam, owner/admin gerenciam.
