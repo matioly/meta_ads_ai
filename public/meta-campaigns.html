@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Campanhas reais | Meta Ads AI</title><link rel="stylesheet" href="/styles.css">
+<script src="/meta-campaigns.js" defer></script></head>
+<body><main style="max-width:1150px;margin:36px auto;padding:20px">
+<p><a href="/">← Voltar ao painel</a></p>
+<p class="eyebrow">META03 · CONSULTA SOMENTE LEITURA</p>
+<h1>Campanhas reais da Meta</h1>
+<p>Consulte as campanhas da conta de anúncios vinculada à clínica. Nenhuma alteração é enviada à Meta.</p>
+<label for="meta-company">Clínica</label>
+<select id="meta-company"><option>Carregando…</option></select>
+<button id="refresh" class="primary" type="button">Atualizar campanhas</button>
+<p id="feedback" role="status" aria-live="polite">Carregando…</p>
+<div class="table-wrapper"><table><caption class="sr-only">Campanhas da Meta</caption>
+<thead><tr><th>Campanha</th><th>Objetivo</th><th>Status</th><th>Orçamento diário</th><th>Orçamento total</th></tr></thead>
+<tbody id="campaigns"></tbody></table></div>
+<p id="pagination-note"></p>
+<p><small>Orçamentos podem estar definidos nos conjuntos de anúncios. Valores exibidos em reais quando a conta utiliza BRL.</small></p>
+</main></body></html>
