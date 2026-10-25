@@ -8,14 +8,13 @@
   const current=++request;
   const root=$("benchmark-auto-results");root.replaceChildren();
   const status=document.createElement("p");status.textContent="Consultando anúncios públicos da Meta via Apify. A busca pode levar até dois minutos e pode gerar cobrança na Apify.";root.append(status);
-  if(!competitor.facebookUrl){status.textContent="Edite o concorrente e informe a página do Facebook para realizar a busca automática.";return;}
   try{
    const path="/api/companies/"+encodeURIComponent($("company").value)+"/benchmark-competitors/"+encodeURIComponent(competitor.id)+"/auto-ads";
    const response=await fetch(path,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:"{}"});
    const data=await response.json();
    if(current!==request)return;
    if(!response.ok)throw Error(data.error||"Falha na busca automática.");
-   status.textContent=data.returned+" anúncio(s) encontrado(s). Resultados externos não foram salvos. Confirme que pertencem à clínica.";
+   status.textContent=data.returned===0?"Nenhum anúncio encontrado nesta busca. Isso não significa necessariamente que a clínica não anuncia.":data.returned+" anúncio(s) encontrado(s). "+(data.searchMode==="name"?"Busca por nome: confira cuidadosamente o anunciante. ":"")+"Resultados externos não foram salvos.";
    for(const ad of data.ads){
     const card=document.createElement("article");card.className="panel benchmark-card";
     const title=document.createElement("h3");title.textContent=ad.pageName||"Anúncio público";

@@ -25,19 +25,30 @@ router.post(base,access,async(req,res,next)=>{
  const key=req.params.companyId+":"+req.params.competitorId;
  if(running.has(key))return res.status(409).json({error:"Já existe uma busca em andamento para este concorrente."});
  try{
-  const found=await pool.query("SELECT name,facebook_url FROM benchmark_competitors WHERE company_id=$1 AND id=$2",[req.params.companyId,req.params.competitorId]);
+  const found=await pool.query("SELECT name,facebook_url,instagram_url FROM benchmark_competitors WHERE company_id=$1 AND id=$2",[req.params.companyId,req.params.competitorId]);
   if(!found.rowCount)return res.status(404).json({error:"Concorrente não encontrado."});
   const c=found.rows[0];
-  if(!c.facebook_url)return res.status(422).json({error:"Cadastre primeiro a URL da página do Facebook do concorrente para uma busca precisa."});
-  const u=new URL(c.facebook_url);
-  if(u.protocol!=="https:"||!["facebook.com","www.facebook.com","m.facebook.com"].includes(u.hostname.toLowerCase()))return res.status(422).json({error:"Página do Facebook inválida."});
+  let searchUrl,searchMode;
+  if(c.facebook_url){
+   const u=new URL(c.facebook_url);
+   if(u.protocol!=="https:"||!["facebook.com","www.facebook.com","m.facebook.com"].includes(u.hostname.toLowerCase()))return res.status(422).json({error:"Página do Facebook inválida."});
+   searchUrl=u.toString();searchMode="facebook";
+  }else{
+   // Instagram profiles are not valid actor start URLs; use a Meta Library keyword search.
+   const library=new URL("https://www.facebook.com/ads/library/");
+   library.searchParams.set("active_status","active");
+   library.searchParams.set("ad_type","all");
+   library.searchParams.set("country","BR");
+   library.searchParams.set("q",c.name);
+   searchUrl=library.toString();searchMode="name";
+  }
   running.add(key);
-  const response=await fetch("https://api.apify.com/v2/acts/"+actor+"/run-sync-get-dataset-items?format=json&clean=true&timeout=110",{method:"POST",headers:{"Authorization":"Bearer "+process.env.APIFY_TOKEN,"Content-Type":"application/json"},body:JSON.stringify({startUrls:[{url:u.toString()}],resultsLimit:20,activeStatus:"active"}),signal:AbortSignal.timeout(115000)});
+  const response=await fetch("https://api.apify.com/v2/acts/"+actor+"/run-sync-get-dataset-items?format=json&clean=true&timeout=110",{method:"POST",headers:{"Authorization":"Bearer "+process.env.APIFY_TOKEN,"Content-Type":"application/json"},body:JSON.stringify({startUrls:[{url:searchUrl}],resultsLimit:20,activeStatus:"active"}),signal:AbortSignal.timeout(115000)});
   if(!response.ok){const error=await response.text();console.error("Benchmark Apify status",response.status,short(error,250));return res.status(502).json({error:"A busca externa falhou (HTTP "+response.status+"). Confira créditos e configuração na Apify."});}
   const result=await response.json();
   if(!Array.isArray(result))return res.status(502).json({error:"A fonte externa não retornou uma lista de anúncios. Confira a execução na Apify."});
   const ads=result.map(mapItem).filter(Boolean).slice(0,20);
-  return res.json({ads,found:result.length,returned:ads.length,source:"Apify / Biblioteca pública da Meta",automaticallyImported:false,note:"Resultados públicos da fonte externa; não representam desempenho, investimento ou conversões. Confirme o anunciante antes de usar."});
+  return res.json({searchMode,ads,found:result.length,returned:ads.length,source:"Apify / Biblioteca pública da Meta",automaticallyImported:false,note:"Resultados públicos da fonte externa; não representam desempenho, investimento ou conversões. Confirme o anunciante antes de usar."});
  }catch(e){if(e.name==="TimeoutError"||e.name==="AbortError")return res.status(504).json({error:"A busca excedeu o tempo limite. Confira a execução na Apify antes de tentar novamente para evitar cobranças duplicadas."});next(e);}
  finally{running.delete(key);}
 });
