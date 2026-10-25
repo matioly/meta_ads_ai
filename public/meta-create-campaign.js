@@ -17,7 +17,17 @@ createForm.addEventListener("submit",async(event)=>{
       body:JSON.stringify({name,objective:"OUTCOME_ENGAGEMENT",confirm:true})
     });
     const data=await response.json();
-    if(!response.ok)throw Error(data.error||"Não foi possível criar.");
+    if(!response.ok){
+      const diagnostic=[
+        data.error||"Não foi possível criar.",
+        data.metaErrorCode!=null?"Código Meta: "+data.metaErrorCode:null,
+        data.metaErrorSubcode!=null?"Subcódigo: "+data.metaErrorSubcode:null,
+        data.metaErrorDetail?"Detalhe: "+data.metaErrorDetail:null,
+        data.metaTraceId?"Referência Meta: "+data.metaTraceId:null,
+        data.uncertain?"ATENÇÃO: resultado incerto. Verifique a lista antes de tentar novamente.":null
+      ].filter(Boolean).join(" | ");
+      throw Error(diagnostic);
+    }
     createFeedback.textContent="Campanha criada e pausada! ID Meta: "+data.id+". Atualize a lista para conferir.";
     await load();
   }catch(error){createFeedback.textContent=error.message;}
