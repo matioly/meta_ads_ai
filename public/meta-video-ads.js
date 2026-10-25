@@ -5,6 +5,12 @@
  status.style.whiteSpace="pre-line";
  let busy=false,state="loading",timer=null,requestId=0,creationOutcome=null;
  const selected=()=>publish.value;
+ const debug=document.getElementById("meta-publish-debug"),logs=[];
+ function trace(event,details={}){
+  logs.push({time:new Date().toLocaleTimeString("pt-BR"),event,...details});
+  if(logs.length>25)logs.shift();
+  debug.textContent=JSON.stringify(logs,null,2);
+ }
  const url=(id,kind)=>"/api/companies/"+encodeURIComponent(company.value)+"/creative-drafts/"+encodeURIComponent(id)+"/"+kind;
  function buttons(){
   const valid=Boolean(selected()&&company.value);
@@ -28,7 +34,7 @@
    const data=await r.json();
    if(seq!==requestId)return;
    if(!r.ok)throw Error(data.error||"Não foi possível verificar o vídeo.");
-   state=data.state;
+   state=data.state;trace("status",{http:r.status,state:data.state,videoId:data.videoId,adId:data.adId});
    if(state==="ad_created"){creationOutcome=null;status.textContent=label(data);}
    else if(creationOutcome){status.textContent=creationOutcome+" Estado atual na Meta: "+label(data);}
    else status.textContent=label(data);
@@ -46,16 +52,17 @@
    "Enviar este vídeo para a Meta? Nenhum anúncio será ativado.":
    "Criar anúncio PAUSADO na Meta? Nenhum anúncio será ativado.";
   if(!confirm(question))return;
-  busy=true;creationOutcome=null;buttons();status.textContent="Processando na Meta. Aguarde; não clique novamente.";
+  trace("POST iniciado",{operation:kind,draftId:id,state});busy=true;creationOutcome=null;buttons();status.textContent="Processando na Meta. Aguarde; não clique novamente.";
   try{
    const r=await fetch(url(id,kind),{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({confirm:true})});
    const ct=r.headers.get("content-type")||"";
    if(!ct.includes("application/json"))throw Error("Resposta inesperada. Confira a Meta antes de repetir.");
    const data=await r.json();
+   trace("POST resposta",{operation:kind,http:r.status,ok:r.ok,error:data.error,metaErrorDetail:data.metaErrorDetail,adId:data.adId,code:data.code});
    if(!r.ok)throw Error([data.error,data.metaErrorDetail].filter(Boolean).join("\n"));
    creationOutcome=kind==="meta-video"?"Vídeo enviado. Verificando processamento…":data.adId?"Meta confirmou a criação do anúncio PAUSADO (ID: "+data.adId+").":"A solicitação foi aceita, mas não retornou ID do anúncio. Confira a Meta antes de repetir.";
    status.textContent=creationOutcome;
-  }catch(e){creationOutcome="Não foi possível confirmar a operação: "+e.message+". Confira a Meta antes de repetir.";status.textContent=creationOutcome;}
+  }catch(e){trace("POST falhou",{operation:kind,message:e.message});creationOutcome="Não foi possível confirmar a operação: "+e.message+". Confira a Meta antes de repetir.";status.textContent=creationOutcome;}
   finally{busy=false;await refresh();}
  }
  publish.addEventListener("change",()=>{creationOutcome=null;refresh();});
