@@ -3,7 +3,7 @@ const pool=require("./db");
 const access=require("./company-access");
 const {uuid}=require("./media-validation");
 const router=express.Router();
-const fields='d.id,d."media_id" AS "mediaId",d.campaign_meta_id AS "campaignMetaId",d.adset_meta_id AS "adsetMetaId",d.headline,d.primary_text AS "primaryText",d.description,d.updated_at AS "updatedAt",m.name AS "mediaName",a.label AS "accountLabel",m.drive_url AS "mediaUrl"';
+const fields='d.id,d."media_id" AS "mediaId",d.campaign_meta_id AS "campaignMetaId",d.adset_meta_id AS "adsetMetaId",d.headline,d.primary_text AS "primaryText",d.description,d.updated_at AS "updatedAt",d.meta_video_id AS "metaVideoId",d.meta_creative_id AS "metaCreativeId",d.meta_ad_id AS "metaAdId",d.meta_publish_state AS "metaPublishState",m.name AS "mediaName",a.label AS "accountLabel",m.drive_url AS "mediaUrl"';
 const join=" FROM creative_drafts d JOIN media m ON m.company_id=d.company_id AND m.id=d.media_id JOIN drive_accounts a ON a.company_id=m.company_id AND a.id=m.account_id ";
 function parse(body){
  const mediaId=body?.mediaId, headline=typeof body?.headline==="string"?body.headline.trim():"",
@@ -35,9 +35,9 @@ router.put("/:companyId/creative-drafts/:draftId",access,async(req,res,next)=>{
  const v=parse(req.body);if(!v)return res.status(400).json({error:"Confira mídia, título, texto e IDs da Meta."});
  try{
  const result=await pool.query(`UPDATE creative_drafts d SET media_id=$3,campaign_meta_id=$4,adset_meta_id=$5,headline=$6,primary_text=$7,description=$8,updated_at=NOW()
- WHERE d.company_id=$1 AND d.id=$2 AND EXISTS(SELECT 1 FROM media m WHERE m.company_id=$1 AND m.id=$3 AND m.kind='video') RETURNING d.id`,
+ WHERE d.company_id=$1 AND d.id=$2 AND d.meta_video_id IS NULL AND EXISTS(SELECT 1 FROM media m WHERE m.company_id=$1 AND m.id=$3 AND m.kind='video') RETURNING d.id`,
  [req.params.companyId,req.params.draftId,v.mediaId,v.campaignMetaId,v.adsetMetaId,v.headline,v.primaryText,v.description]);
- if(!result.rows.length)return res.status(404).json({error:"Rascunho não encontrado ou vídeo indisponível."});
+ if(!result.rows.length)return res.status(404).json({error:"Rascunho não encontrado, vídeo indisponível ou já enviado à Meta. Crie um novo rascunho para alterar."});
  res.json({id:result.rows[0].id});
  }catch(e){next(e);}
 });
