@@ -1,3 +1,9 @@
+## 25/10/2026 — META04.1 validada em produção; META04.2A em revisão
+
+**Aceite operacional confirmado por screenshot:** a conta Alps criou a campanha real **Teste Integracao API** (ID Meta `120249780034580576`), objetivo OUTCOME_ENGAGEMENT, status PAUSED, sem conjunto, anúncio ou orçamento. Após corrigir erro 100/subcódigo 4834011 com `is_adset_budget_sharing_enabled=false`, a API retornou ID e a lista passou de uma para duas campanhas. O operador confirmou visualmente. Flag `META_CAMPAIGN_CREATION_ENABLED=true` no serviço da aplicação. O token não foi exposto.
+
+**META04.2A (PR em revisão):** formulário para planejar conjunto de anúncios em campanha pausada existente, com nome, idades 18–65, país Brasil e orçamento diário em reais. Endpoint `POST /api/companies/:companyId/meta-adset-preview` apenas valida e devolve prévia; **não chama a Meta, não cria conjunto e não gera gasto**. Ainda não valida a existência/status da campanha na Meta durante o POST; a lista do formulário é obtida da Meta. O orçamento é simulado, não garantido como aceito pela Meta. META04.2B deverá tratar objetivo/otimização/destino, programação, posicionamentos, idempotência persistente e confirmação explícita antes da primeira escrita de conjunto. Sem testes de produção da META04.2A.
+
 ## 24/10/2026 — META04.1 (PR em revisão)
 
 Criação explícita de campanha OUTCOME_ENGAGEMENT com status PAUSED via Marketing API, sem conjunto, criativo ou orçamento. Endpoint POST /api/companies/:companyId/meta-create-campaign, autorização de owner/admin por clínica, confirmação no navegador, flag de segurança META_CAMPAIGN_CREATION_ENABLED=true no Railway (desabilitada por padrão), token apenas no servidor. Repetição de mesma chave protegida apenas em memória no processo (não é idempotência durável entre reinícios/instâncias); respostas incertas exigem conferir lista antes de repetir. Não testar criação sem autorização do operador. Produção ainda não validada.
