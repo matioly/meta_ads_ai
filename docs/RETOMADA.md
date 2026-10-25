@@ -1,3 +1,5 @@
+> **PONTO DE RETOMADA MAIS RECENTE (25/10/2026, após PR #62):** iniciar por [GUIA_DE_RETOMADA_2026-10-25.md](GUIA_DE_RETOMADA_2026-10-25.md), [TELAS_E_NAVEGACAO.md](TELAS_E_NAVEGACAO.md) e [CADASTRO_CLINICAS_USUARIOS.md](CADASTRO_CLINICAS_USUARIOS.md). PRs #55–#62: cadastro de clínica/usuário, dashboard real de 30 dias, integração e biblioteca modernizadas, sidebar consistente, hotfixes de inicialização e mitigação de flash de Campanhas. **Flash após #62 ainda não homologado.** Bug funcional confirmado: viewer não é aceito pelo CHECK SQL original. O operador já confirmou criação de anúncio PAUSADO com ID Meta em etapa anterior; os trechos antigos que dizem “5B não homologado” representam estados anteriores, não o marco atual.
+
 # ESTADO PRIORITÁRIO — 25/10/2026
 
 Esta atualização prevalece sobre o histórico abaixo. Repositório matioly/meta_ads_ai; Railway com Node.js/Express/PostgreSQL; projeto separado do bot WhatsApp assistente_alps.

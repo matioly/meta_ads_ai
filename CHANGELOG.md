@@ -1,3 +1,14 @@
+## 25/10/2026 — Handoff completo, administração de workspaces e navegação (#55–#62)
+
+- **#55:** Contas e ativos com shell consistente; endpoints e UI de criação de clínica, novo usuário e listagem de membros.
+- **#56–#57:** dashboard com métricas reais Meta de 30 dias; cards de Integrações; links reais para navegar entre páginas independentes; espaçamento e placeholders.
+- **#58–#59:** correção de referências nulas a `#hero-create` após redesign. #59 restabeleceu inicialização das clínicas e manteve logout acessível; melhora confirmada pelo operador.
+- **#60:** Biblioteca de mídias com tipografia, tabela e cabeçalho modernizados; pré-seleção da seção na inicialização.
+- **#61–#62:** tentativas de remover flash da Visão geral ao entrar em Campanhas. **Aceite após #62 ainda pendente.**
+- **Documentação:** guia de retomada, telas/navegação, cadastro/permissões e atualizações em README, arquitetura, operação, backlog e changelog.
+- **Problema novo identificado na revisão:** API cria papel `viewer`, mas migration `001_initial.sql` restringe `role` a owner/admin/member. Exige correção antes da homologação de viewer.
+- **Validação:** commits e PRs confirmados no GitHub; testes automatizados e produção **não executados** nesta atualização de documentação. Fluxo anterior de anúncio PAUSADO foi confirmado pelo operador em 25/10, mas não equivale à homologação de todos os casos.
+
 ## 25/10/2026 — Destino UNDEFINED no fluxo de site
 O diagnóstico do operador confirmou conta, vínculo, PAUSED, OUTCOME_TRAFFIC e LINK_CLICKS; apenas destination_type veio UNDEFINED. Recriar o rascunho preservou os mesmos IDs e resultado. O print do Gerenciador mostra Site/cliques, embora o ID do conjunto não esteja visível nessa captura.
 

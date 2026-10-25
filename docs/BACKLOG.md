@@ -1,3 +1,15 @@
+## Prioridades revisadas — 25/10/2026 após PR #62
+
+1. **P0 — Corrigir papel viewer:** `src/workspace-admin.js` aceita `viewer`, mas `001_initial.sql` limita a `owner/admin/member`. Criar migration e testes, ou harmonizar o contrato. Não homologado.
+2. **P0 — Validar navegação após PR #62:** flash de Visão geral ao abrir Campanhas relatado repetidamente; testar em browser após deploy, revisar inicialização sem multiplicar hacks CSS.
+3. **P1 — Homologar cadastro de clínicas e usuários:** owner, admin, viewer, isolamento entre clínicas, e-mail duplicado, login de novo usuário.
+4. **P1 — Conferir dashboard Meta 30 dias:** moeda, período, dados ausentes, valores vs Gerenciador Meta.
+5. **P1 — Revisar fluxo de ativação:** confirmação explícita, permissões, idempotência e logs; nunca ativar automaticamente.
+6. **P2 — Gestão de contas:** convites, vínculo de usuário já existente, troca de papéis, desativação, recuperação de senha, auditoria.
+7. **P2 — UX e recursos avançados:** interesses, destinos site/WhatsApp, Drive OAuth/streaming, IA assistida e relatórios.
+
+Detalhes e evidências: [Guia de retomada](GUIA_DE_RETOMADA_2026-10-25.md), [Telas](TELAS_E_NAVEGACAO.md), [Cadastro](CADASTRO_CLINICAS_USUARIOS.md). Os status antigos abaixo são históricos e não substituem esta lista.
+
 # STATUS PRIORITÁRIO — 25/10/2026
 
 - META01 inventário Alps: validado em produção; permissão da Página Facebook a reconfirmar.
