@@ -1,1 +1,51 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Integrações Meta | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><script src="/meta-assets.js" defer></script></head><body><main style="max-width:900px;margin:36px auto;padding:20px"><p><a href="/">← Voltar ao painel</a></p><section class="panel" style="padding:28px"><h1>Integrações Meta</h1><h2>Ativos da Meta</h2><p>Cadastre os identificadores por clínica. Este formulário não conecta nem publica anúncios.</p><label for="company">Clínica</label><select id="company"></select><p id="feedback" role="status"></p><form id="assets-form"><div id="fields" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px"></div><p><button class="primary" type="submit" id="save">Salvar inventário</button></p></form></section></main></body></html>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Contas e ativos | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/meta-shell.css"><script src="/meta-shell.js" defer></script><script src="/meta-assets.js" defer></script><script src="/workspace-admin.js" defer></script></head><body><aside class="sidebar">
+      <a class="brand" href="/">
+        <span class="brand-symbol">ai</span>
+        <span>Meta Ads <strong>AI</strong></span>
+      </a>
+
+      <div class="workspace">
+        <label for="company">ESPAÇO DE TRABALHO</label>
+        <select id="company">
+          <option value="">Carregando clínicas…</option>
+        </select>
+      </div>
+
+      <p class="nav-label">PAINEL</p>
+      <nav aria-label="Navegação principal">
+        <button
+          class="nav-button active"
+          data-view="overview"
+          aria-current="page"
+        >
+          <span class="nav-icon" aria-hidden="true">◈</span><span>Visão geral</span></button>
+        <button class="nav-button" data-view="campaigns">
+          <span class="nav-icon" aria-hidden="true">◎</span><span>Campanhas</span></button>
+        <a class="nav-button" href="/meta-campaigns.html"><span class="nav-icon" aria-hidden="true">◉</span><span>Gerenciador Meta</span></a>
+        <button class="nav-button" data-view="media"><span class="nav-icon" aria-hidden="true">▣</span><span>Biblioteca de mídias</span></button>
+        <button class="nav-button" data-view="integrations">
+          <span class="nav-icon" aria-hidden="true">⇄</span><span>Integrações</span></button>
+      </nav>
+
+      <p class="nav-label">CONFIGURAÇÕES</p>
+      <div class="sidebar-shortcuts">
+        <a class="nav-button active" aria-current="page" href="/meta-assets.html"><span class="nav-icon" aria-hidden="true">⚙</span><span>Contas e ativos Meta</span></a>
+      </div>
+
+      <div class="sidebar-footer">
+        <span class="avatar">AI</span>
+        <div>
+          <strong>Seu centro de campanhas</strong>
+          <small>Planeje. Revise. Publique.</small>
+        </div>
+      </div>
+    </aside><div class="main"><header class="topbar">
+        <span
+          >Workspace <span class="separator">/</span>
+          <strong id="company-name">Sorriso de Campinas</strong>
+        </span>
+        <div class="topbar-actions">
+          <span class="preview-badge" id="user-name">Carregando…</span>
+          <button class="secondary" id="logout" type="button">Sair</button>
+        </div>
+      </header><main class="meta-manager-main" style="padding:24px"><p class="eyebrow">CONFIGURAÇÕES</p><h1>Contas e ativos Meta</h1><p>Gerencie as integrações, os espaços de trabalho e os acessos ao sistema.</p><section class="panel" style="padding:28px;margin:20px 0"><h2>Inventário de ativos Meta</h2><p>Os identificadores são exclusivos da clínica selecionada. Salvar não publica anúncios.</p><label for="meta-company">Clínica</label><select id="meta-company"></select><p id="feedback" role="status"></p><form id="assets-form"><div id="fields" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px"></div><p><button class="primary" type="submit" id="save">Salvar inventário</button></p></form></section><section class="panel" style="padding:28px;margin:20px 0"><h2>Espaços de trabalho</h2><p>Cadastre uma nova clínica para configurar uma conta Meta independente.</p><form id="workspace-form"><label>Nome da clínica<input id="workspace-name" maxlength="120" required placeholder="Ex.: Clínica Centro"></label><label>Cidade<input id="workspace-city" maxlength="120" required value="Campinas"></label><label>UF<input id="workspace-state" maxlength="2" required value="SP"></label><p><button class="primary" type="submit">Adicionar espaço de trabalho</button></p></form><p id="workspace-feedback" role="status"></p></section><section class="panel" style="padding:28px;margin:20px 0"><h2>Usuários e permissões</h2><p>Cadastre um usuário de teste para a clínica selecionada. O acesso não será compartilhado com outras clínicas.</p><div id="workspace-users"></div><form id="workspace-user-form"><label>Nome<input id="new-user-name" required maxlength="120"></label><label>E-mail<input id="new-user-email" type="email" required maxlength="254" autocomplete="off"></label><label>Senha inicial (mínimo 12 caracteres)<input id="new-user-password" type="password" required minlength="12" maxlength="72" autocomplete="new-password"></label><label>Permissão<select id="new-user-role"><option value="viewer">Visualizador (somente leitura)</option><option value="admin">Administrador da clínica</option></select></label><p><button class="primary" type="submit">Cadastrar usuário</button></p></form><p id="user-feedback" role="status"></p></section></main></div></body></html>
