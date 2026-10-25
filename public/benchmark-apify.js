@@ -1,20 +1,22 @@
 (() => {
  const $=id=>document.getElementById(id);
  let request=0;
- function reset(){request++;$("benchmark-auto-results").replaceChildren();}
+ function reset(){request++;window.benchmarkSelectedCompetitor=null;$("benchmark-auto-results").replaceChildren();}
  window.benchmarkAutoReset=reset;
  window.benchmarkAutoSearch=async competitor=>{
+  window.benchmarkSelectedCompetitor=competitor;
   window.benchmarkAdsOpen(competitor,true);
   const current=++request;
   const root=$("benchmark-auto-results");root.replaceChildren();
   const status=document.createElement("p");status.textContent="Consultando anúncios públicos da Meta via Apify. A busca pode levar até dois minutos e pode gerar cobrança na Apify.";root.append(status);
   try{
    const path="/api/companies/"+encodeURIComponent($("company").value)+"/benchmark-competitors/"+encodeURIComponent(competitor.id)+"/auto-ads";
-   const response=await fetch(path,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:"{}"});
+   const response=await fetch(path,{method:"GET",credentials:"same-origin"});
    const data=await response.json();
    if(current!==request)return;
    if(!response.ok)throw Error(data.error||"Falha na busca automática.");
-   status.textContent=data.returned===0?"Nenhum anúncio encontrado nesta busca. Isso não significa necessariamente que a clínica não anuncia.":data.returned+" anúncio(s) encontrado(s). "+(data.searchMode==="name"?"Busca por nome: confira cuidadosamente o anunciante. ":"")+"Resultados externos não foram salvos.";
+   if(!data.cached){status.textContent="Nenhuma busca salva ainda. Clique em Atualizar anúncios para consultar a Apify.";return;}
+   status.textContent=data.returned===0?"Nenhum anúncio encontrado nesta busca. Isso não significa necessariamente que a clínica não anuncia.":data.returned+" anúncio(s) encontrado(s). "+(data.searchMode==="name"?"Busca por nome: confira cuidadosamente o anunciante. ":"")+"Atualizado em "+new Date(data.updatedAt).toLocaleString("pt-BR")+". Exibindo resultados salvos.";
    for(const ad of data.ads){
     const card=document.createElement("article");card.className="panel benchmark-card";
     const title=document.createElement("h3");title.textContent=ad.pageName||"Anúncio público";
@@ -34,5 +36,20 @@
     };actions.append(save);card.append(actions);root.append(card);
    }
   }catch(e){if(current===request)status.textContent=e.message;}
+ };
+ window.benchmarkAutoRefresh=async()=>{
+  const root=$("benchmark-auto-results");
+  const refresh=$("benchmark-auto-refresh");
+  if(!window.benchmarkSelectedCompetitor)return;
+  const c=window.benchmarkSelectedCompetitor;
+  refresh.disabled=true;refresh.textContent="Consultando Apify…";
+  const status=document.createElement("p");status.textContent="Atualizando anúncios na Apify. Aguarde; esta operação pode gerar cobrança.";root.prepend(status);
+  try{
+   const path="/api/companies/"+encodeURIComponent($("company").value)+"/benchmark-competitors/"+encodeURIComponent(c.id)+"/auto-ads";
+   const r=await fetch(path,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:"{}"});
+   const d=await r.json();if(!r.ok)throw Error(d.error||"Falha ao atualizar.");
+   await window.benchmarkAutoSearch(c);
+  }catch(e){status.textContent=e.message;}
+  finally{refresh.disabled=false;refresh.textContent="↻ Atualizar anúncios";}
  };
 })();
