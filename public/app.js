@@ -97,6 +97,7 @@ function notify (message) {
 }
 
 function changeView (view) {
+  if (!pages[view]) view = 'overview'
   $('#page-title').textContent = pages[view].title
   $('#page-description').textContent = pages[view].description
 
@@ -105,7 +106,7 @@ function changeView (view) {
   $('#meta-real-campaigns').hidden = !['overview', 'campaigns'].includes(view)
   $('#media-section').hidden = view !== 'media'
   $('#integrations-section').hidden = view !== 'integrations'
-  $('#new-campaign').hidden = !['overview', 'campaigns'].includes(view)
+  $('#new-campaign').hidden = true
 
   document.querySelectorAll('[data-view]').forEach(button => {
     const active = button.dataset.view === view
