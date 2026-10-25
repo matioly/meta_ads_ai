@@ -1,3 +1,9 @@
+## 24/10/2026 — META02 validada e META03 em implementação
+
+**META02:** PR #2 integrado e deploy Railway confirmado pelo operador. Teste real no Chrome autenticado retornou HTTP 200 e `{ connected: true, account: {...} }` para Alps Oral Clinic. Isso confirma consulta à conta de anúncios via Graph API usando `META_ACCESS_TOKEN` armazenado no servidor. Não comprova permissões de publicação nem valida acesso à página Facebook.
+
+**META03 (PR em revisão, teste operacional pendente):** novo endpoint somente leitura `GET /api/companies/:companyId/meta-campaigns`, com autenticação e autorização por clínica, consulta Graph API `act_{ad_account_id}/campaigns`, limite de 100 resultados, timeout e erros sanitizados. Nova tela `/meta-campaigns.html` acessível em Integrações, com nome, objetivo, status e orçamentos informados pela Meta. A tela diferencia ausência de orçamento na campanha (pode existir no conjunto) e indica quando há mais de 100 campanhas. Sem migrations, novas dependências ou operações de escrita. A lista de campanhas ainda precisa de teste real no Railway após merge/deploy. Próximos passos: validar a lista, paginação, métricas e controle de publicação em fases separadas.
+
 # Release notes — Meta Ads AI
 
 ## 24/10/2026 — META01: inventário de ativos Meta por clínica
