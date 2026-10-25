@@ -4,8 +4,8 @@
  function reset(){request++;$("benchmark-auto-results").replaceChildren();}
  window.benchmarkAutoReset=reset;
  window.benchmarkAutoSearch=async competitor=>{
-  const current=++request;
   window.benchmarkAdsOpen(competitor,true);
+  const current=++request;
   const root=$("benchmark-auto-results");root.replaceChildren();
   const status=document.createElement("p");status.textContent="Consultando anúncios públicos da Meta via Apify. A busca pode levar até dois minutos e pode gerar cobrança na Apify.";root.append(status);
   if(!competitor.facebookUrl){status.textContent="Edite o concorrente e informe a página do Facebook para realizar a busca automática.";return;}
