@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gerenciar anúncios | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><script src="/meta-campaigns.js" defer></script><script src="/meta-create-campaign.js" defer></script><script src="/meta-adset-preview.js" defer></script></head>
+<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gerenciar anúncios | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><script src="/meta-campaigns.js" defer></script><script src="/meta-create-campaign.js" defer></script><script src="/meta-adset-preview.js" defer></script><script src="/meta-create-adset.js" defer></script></head>
 <body><main style="max-width:1250px;margin:32px auto;padding:20px">
 <p><a href="/">← Voltar ao painel</a></p><p class="eyebrow">GERENCIAR ANÚNCIOS</p>
 <h1>Gerenciar anúncios</h1><p>Acompanhe seus resultados e prepare campanhas para a clínica. Tudo que for criado nesta etapa fica pausado até sua decisão.</p>
@@ -38,7 +38,7 @@
 </section>
 <section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="adset-preview-title">
 <h2 id="adset-preview-title">2. Configurar público e orçamento</h2>
-<p>Escolha quem poderá ver seus anúncios e quanto pretende investir por dia. <strong>Esta etapa é apenas uma simulação: nada será enviado à Meta.</strong> Por enquanto, a região disponível é Brasil.</p>
+<p>Escolha quem poderá ver seus anúncios e quanto pretende investir por dia. <strong>Confira a simulação antes de criar o público pausado na Meta. Nenhum anúncio será publicado.</strong> Por enquanto, a região disponível é Brasil.</p>
 <form id="adset-preview-form">
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
 <label>Escolha a campanha<select id="adset-campaign" required><option value="">Carregando campanhas…</option></select></label>
@@ -50,7 +50,7 @@
 <button type="submit" class="secondary" id="adset-preview-button" style="margin-top:12px">Conferir configurações</button>
 </form><p id="adset-preview-feedback" role="status" aria-live="polite"></p>
 <div style="margin-top:10px;font-weight:600">3. Adicionar vídeo e texto <span style="font-weight:400">(em breve)</span></div><div style="margin-top:8px;font-weight:600">4. Revisar e publicar <span style="font-weight:400">(em breve; nunca automático)</span></div>
-<pre id="adset-preview-result" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+<div id="adset-create-actions" hidden><button type="button" id="adset-create-button" class="primary">Criar público pausado na Meta</button><p id="adset-create-feedback" role="status"></p></div><pre id="adset-preview-result" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
 </section>
 <p id="feedback" role="status" aria-live="polite">Carregando…</p>
 <div class="table-wrapper"><table><caption id="table-caption">Campanhas da Meta</caption><thead><tr id="headers"></tr></thead><tbody id="campaigns"></tbody></table></div>
