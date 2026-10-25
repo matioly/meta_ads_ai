@@ -13,9 +13,9 @@ async function refreshAdsetCampaigns(){
     const data=await r.json();
     if(!r.ok)throw Error(data.error||"Falha ao consultar campanhas.");
     const paused=(data.items||[]).filter(c=>c.status==="PAUSED");
-    const placeholder=document.createElement("option");placeholder.value="";placeholder.textContent="Selecione uma campanha pausada";adsetCampaign.append(placeholder);
+    const placeholder=document.createElement("option");placeholder.value="";placeholder.textContent="Escolha uma campanha";adsetCampaign.append(placeholder);
     for(const campaign of paused){const option=document.createElement("option");option.value=campaign.id;option.textContent=campaign.name+" · "+campaign.id;adsetCampaign.append(option);}
-    adsetFeedback.textContent=paused.length?"Escolha uma campanha pausada para simular.":"Nenhuma campanha pausada disponível.";
+    adsetFeedback.textContent=paused.length?"Escolha uma campanha para conferir o público e orçamento.":"Nenhuma campanha pausada disponível para configurar.";
   }catch(e){adsetFeedback.textContent=e.message;}
 }
 adsetForm.addEventListener("submit",async e=>{
@@ -32,12 +32,12 @@ adsetForm.addEventListener("submit",async e=>{
     });
     const data=await r.json();
     if(!r.ok)throw Error(data.error||"Não foi possível validar.");
-    adsetFeedback.textContent="Plano validado. Nenhum conjunto foi criado.";
+    adsetFeedback.textContent="Tudo certo! Este é apenas um planejamento; nenhum anúncio foi criado.";
     adsetResult.textContent=[
-      "Campanha: "+data.campaignId,"Conjunto: "+data.name,"Status futuro: PAUSADA",
-      "Região: Brasil","Idades: "+data.targeting.age_min+"–"+data.targeting.age_max,
-      "Orçamento diário planejado: "+new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(data.dailyBudgetBrl),
-      "Pendente para META04.2B:",...data.pending.map(p=>"• "+p)
+      "Campanha escolhida: "+adsetCampaign.selectedOptions[0].textContent,"Nome do público: "+data.name,"Situação: ainda não criado",
+       "Localização inicial: Brasil","Faixa etária: "+data.targeting.age_min+"–"+data.targeting.age_max,
+       "Investimento diário planejado: "+new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(data.dailyBudgetBrl),
+      "Antes de criar anúncios, ainda precisamos:",...data.pending.map(p=>"• "+p)
     ].join("\n");
   }catch(e){adsetFeedback.textContent=e.message;}finally{adsetButton.disabled=false;}
 });
