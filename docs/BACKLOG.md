@@ -17,9 +17,18 @@ Data-base: 24/10/2026. Este é um plano proposto, não uma lista de funcionalida
 
 Os testes funcionais anteriores ao briefing foram confirmados manualmente pelo operador. B01 tem implementação versionada; seu aceite operacional específico ainda está pendente. Isso não marca testes automatizados, auditoria de segurança ou integração externa como concluídos.
 
+## Decisão de armazenamento — 24/10/2026
+
+A equipe já distribui arquivos em várias contas Google. Foi escolhida biblioteca de links, com apelido/e-mail da conta e vínculo ao rascunho, sem bucket neste momento. L01 está implementado; aceite no Railway pendente. M01/M02 originais (upload próprio e pré-visualização hospedada) ficam adiados, não concluídos.
+
+| ID | Estado | Escopo | Aceite |
+|---|---|---|---|
+| L01 | Implementado; aceite operacional pendente | CRUD de contas e links por clínica; vídeo/imagem; uma mídia por rascunho | Cadastrar, editar, vincular, recarregar, verificar member e clínica diferente |
+| L02 | Próxima proposta | Acesso autorizado ao Drive para uso automatizado | Definir consentimento/contas; validar download privado e tratar revogação sem tornar pastas públicas |
+
 ## Ordem de produto recomendada
 
-Briefing completo → mídia → assistência de conteúdo → revisão → conexão Meta inicialmente de leitura → publicação controlada → resultados → automações graduais.
+Briefing completo → biblioteca de links → acesso autorizado à mídia → assistência de conteúdo → revisão → conexão Meta inicialmente de leitura → publicação controlada → resultados → automações graduais.
 
 A preparação da conexão Meta pode avançar antes da IA, conforme disponibilidade dos ativos. Publicação depende de credenciais, permissões e revisão; nenhuma atividade deste backlog autoriza por si só gastos reais.
 
@@ -41,8 +50,8 @@ A preparação da conexão Meta pode avançar antes da IA, conforme disponibilid
 
 | ID | Prioridade | Trabalho | Dependências | Critério de aceite |
 |---|---|---|---|---|
-| M01 | Próxima feature proposta após aceite B01 | Upload de vídeos/imagens e biblioteca por clínica | Escolher armazenamento de objetos | Validar tipo/tamanho, separar acesso por clínica, mostrar progresso/erro e recuperar arquivo após novo login |
-| M02 | Média | Vincular mídias ao rascunho e pré-visualizar | M01 | Escolher/substituir mídia sem expor arquivos de outras clínicas |
+| M01 | Adiado; biblioteca por links escolhida | Upload de vídeos/imagens e biblioteca por clínica | Escolher armazenamento de objetos | Validar tipo/tamanho, separar acesso por clínica, mostrar progresso/erro e recuperar arquivo após novo login |
+| M02 | Adiado no formato de upload próprio | Vincular mídias ao rascunho e pré-visualizar | M01 | Escolher/substituir mídia sem expor arquivos de outras clínicas |
 | M03 | Média | Processamento assíncrono, miniaturas e metadados | M01 e avaliação de volume | Estado pendente/pronto/erro; reprocessamento controlado sem bloquear API |
 | A01 | Alta após B01 | Geração assistida de texto/títulos/variações | Escolher provedor/modelo, credenciais e orçamento | Gerar a partir do briefing; resultado editável e salvo; limites de custo; erros claros; sem publicação automática |
 | A02 | Média | Histórico de geração e versionamento de textos | A01 | Rastrear parâmetros e versão; recuperar variações e registrar revisão humana |
@@ -89,3 +98,4 @@ Permissões, revisão do aplicativo, tipos de token e versão da API devem ser v
 ## Definição de pronto
 
 Uma entrega deve ter código e migrations versionados quando necessários; validação no servidor; isolamento por clínica; estados de erro na interface; verificações adequadas ao risco; deploy e teste funcional registrados. Atualizar CHANGELOG, RETOMADA e este backlog com evidências e limitações. Dependências externas só ficam concluídas depois de testadas com o serviço correspondente.
+

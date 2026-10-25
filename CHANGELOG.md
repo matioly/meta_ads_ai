@@ -1,5 +1,20 @@
 # Release notes — Meta Ads AI
 
+## 24/10/2026 — Biblioteca de links do Google Drive (L01)
+
+Implementados cadastro/edição/exclusão de contas identificadas por apelido e e-mail opcional, biblioteca de vídeos/imagens por clínica e vínculo opcional de uma mídia ao rascunho. Botão Abrir no Drive; membros consultam, owner/admin gerenciam.
+
+Migration 006 cria drive_accounts e media, adiciona campaigns.media_id e chaves compostas para isolamento por clínica. Não há upload próprio, OAuth Google, download ou alteração de arquivos externos. M01 de bucket/upload foi adiado por decisão de aproveitar o Drive existente.
+
+Validação de links HTTPS do Drive com normalização e preservação de resourcekey; duplicidades retornam 409. Registros vinculados não podem ser excluídos. PUT de campanha sem mediaId preserva vínculo; null remove.
+
+Seis testes unitários de validação e autorização agora versionados e executáveis por npm test. Migrations 001–006 e rotas testadas em PostgreSQL embarcado PGlite, com autenticação simulada: permissões, duplicidade, FK entre clínicas, bloqueio de exclusão e compatibilidade passaram. Essa execução não substitui teste no PostgreSQL do Railway nem verifica sessão real de produção.
+
+Fluxos de cadastro de contas e mídias, vínculo de campanha, novo rascunho sem mídia herdada, troca de clínica e consulta member passaram em DOM simulado (jsdom), com chamadas à API de teste. Não houve validação visual em navegador real; o navegador de teste não pôde ser instalado neste ambiente.
+
+Aceite operacional no Railway pendente. Próximo passo: confirmar biblioteca e planejar acesso autorizado ao Drive para automação.
+
+
 ## 24/10/2026 — Briefing opcional de campanha (B01)
 
 Commit funcional: [8860d6e](https://github.com/matioly/meta_ads_ai/commit/8860d6e4867b565c53d4c2c9c2ece22bb49d7e13).
@@ -109,3 +124,4 @@ Briefing completo por campanha, seguido de mídia e integrações graduais. Ver 
 ## Como registrar futuras entregas
 
 Adicionar seção com data, commit/PR, problema resolvido, comportamento novo, alterações de banco/configuração, testes executados, limitações e próximo passo. Não substituir o histórico anterior. Usar versão formal somente quando houver decisão de versionamento e tag correspondente.
+

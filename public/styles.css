@@ -506,3 +506,18 @@ main.login-card {
   color: var(--text);
   opacity: 1;
 }
+/* Drive library */
+.media-actions, .media-actions-cell { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.media-notice, .media-accounts { padding: 20px 24px; }
+.media-notice { margin-bottom: 0; font-size: 13px; }
+.media-accounts { border-top: 1px solid var(--line); }
+.media-accounts summary { cursor: pointer; font-weight: 600; margin-bottom: 12px; }
+#media-rows td:nth-child(3), #media-rows td:nth-child(4) { white-space: normal; overflow-wrap: anywhere; min-width: 160px; max-width: 280px; }
+.drive-link { display: inline-block; color: var(--purple); padding: 8px 4px; text-decoration: underline; }
+#media-form > textarea { width: 100%; resize: vertical; min-height: 85px; font: inherit; padding: 11px 12px; border: 1px solid #dfe2ec; border-radius: 8px; }
+#media-form > textarea:focus { outline: 2px solid #b9a4ff; outline-offset: 2px; }
+@media (max-width: 650px) {
+  nav { grid-template-columns: repeat(2, 1fr); }
+  .media-actions { width: 100%; }
+}
+

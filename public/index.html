@@ -7,6 +7,7 @@
     <title>Meta Ads AI | Painel</title>
     <link rel="stylesheet" href="/styles.css" />
     <script src="/app.js" defer></script>
+    <script src="/media-library.js" defer></script>
   </head>
   <body>
     <aside class="sidebar">
@@ -34,6 +35,7 @@
         <button class="nav-button" data-view="campaigns">
           <span aria-hidden="true">◎</span> Campanhas
         </button>
+        <button class="nav-button" data-view="media"><span aria-hidden="true">▣</span> Mídias</button>
         <button class="nav-button" data-view="integrations">
           <span aria-hidden="true">⇄</span> Integrações
         </button>
@@ -171,7 +173,36 @@
           </p>
         </section>
 
-        <section id="integrations-section" hidden>
+        
+      <section class="panel" id="media-section" hidden>
+        <div class="panel-heading">
+          <div><h2>Biblioteca do Drive</h2><p>Organize os links por clínica e identifique a conta de origem.</p></div>
+          <div class="media-actions">
+            <button class="secondary" id="new-drive-account" type="button">Cadastrar conta</button>
+            <button class="primary" id="new-media" type="button">Cadastrar mídia</button>
+          </div>
+        </div>
+        <p class="media-notice">Os arquivos continuam no Google Drive. A conta é uma identificação, sem conexão ou senha. Para abrir o arquivo, você precisa ter permissão no Google. O acesso e o tipo informado não são verificados automaticamente.</p>
+        <p id="media-feedback" class="no-results" role="status"></p>
+        <div class="table-wrapper" id="media-table-wrapper" hidden>
+          <table>
+            <caption class="sr-only">Mídias da clínica selecionada</caption>
+            <thead><tr><th>Mídia</th><th>Tipo</th><th>Conta de origem</th><th>Observações</th><th>Ações</th></tr></thead>
+            <tbody id="media-rows"></tbody>
+          </table>
+        </div>
+        <details class="media-accounts">
+          <summary>Contas cadastradas</summary>
+          <p>Use um apelido, como “Vídeos Alps 01”. O e-mail é opcional. A mesma conta pode ser cadastrada separadamente em cada clínica.</p>
+          <div class="table-wrapper"><table>
+            <caption class="sr-only">Contas identificadas nesta clínica</caption>
+            <thead><tr><th>Apelido</th><th>E-mail</th><th>Ações</th></tr></thead>
+            <tbody id="drive-account-rows"></tbody>
+          </table></div>
+        </details>
+      </section>
+
+<section id="integrations-section" hidden>
           <div class="integration-grid">
             <article class="panel integration-card">
               <span class="integration-logo meta-logo">∞</span>
@@ -257,6 +288,10 @@
           required
         />
 
+        <label for="campaign-media">Mídia da campanha (opcional)</label>
+        <select id="campaign-media"><option value="">Nenhuma mídia vinculada</option></select>
+        <div id="campaign-media-link"></div>
+        <p class="form-note">Cadastre os links na seção Mídias. Selecionar um arquivo não publica anúncios nem libera acesso no Google.</p>
         <details class="briefing-section" id="campaign-briefing">
           <summary>Briefing da campanha</summary>
 
@@ -341,5 +376,44 @@
     </dialog>
 
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-  </body>
+  
+  <dialog id="drive-account-dialog" aria-labelledby="drive-account-title">
+    <form id="drive-account-form">
+      <h2 id="drive-account-title">Cadastrar conta</h2>
+      <p class="form-note">Somente identificação. Não informe senha ou token.</p>
+      <label for="drive-account-label">Apelido da conta</label>
+      <input id="drive-account-label" maxlength="120" required placeholder="Ex.: Vídeos Alps 01">
+      <label for="drive-account-email">E-mail da conta (opcional)</label>
+      <input id="drive-account-email" type="email" maxlength="254" placeholder="conta@gmail.com">
+      <p id="drive-account-error" role="alert" class="login-error" hidden></p>
+      <div class="dialog-actions">
+        <button class="secondary" type="button" data-close-media="drive-account-dialog">Cancelar</button>
+        <button class="primary" type="submit">Salvar conta</button>
+      </div>
+    </form>
+  </dialog>
+  <dialog id="media-dialog" aria-labelledby="media-title">
+    <form id="media-form">
+      <h2 id="media-title">Cadastrar mídia</h2>
+      <p class="form-note">Cole o link de um arquivo já salvo no Drive. Nenhum arquivo será enviado ou copiado.</p>
+      <label for="media-name">Nome da mídia</label>
+      <input id="media-name" maxlength="120" required placeholder="Ex.: Implantes — apresentação">
+      <label for="media-kind">Tipo informado</label>
+      <select id="media-kind"><option value="video">Vídeo</option><option value="image">Imagem</option></select>
+      <label for="media-account">Conta onde está salvo</label>
+      <select id="media-account" required></select>
+      <label for="media-url">Link do arquivo no Google Drive</label>
+      <input id="media-url" type="url" maxlength="2048" required placeholder="https://drive.google.com/file/d/.../view">
+      <label for="media-notes">Observações</label>
+      <textarea id="media-notes" maxlength="500" rows="3" placeholder="Ex.: Vertical, versão final"></textarea>
+      <p id="media-error" role="alert" class="login-error" hidden></p>
+      <div class="dialog-actions">
+        <button class="secondary" type="button" data-close-media="media-dialog">Cancelar</button>
+        <button class="primary" type="submit">Salvar mídia</button>
+      </div>
+    </form>
+  </dialog>
+
+</body>
 </html>
+

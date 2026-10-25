@@ -2,7 +2,11 @@
 
 Atualizado em 24/10/2026. Código de referência: 8860d6e.
 
-## Onde paramos
+## Último incremento: biblioteca do Drive
+
+Implementada biblioteca de links com cadastro de contas por apelido/e-mail, vídeos/imagens por clínica e uma mídia opcional por campanha. Migration nova: 006_drive_library.sql. Não criar bucket nem solicitar senha Google: esta etapa guarda apenas metadados e links. Detalhes em BIBLIOTECA_DRIVE.md. Aceite no Railway pendente.
+
+## Histórico anterior
 
 O painel permite fazer login, escolher a clínica e criar, consultar, editar e excluir rascunhos persistidos no PostgreSQL. Evandro confirmou os testes manuais após as entregas de persistência e edição. O último incremento funcional é **briefing opcional de campanha**, versionado em 8860d6e, com a migration 005. Sintaxe e validação isolada foram verificadas; o teste ponta a ponta específico do briefing no Railway ainda precisa ser registrado.
 
@@ -36,11 +40,11 @@ Se houver mudanças locais, preservá-las em commit ou stash antes de sincroniza
 
 Primeiro concluir o aceite operacional de **B01**: migration 005 aplicada, briefing salvo e recarregado, campos apagados persistindo vazios, rascunhos antigos funcionando e consulta por member sem escrita.
 
-Depois, **upload de vídeos/imagens e biblioteca por clínica (M01)**. Escolher armazenamento de objetos e limites, definir acesso privado por clínica, implementar upload com validação e estados de progresso/erro. O vínculo da mídia ao rascunho é M02.
+A decisão posterior foi usar os links de arquivos que a equipe já guarda em várias contas do Google Drive. A biblioteca e o vínculo estão implementados em L01. Confirmar seu funcionamento após a migration 006; depois definir o acesso autorizado ao Drive para futura transferência ao Meta (L02). Upload próprio M01 fica adiado.
 
 O briefing já tem serviço, oferta, público, região, mensagem, destino e observações, todos opcionais. Não refazer essa feature. A API preserva o briefing se PUT não enviar a propriedade; se enviar, substitui o objeto inteiro.
 
-A escolha do provedor de mídia ainda está aberta. Testes de autorização e prevenção de migrations vazias continuam no backlog técnico.
+A biblioteca atual usa Google Drive como origem dos links, sem conexão OAuth. A estratégia de acesso automático ainda será definida. Testes de autorização e prevenção de migrations vazias continuam no backlog técnico.
 
 ## Cuidados para não repetir problemas
 
@@ -55,8 +59,9 @@ A escolha do provedor de mídia ainda está aberta. Testes de autorização e pr
 
 ## Texto para iniciar outra sessão de trabalho
 
-> Continuar o projeto matioly/meta_ads_ai. Leia README.md, docs/RETOMADA.md, CHANGELOG.md, docs/ARQUITETURA.md e docs/BACKLOG.md e confira o código atual antes de alterar. Já temos Node/Express, PostgreSQL, deploy Railway, login com sessões e CRUD de rascunhos por clínica, inclusive edição. Meta Ads, mídia e IA ainda não estão integrados. Preservar o layout aprovado e o isolamento por clínica. Briefing opcional já implementado em 8860d6e com migration 005; confirmar seu aceite operacional. Próxima feature proposta: upload/biblioteca de mídia por clínica (M01), escolhendo armazenamento e limites antes de implementar. Atualizar a documentação após a entrega e registrar o que foi efetivamente testado.
+> Continuar o projeto matioly/meta_ads_ai. Leia README.md, docs/RETOMADA.md, CHANGELOG.md, docs/ARQUITETURA.md e docs/BACKLOG.md e confira o código atual antes de alterar. Já temos Node/Express, PostgreSQL, deploy Railway, login com sessões e CRUD de rascunhos por clínica, inclusive edição. Meta Ads, mídia e IA ainda não estão integrados. Preservar o layout aprovado e o isolamento por clínica. Briefing opcional já implementado em 8860d6e com migration 005; confirmar seu aceite operacional. Biblioteca por links do Drive (L01) também já implementada, com migration 006. Confirmar o deploy e os testes operacionais; próximo passo proposto é acesso autorizado aos arquivos (L02). Não criar bucket sem nova decisão. Atualizar a documentação após a entrega e registrar o que foi efetivamente testado.
 
 ## Como manter este ponto de retomada
 
 Ao parar, registrar data, último commit funcional, resultado dos testes, próximo item, decisões e bloqueios. Não marcar um item como entregue apenas porque foi proposto. Usar links de commits e distinguir teste manual relatado, teste automatizado e verificação de produção.
+

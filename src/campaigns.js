@@ -4,7 +4,21 @@ const { briefingMiddleware } = require('./briefing')
 
 const router = express.Router()
 
-const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const access = require('./company-access')
+const { uuid } = require('./media-validation')
+
+async function campaignMedia(req, res, next) {
+  req.hasMedia = Object.hasOwn(req.body || {}, 'mediaId')
+  req.mediaId = req.body?.mediaId ?? null
+  if (!req.hasMedia || req.mediaId === null) return next()
+  if (typeof req.mediaId !== 'string' || !uuid.test(req.mediaId)) {
+    return res.status(400).json({ error: 'Selecione uma mídia válida.' })
+  }
+  const result = await pool.query('SELECT id FROM media WHERE company_id=$1 AND id=$2', [req.params.companyId, req.mediaId])
+  if (!result.rows[0]) return res.status(400).json({ error: 'Mídia indisponível nesta clínica.' })
+  next()
+}
+
 
 const objectives = new Set([
   'Conversas no WhatsApp',
@@ -19,48 +33,9 @@ const fields = `
   objective,
   budget_cents AS "budgetCents",
   status,
-  briefing
+  briefing,
+  media_id AS "mediaId"
 `
-
-async function access (req, res, next) {
-  if (!req.session?.userId) {
-    return res.status(401).json({
-      error: 'Faça login para continuar.'
-    })
-  }
-
-  if (
-    !uuid.test(req.params.companyId) ||
-    (req.params.campaignId && !uuid.test(req.params.campaignId))
-  ) {
-    return res.status(400).json({
-      error: 'Identificador inválido.'
-    })
-  }
-
-  const result = await pool.query(
-    `SELECT role
-     FROM company_members
-     WHERE company_id = $1 AND user_id = $2`,
-    [req.params.companyId, req.session.userId]
-  )
-
-  const membership = result.rows[0]
-
-  if (!membership) {
-    return res.status(403).json({
-      error: 'Você não tem acesso a esta clínica.'
-    })
-  }
-
-  if (req.method !== 'GET' && !['owner', 'admin'].includes(membership.role)) {
-    return res.status(403).json({
-      error: 'Seu acesso permite apenas consultar.'
-    })
-  }
-
-  next()
-}
 
 router.get('/:companyId/campaigns', access, async (req, res) => {
   const result = await pool.query(
@@ -78,6 +53,7 @@ router.post(
   '/:companyId/campaigns',
   access,
   briefingMiddleware,
+  campaignMedia,
   async (req, res) => {
     const name = typeof req.body?.name === 'string' ? req.body.name.trim() : ''
 
@@ -105,9 +81,10 @@ router.post(
        name,
        objective,
        budget_cents,
-       briefing
+       briefing,
+       media_id
      )
-     VALUES ($1, $2, $3, $4, $5, $6::jsonb)
+     VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7)
      RETURNING ${fields}`,
       [
         req.params.companyId,
@@ -115,7 +92,8 @@ router.post(
         name,
         objective,
         budgetCents,
-        JSON.stringify(req.briefing ?? {})
+        JSON.stringify(req.briefing ?? {}),
+        req.mediaId
       ]
     )
 
@@ -146,6 +124,7 @@ router.put(
   '/:companyId/campaigns/:campaignId',
   access,
   briefingMiddleware,
+  campaignMedia,
   async (req, res) => {
     const name = typeof req.body?.name === 'string' ? req.body.name.trim() : ''
 
@@ -171,7 +150,8 @@ router.put(
        SET name = $1,
            objective = $2,
            budget_cents = $3,
-           briefing = COALESCE($6::jsonb, briefing)
+           briefing = COALESCE($6::jsonb, briefing),
+           media_id = CASE WHEN $7::boolean THEN $8::uuid ELSE media_id END
        WHERE id = $4
          AND company_id = $5
          AND status = 'draft'
@@ -182,7 +162,9 @@ router.put(
         budgetCents,
         req.params.campaignId,
         req.params.companyId,
-        req.briefing === null ? null : JSON.stringify(req.briefing)
+        req.briefing === null ? null : JSON.stringify(req.briefing),
+        req.hasMedia,
+        req.mediaId
       ]
     )
 
@@ -197,3 +179,4 @@ router.put(
 )
 
 module.exports = router
+

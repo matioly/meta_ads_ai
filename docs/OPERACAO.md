@@ -124,6 +124,10 @@ node --check src/server.js
 node --check src/bootstrap.js
 node --check src/campaigns.js
 node --check src/briefing.js
+node --check src/media.js
+node --check src/media-validation.js
+node --check src/company-access.js
+node --check public/media-library.js
 node --check src/migrate.js
 node --check public/app.js
 node --check public/login.js
@@ -132,7 +136,7 @@ git status
 git diff --stat
 ```
 
-Esses comandos verificam sintaxe/diff, não conexão, migrations ou comportamento. Conferir conteúdo de novos SQLs. npm test ainda é o placeholder que termina com erro; não existe suíte automatizada versionada.
+Esses comandos verificam sintaxe/diff, não conexão, migrations ou comportamento. Conferir conteúdo de novos SQLs. npm test executa os testes unitários versionados de validação da biblioteca. A cobertura ainda não substitui testes de integração e autenticação.
 
 Após selecionar os arquivos de uma entrega:
 ```sh
@@ -214,3 +218,10 @@ Sintaxe dos três JavaScripts envolvidos e testes isolados do validador passaram
 Se ocorrer erro de coluna briefing ausente, verificar se a aplicação e o banco usam o mesmo ambiente e se a migration 005 foi executada. Não recriar tabela nem remover dados para resolver.
 
 Nenhuma variável de ambiente ou dependência npm nova é necessária para esta entrega.
+
+
+## Deploy da biblioteca Drive
+
+Pré-deploy deve aplicar 006_drive_library.sql. Sem nova variável, serviço, bucket ou credencial Google. Não instalar as dependências usadas apenas no ambiente externo de integração: PGlite e Playwright não são dependências de produção.
+
+Depois do deploy: abrir Mídias, cadastrar conta, cadastrar link, abrir no Drive com usuário autorizado, vincular ao rascunho, salvar e recarregar. Verificar modo member, troca de clínica e tentativa de excluir mídia vinculada (409). Excluir um cadastro livre deve manter o arquivo original no Drive. Roteiro completo em BIBLIOTECA_DRIVE.md.

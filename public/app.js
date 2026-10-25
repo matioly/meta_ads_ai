@@ -6,6 +6,8 @@ const form = $('#campaign-form')
 const search = $('#search')
 
 let drafts = []
+let driveAccounts = []
+let mediaList = []
 let editingId = null
 let companies = []
 let busy = false
@@ -19,6 +21,10 @@ const money = new Intl.NumberFormat('pt-BR', {
 })
 
 const pages = {
+  media: {
+    title: 'Biblioteca de mídias',
+    description: 'Os vídeos e imagens continuam nas contas Google que vocês já usam.'
+  },
   overview: {
     title: 'Visão geral',
     description: 'Organize suas próximas campanhas em um só lugar.'
@@ -95,9 +101,10 @@ function changeView (view) {
   $('#page-description').textContent = pages[view].description
 
   $('#overview-section').hidden = view !== 'overview'
-  $('#campaign-section').hidden = view === 'integrations'
+  $('#campaign-section').hidden = !['overview', 'campaigns'].includes(view)
+  $('#media-section').hidden = view !== 'media'
   $('#integrations-section').hidden = view !== 'integrations'
-  $('#new-campaign').hidden = view === 'integrations'
+  $('#new-campaign').hidden = !['overview', 'campaigns'].includes(view)
 
   document.querySelectorAll('[data-view]').forEach(button => {
     const active = button.dataset.view === view
@@ -170,6 +177,8 @@ function render () {
     control.disabled = busy
   })
 
+  renderMedia()
+
   const rows = $('#campaign-rows')
   rows.replaceChildren()
 
@@ -212,6 +221,8 @@ function render () {
 
 async function loadDrafts () {
   drafts = []
+  driveAccounts = []
+  mediaList = []
   loaded = false
   busy = true
   loadMessage = 'Carregando rascunhos…'
@@ -223,8 +234,14 @@ async function loadDrafts () {
       return
     }
 
-    const data = await api(endpoint())
+    const [data, accounts, media] = await Promise.all([
+      api(endpoint()),
+      api(mediaEndpoint('drive-accounts')),
+      api(mediaEndpoint('media'))
+    ])
     drafts = data.campaigns
+    driveAccounts = accounts.accounts
+    mediaList = media.media
     loaded = true
   } catch (error) {
     loadMessage = error.message + ' Atualize a página para tentar novamente.'
@@ -291,6 +308,8 @@ function openDialog (draft = null) {
   $('#campaign-briefing').open = true
 
   render()
+  $('#campaign-media').value = draft?.mediaId || ''
+  updateCampaignMediaLink()
   dialog.showModal()
 
   if (readOnly) {
@@ -345,7 +364,8 @@ form.addEventListener('submit', async event => {
     name,
     objective: $('#campaign-objective').value,
     budgetCents: Math.round(budget * 100),
-    briefing
+    briefing,
+    mediaId: $('#campaign-media').value || null
   }
 
   busy = true
@@ -444,4 +464,5 @@ $('#logout').addEventListener('click', async () => {
   }
 })
 
-loadProfile()
+// Initialization runs from media-library.js after both scripts have loaded.
+

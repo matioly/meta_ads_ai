@@ -139,7 +139,7 @@ O isolamento está implementado na aplicação; não há política PostgreSQL RL
 - Páginas / e /index.html redirecionam visitantes sem sessão para /login.
 - Logs de erro da API registram código e caminho, sem devolver detalhes internos ao cliente.
 
-Essas medidas não equivalem a uma auditoria completa. Não há MFA, recuperação de senha, rate limit distribuído, trilha de auditoria, revogação administrativa de sessões ou testes automatizados versionados. JSON malformado e alguns erros internos passam pelo handler genérico 500; refinar a classificação está no backlog.
+Essas medidas não equivalem a uma auditoria completa. Não há MFA, recuperação de senha, rate limit distribuído, trilha de auditoria, revogação administrativa de sessões ou cobertura automatizada completa. Há testes unitários de validação e autorização da biblioteca em tests/. JSON malformado e alguns erros internos passam pelo handler genérico 500; refinar a classificação está no backlog.
 
 ## Contrato da API
 
@@ -185,3 +185,25 @@ O modal é compartilhado: editingId nulo cria via POST; preenchido edita via PUT
 A busca é local sobre todos os rascunhos carregados. Não há paginação nem persistência da última clínica selecionada. Os cards de campanhas Meta e resultados ainda não possuem dados reais.
 
 O formulário inclui uma seção expansível de briefing, preenchida ao editar e limpa ao criar. Para member, o botão Ver abre o formulário com campos desabilitados e sem botão de salvar; POST/PUT/DELETE continuam bloqueados no servidor. A busca atual continua por nome/objetivo, sem pesquisar o briefing.
+
+
+## Biblioteca por links do Drive — incremento de 24/10/2026
+
+- src/company-access.js centraliza a autorização por clínica para campanhas, contas e mídias.
+- src/media-validation.js valida metadados e normaliza URLs HTTPS de arquivos do Drive; não faz requisições externas.
+- src/media.js implementa CRUD de contas identificadas e links de mídia.
+- public/media-library.js complementa app.js; ambos são scripts defer, nessa ordem. A inicialização loadProfile ocorre no segundo script.
+- Migration 006 cria drive_accounts e media e adiciona campaigns.media_id opcional.
+- Chaves estrangeiras compostas com company_id impedem associação entre clínicas diferentes no banco, além da validação na API.
+- Uma campanha tem zero ou uma mídia; a mesma mídia pode ser usada em vários rascunhos. Uma conta pode identificar várias mídias da clínica.
+- Conta e arquivo têm CRUD local; não são usuários OAuth e não representam autenticação Google.
+- UNIQUE(company_id,label) impede apelido repetido exato; UNIQUE(company_id,drive_file_id) impede o mesmo arquivo duplicado dentro da clínica.
+- Contas com mídias e mídias com campanhas não podem ser excluídas enquanto vinculadas (409). A exclusão nunca chega ao Google.
+
+Campanhas retornam mediaId. POST sem mediaId cria sem vínculo. PUT sem a propriedade preserva o vínculo; mediaId: null remove; UUID válido da mesma clínica substitui. Briefing mantém seu contrato anterior.
+
+APIs adicionais: GET/POST /api/companies/:companyId/drive-accounts e /media; PUT/DELETE com /:accountId ou /:mediaId. GET é permitido para membros; escrita somente owner/admin. Validação retorna 400, ausência 404 e conflitos de duplicidade/vínculos 409.
+
+Links aceitos: https://drive.google.com/file/d/ID/view (também preview/edit ou sem sufixo) e https://drive.google.com/open?id=ID. Normalização usa /file/d/ID/view e preserva resourcekey quando válido. Pastas, outros domínios, HTTP e URLs com credenciais são rejeitados. Não há confirmação de existência, propriedade, MIME real ou permissão Google; kind é declarado pelo operador.
+
+A tela abre links em outra aba com noopener/noreferrer, sem incorporar conteúdo remoto. A conta selecionada informa onde procurar o arquivo, mas não concede permissão de leitura. Detalhes e testes operacionais: [BIBLIOTECA_DRIVE](BIBLIOTECA_DRIVE.md).
