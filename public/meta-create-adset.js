@@ -31,6 +31,7 @@
    approvedAdsetPreview=null;
    document.querySelector("#adset-create-actions").hidden=true;
    adsetFeedback.textContent="Público criado com sucesso e mantido pausado na Meta.";
+   status.textContent="";
    window.dispatchEvent(new Event("meta-adset-created"));
    adsetResult.textContent=adsetResult.textContent.replace("Situação: ainda não criado","Situação: criado e pausado na Meta · ID: "+data.id).replace("Antes de criar anúncios, ainda precisamos:","Próxima etapa: preparar o vídeo e o texto do anúncio.");
    await load();
