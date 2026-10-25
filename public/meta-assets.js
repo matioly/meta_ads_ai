@@ -13,7 +13,7 @@ const fields = [
 let companies=[];
 let busy=false;
 function feedback(message){$('feedback').textContent=message;}
-function endpoint(){return '/api/companies/'+encodeURIComponent($('company').value)+'/meta-assets';}
+function endpoint(){return '/api/companies/'+encodeURIComponent($('meta-company').value)+'/meta-assets';}
 async function request(url,method='GET',body){
  const r=await fetch(url,{method,credentials:'same-origin',headers:method==='GET'?{}:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
  if(r.status===401){location.assign('/login');throw Error('Sessão expirada.');}
@@ -29,22 +29,22 @@ for(const [id,label] of fields){
  wrapper.append(input);$('fields').append(wrapper);
 }
 async function load(){
- const id=$('company').value;if(!id)return;
+ const id=$('meta-company').value;if(!id)return;
  feedback('Carregando...');$('save').disabled=true;
  try{
  const data=await request(endpoint());
- if(id!==$('company').value)return;
+ if(id!==$('meta-company').value)return;
  for(const [field] of fields)$(field).value=data.assets[field]|| (field==='facebookPageStatus'?'unknown':'');
  feedback('Inventário carregado. IDs não são verificados automaticamente na Meta.');
  }catch(e){feedback(e.message);}
- finally{$('save').disabled=!['owner','admin'].includes(companies.find(c=>c.id===$('company').value)?.role);}
+ finally{$('save').disabled=!['owner','admin'].includes(companies.find(c=>c.id===$('meta-company').value)?.role);}
 }
-$('company').addEventListener('change',load);
+$('meta-company').addEventListener('change',load);
 $('assets-form').addEventListener('submit',async e=>{
  e.preventDefault();if(busy)return;
  busy=true;$('save').disabled=true;feedback('Salvando...');
  try{const data=Object.fromEntries(fields.map(([id])=>[id,$(id).value.trim()]));await request(endpoint(),'PUT',data);feedback('Inventário salvo com sucesso.');}
  catch(e){feedback(e.message);}
- finally{busy=false;$('save').disabled=!['owner','admin'].includes(companies.find(c=>c.id===$('company').value)?.role);}
+ finally{busy=false;$('save').disabled=!['owner','admin'].includes(companies.find(c=>c.id===$('meta-company').value)?.role);}
 });
-(async()=>{try{const data=await request('/api/me');companies=data.companies;for(const c of companies){const option=document.createElement('option');option.value=c.id;option.textContent=c.name;$('company').append(option);}await load();}catch(e){feedback(e.message);}})();
+(async()=>{try{const data=await request('/api/me');companies=data.companies;for(const c of companies){const option=document.createElement('option');option.value=c.id;option.textContent=c.name;$('meta-company').append(option);}await load();window.dispatchEvent(new Event('workspace-company-ready'));}catch(e){feedback(e.message);}})();
