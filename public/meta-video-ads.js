@@ -3,7 +3,7 @@
  const $=id=>document.getElementById(id);
  const company=$("meta-company"),status=$("meta-video-status"),upload=$("meta-video-upload"),create=$("meta-ad-create"),publish=$("meta-publish-draft");
  status.style.whiteSpace="pre-line";
- let busy=false,state="loading",timer=null,requestId=0;
+ let busy=false,state="loading",timer=null,requestId=0,creationOutcome=null;
  const selected=()=>publish.value;
  const url=(id,kind)=>"/api/companies/"+encodeURIComponent(company.value)+"/creative-drafts/"+encodeURIComponent(id)+"/"+kind;
  function buttons(){
@@ -28,7 +28,11 @@
    const data=await r.json();
    if(seq!==requestId)return;
    if(!r.ok)throw Error(data.error||"Não foi possível verificar o vídeo.");
-   state=data.state;status.textContent=label(data);buttons();
+   state=data.state;
+   if(state==="ad_created"){creationOutcome=null;status.textContent=label(data);}
+   else if(creationOutcome){status.textContent=creationOutcome+" Estado atual na Meta: "+label(data);}
+   else status.textContent=label(data);
+   buttons();
    if(state==="processing")timer=setTimeout(refresh,10000);
   }catch(e){
    if(seq!==requestId)return;
@@ -42,19 +46,20 @@
    "Enviar este vídeo para a Meta? Nenhum anúncio será ativado.":
    "Criar anúncio PAUSADO na Meta? Nenhum anúncio será ativado.";
   if(!confirm(question))return;
-  busy=true;buttons();status.textContent="Processando na Meta. Aguarde; não clique novamente.";
+  busy=true;creationOutcome=null;buttons();status.textContent="Processando na Meta. Aguarde; não clique novamente.";
   try{
    const r=await fetch(url(id,kind),{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({confirm:true})});
    const ct=r.headers.get("content-type")||"";
    if(!ct.includes("application/json"))throw Error("Resposta inesperada. Confira a Meta antes de repetir.");
    const data=await r.json();
    if(!r.ok)throw Error([data.error,data.metaErrorDetail].filter(Boolean).join("\n"));
-   status.textContent=kind==="meta-video"?"Vídeo enviado! Verificando processamento…":"Anúncio criado PAUSADO! ID: "+data.adId;
-  }catch(e){status.textContent="Não foi possível concluir: "+e.message+" Confira a Meta antes de repetir.";}
+   creationOutcome=kind==="meta-video"?"Vídeo enviado. Verificando processamento…":data.adId?"Meta confirmou a criação do anúncio PAUSADO (ID: "+data.adId+").":"A solicitação foi aceita, mas não retornou ID do anúncio. Confira a Meta antes de repetir.";
+   status.textContent=creationOutcome;
+  }catch(e){creationOutcome="Não foi possível confirmar a operação: "+e.message+". Confira a Meta antes de repetir.";status.textContent=creationOutcome;}
   finally{busy=false;await refresh();}
  }
- publish.addEventListener("change",refresh);
- company.addEventListener("change",refresh);
+ publish.addEventListener("change",()=>{creationOutcome=null;refresh();});
+ company.addEventListener("change",()=>{creationOutcome=null;refresh();});
  upload.addEventListener("click",()=>action("meta-video"));
  create.addEventListener("click",()=>action("meta-paused-ad"));
  refresh();
