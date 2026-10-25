@@ -61,7 +61,7 @@ router.post("/:companyId/meta-create-adset",access,async(req,res,next)=>{
       bid_strategy:"LOWEST_COST_WITHOUT_CAP",
       destination_type:"UNDEFINED",
       daily_budget:String(Math.round(dailyBudgetBrl*100)),
-      targeting:JSON.stringify({geo_locations:{countries:["BR"]},age_min:ageMin,age_max:ageMax})
+      targeting:JSON.stringify({geo_locations:{countries:["BR"]},age_min:ageMin,age_max:ageMax,targeting_automation:{advantage_audience:0}})
     });
     let data;
     try{
