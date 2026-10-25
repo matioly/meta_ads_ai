@@ -5,23 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#171b2e" />
     <title>Meta Ads AI | Painel</title>
-    <script>
-      // Establish the requested view before the page is rendered.
-      (function () {
-        const requested = new URLSearchParams(location.search).get('view');
-        document.documentElement.dataset.initialView =
-          ['overview', 'campaigns', 'media', 'integrations'].includes(requested)
-            ? requested : 'overview';
-      })();
-    </script>
-    <style>
-      /* Never paint the default overview while another view is requested. */
-      /* Only affect the initial paint; never override JS navigation after ready. */
-      html:not([data-view-ready]) .main main { visibility: hidden; }
-      html:not([data-view-ready])[data-initial-view="campaigns"] #overview-section,
-      html:not([data-view-ready])[data-initial-view="media"] #overview-section,
-      html:not([data-view-ready])[data-initial-view="integrations"] #overview-section { display: none !important; }
-    </style>
     <link rel="stylesheet" href="/styles.css" />
     <script src="/app.js" defer></script>
     <script src="/media-library.js" defer></script><script src="/home-meta.js" defer></script>
@@ -384,19 +367,6 @@
     </form>
   </dialog>
 
-<script>
-// Apply the requested view synchronously before deferred application initialization.
-(function(){
- const view=new URLSearchParams(location.search).get('view');
- if(!['media','campaigns','integrations'].includes(view))return;
- const sections={overview:['overview-section'],campaigns:['campaign-section','meta-real-campaigns'],media:['media-section'],integrations:['integrations-section']};
- for(const [key,ids] of Object.entries(sections))for(const id of ids){const el=document.getElementById(id);if(el)el.hidden=key!==view;}
- const titles={media:'Biblioteca de mídias',campaigns:'Campanhas',integrations:'Integrações'};
- document.getElementById('page-title').textContent=titles[view];
- document.querySelectorAll('[data-view]').forEach(button=>{const active=button.dataset.view===view;button.classList.toggle('active',active);if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
-})();
-document.documentElement.setAttribute('data-view-ready', 'true');
-</script>
 </body>
 </html>
 
