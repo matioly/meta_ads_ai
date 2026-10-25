@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#171b2e" />
+    <title>Meta Ads AI | Integrações</title>
+    <script src="/initial-view.js"></script>
+    <link rel="stylesheet" href="/styles.css?v=79" />
+    <script src="/app.js?v=81" defer></script>
+    <script src="/media-library.js" defer></script><script src="/home-meta.js" defer></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <a class="brand" href="/">
+        <span class="brand-symbol">ai</span>
+        <span>Meta Ads <strong>AI</strong></span>
+      </a>
+
+      <div class="workspace">
+        <label for="company">ESPAÇO DE TRABALHO</label>
+        <select id="company">
+          <option value="">Carregando clínicas…</option>
+        </select>
+      </div>
+
+      <p class="nav-label">PAINEL</p>
+      <nav aria-label="Navegação principal">
+        <a class="nav-button" href="/">
+          <span class="nav-icon" aria-hidden="true">◈</span><span>Visão geral</span></a>
+        <a class="nav-button" href="/campaigns.html">
+          <span class="nav-icon" aria-hidden="true">◎</span><span>Campanhas</span></a>
+        <a class="nav-button" href="/meta-campaigns.html"><span class="nav-icon" aria-hidden="true">◉</span><span>Gerenciador Meta</span></a>
+        <button class="nav-button" data-view="media"><span class="nav-icon" aria-hidden="true">▣</span><span>Biblioteca de mídias</span></button>
+        <a class="nav-button active" href="/integrations.html" aria-current="page">
+          <span class="nav-icon" aria-hidden="true">⇄</span><span>Integrações</span></a>
+      <a class="nav-button" href="/benchmark.html"><span class="nav-icon" aria-hidden="true">▤</span><span>Benchmark</span></a></nav>
+
+      <p class="nav-label">CONFIGURAÇÕES</p>
+      <div class="sidebar-shortcuts">
+        <a class="nav-button" href="/meta-assets.html"><span class="nav-icon" aria-hidden="true">⚙</span><span>Contas e ativos Meta</span></a>
+      </div>
+
+      <div class="sidebar-footer">
+        <span class="avatar">AI</span>
+        <div>
+          <strong>Seu centro de campanhas</strong>
+          <small>Planeje. Revise. Publique.</small>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <span
+          >Workspace <span class="separator">/</span>
+          <strong id="company-name">Sorriso de Campinas</strong>
+        </span>
+        <div class="topbar-actions">
+          <span class="preview-badge" id="user-name">Carregando…</span>
+          <button class="secondary" id="logout" type="button">Sair</button>
+        </div>
+      </header>
+
+      <main>
+        <div class="notice"><strong>Publicação sob seu controle</strong> Prepare campanhas, revise os criativos e envie anúncios pausados para a Meta. A ativação é sempre uma decisão sua.</div>
+
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">META ADS AI</p>
+            <h1 id="page-title">Integrações</h1>
+            <p id="page-description">
+              Consulte e configure as integrações de cada clínica.
+            </p>
+          </div>
+          <button class="primary" id="new-campaign">
+            <span aria-hidden="true">＋</span> Nova campanha
+          </button>
+        </div>
+
+        <section id="overview-section" hidden>
+          <div class="dashboard-welcome"><div><p class="eyebrow">DESEMPENHO DA CLÍNICA</p><h2>Resultados dos últimos 30 dias</h2><p>Dados reais da conta Meta selecionada. Atualize os indicadores ou abra o gerenciador para criar e ativar anúncios.</p></div><a class="primary" href="/meta-campaigns.html">Gerenciar anúncios ↗</a></div><div class="metrics">
+            <article class="metric">
+              <span>Investimento · 30 dias</span>
+              <strong id="dashboard-spend">—</strong><span id="draft-count" hidden></span>
+              <small>Valor gasto na Meta</small>
+            </article>
+            <article class="metric">
+              <span>Alcance · 30 dias</span>
+              <strong id="dashboard-reach">—</strong><span id="planned-budget" hidden></span>
+              <small>Pessoas alcançadas</small>
+            </article>
+            <article class="metric">
+              <span>Campanhas no Meta</span>
+              <strong id="meta-campaign-count">—</strong>
+              <small>Campanhas reais da conta selecionada</small>
+            </article>
+            <article class="metric">
+              <span>Anúncios na Meta</span>
+              <strong id="meta-ad-count">—</strong>
+              <small>Quantidade de anúncios retornados</small>
+            </article>
+          </div>
+          <div class="dashboard-insights"><article class="metric"><span>Impressões · 30 dias</span><strong id="dashboard-impressions">—</strong></article><article class="metric"><span>Cliques no link · 30 dias</span><strong id="dashboard-links">—</strong></article><article class="metric"><span>Conversas iniciadas · 30 dias</span><strong id="dashboard-conversations">—</strong><small>Quando disponível na Meta</small></article></div><p id="meta-home-feedback" role="status" class="meta-home-feedback">Carregando dados da Meta…</p>
+        </section>
+
+        <section class="panel" id="meta-real-campaigns" hidden><div class="panel-heading"><div><h2>Campanhas reais na Meta</h2><p>Dados da conta selecionada. Campanhas pausadas não geram gastos.</p></div><a class="secondary" href="/meta-campaigns.html">Abrir Gerenciador Meta ↗</a></div><div class="table-wrapper"><table><thead><tr><th>Campanha</th><th>Objetivo</th><th>Status</th><th>Orçamento/dia</th></tr></thead><tbody id="meta-home-rows"></tbody></table></div><p id="meta-campaigns-feedback" class="meta-home-feedback" role="status"></p></section>
+
+        <section class="panel" id="campaign-section" hidden>
+          <div class="panel-heading">
+            <div>
+              <h2>Rascunhos de planejamento</h2>
+              <p>Planejamentos locais, separados das campanhas reais. Para publicar anúncios pausados, acesse <a href="/meta-campaigns.html">Campanhas na Meta →</a>.</p>
+            </div>
+            <label class="search">
+              <span class="sr-only">Buscar rascunhos</span>
+              <input
+                id="search"
+                type="search"
+                placeholder="Buscar campanha…"
+                maxlength="120"
+              />
+            </label>
+          </div>
+
+          <div id="empty-state" class="empty-state">
+            <span class="empty-icon" aria-hidden="true">◎</span>
+            <h3>Nenhum rascunho por aqui</h3>
+            <p>Comece pelo nome, objetivo e orçamento da campanha.</p>
+            <button class="secondary" id="empty-create">Criar rascunho</button>
+          </div>
+
+          <div class="table-wrapper" id="table-wrapper" hidden>
+            <table>
+              <caption class="sr-only">
+                Rascunhos de campanhas
+              </caption>
+              <thead>
+                <tr>
+                  <th>Campanha</th>
+                  <th>Objetivo</th>
+                  <th>Orçamento/dia</th>
+                  <th>Status</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="campaign-rows"></tbody>
+            </table>
+          </div>
+          <p class="no-results" id="no-results" hidden>
+            Nenhum rascunho corresponde à busca.
+          </p>
+        </section>
+
+        
+      <section class="panel media-library-panel" id="media-section" hidden>
+        <div class="panel-heading media-library-heading">
+          <div><p class="eyebrow">ARQUIVOS E CRIATIVOS</p><h2>Biblioteca de mídias</h2><p>Organize vídeos e imagens por clínica, com identificação da conta de origem.</p></div>
+          <div class="media-actions">
+            <button class="secondary" id="new-drive-account" type="button">Cadastrar conta</button>
+            <button class="primary" id="new-media" type="button">Cadastrar mídia</button>
+          </div>
+        </div>
+        <p class="media-notice">Os arquivos continuam no Google Drive. A conta é uma identificação, sem conexão ou senha. Para abrir o arquivo, você precisa ter permissão no Google. O acesso e o tipo informado não são verificados automaticamente.</p>
+        <p id="media-feedback" class="no-results" role="status"></p>
+        <div class="table-wrapper" id="media-table-wrapper" hidden>
+          <table>
+            <caption class="sr-only">Mídias da clínica selecionada</caption>
+            <thead><tr><th>Mídia</th><th>Tipo</th><th>Conta de origem</th><th>Observações</th><th>Ações</th></tr></thead>
+            <tbody id="media-rows"></tbody>
+          </table>
+        </div>
+        <details class="media-accounts">
+          <summary>Contas de origem cadastradas</summary>
+          <p>Use um apelido, como “Vídeos Alps 01”. O e-mail é opcional. A mesma conta pode ser cadastrada separadamente em cada clínica.</p>
+          <div class="table-wrapper"><table>
+            <caption class="sr-only">Contas identificadas nesta clínica</caption>
+            <thead><tr><th>Apelido</th><th>E-mail</th><th>Ações</th></tr></thead>
+            <tbody id="drive-account-rows"></tbody>
+          </table></div>
+        </details>
+      </section>
+
+<section id="integrations-section"><div class="integration-grid"><article class="panel integration-card"><span class="integration-logo meta-logo">∞</span><span class="status">Meta Marketing API</span><h2>Meta Ads</h2><p>Configure os identificadores de cada clínica e consulte campanhas, anúncios e resultados em tempo real.</p><div class="integration-actions"><a class="secondary" href="/meta-assets.html">Configurar conta e ativos</a><a class="primary" href="/meta-campaigns.html">Abrir gerenciador ↗</a></div></article><article class="panel integration-card"><span class="integration-logo ai-logo">AI</span><span class="status">Em planejamento</span><h2>Assistente de campanhas</h2><p>Uma futura integração para sugerir textos e variações de criativos. A publicação continua sob seu controle.</p><span class="integration-soon">Disponível em uma próxima etapa</span></article></div></section>
+
+        <footer class="page-footer">
+          Meta Ads AI <span>Seu planejamento, sob seu controle.</span>
+        </footer>
+      </main>
+    </div>
+
+    <dialog id="campaign-dialog" aria-labelledby="dialog-title">
+      <form id="campaign-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">PLANEJAMENTO</p>
+            <h2 id="dialog-title">Nova campanha</h2>
+          </div>
+          <button
+            type="button"
+            class="close-button"
+            id="close-dialog"
+            aria-label="Fechar"
+          >
+            ×
+          </button>
+        </div>
+
+        <p class="form-note">
+          Salve o planejamento desta campanha para continuar depois. Nenhum
+          anúncio será enviado ao Meta.
+        </p>
+
+        <label for="campaign-name">Nome da campanha</label>
+        <input
+          id="campaign-name"
+          name="name"
+          required
+          maxlength="120"
+          placeholder="Ex.: Avaliação de ortodontia"
+        />
+
+        <label for="campaign-objective">Objetivo</label>
+        <select id="campaign-objective" name="objective">
+          <option value="Conversas no WhatsApp">Conversas no WhatsApp</option>
+          <option value="Geração de leads">Geração de leads</option>
+          <option value="Reconhecimento">Reconhecimento</option>
+        </select>
+
+        <label for="campaign-budget">Orçamento diário planejado (R$)</label>
+        <input
+          id="campaign-budget"
+          name="budget"
+          type="number"
+          min="1"
+          max="100000"
+          step="0.01"
+          value="30"
+          required
+        />
+
+        <label for="campaign-media">Mídia da campanha (opcional)</label>
+        <select id="campaign-media"><option value="">Nenhuma mídia vinculada</option></select>
+        <div id="campaign-media-link"></div>
+        <p class="form-note">Cadastre os links na seção Mídias. Selecionar um arquivo não publica anúncios nem libera acesso no Google.</p>
+        <details class="briefing-section" id="campaign-briefing">
+          <summary>Briefing da campanha</summary>
+
+          <p class="form-note">
+            Preencha o que já souber e complete depois. Essas informações
+            orientam o planejamento do anúncio.
+          </p>
+
+          <label for="briefing-service">Serviço ou procedimento</label>
+          <input
+            id="briefing-service"
+            data-briefing="service"
+            maxlength="120"
+            placeholder="Ex.: Ortodontia infantil"
+          />
+
+          <label for="briefing-offer">Oferta ou proposta</label>
+          <textarea
+            id="briefing-offer"
+            data-briefing="offer"
+            maxlength="500"
+            rows="3"
+            placeholder="O que a clínica deseja apresentar?"
+          ></textarea>
+
+          <label for="briefing-audience">Público desejado</label>
+          <textarea
+            id="briefing-audience"
+            data-briefing="audience"
+            maxlength="300"
+            rows="3"
+            placeholder="Ex.: Pais e responsáveis interessados em avaliação infantil"
+          ></textarea>
+
+          <label for="briefing-region">Cidade ou região</label>
+          <input
+            id="briefing-region"
+            data-briefing="region"
+            maxlength="200"
+            placeholder="Ex.: Campinas — Swiss Park e região"
+          />
+
+          <label for="briefing-message">Mensagem principal</label>
+          <textarea
+            id="briefing-message"
+            data-briefing="message"
+            maxlength="500"
+            rows="3"
+            placeholder="Qual ideia você quer transmitir?"
+          ></textarea>
+
+          <label for="briefing-destination">Destino desejado</label>
+          <input
+            id="briefing-destination"
+            data-briefing="destination"
+            maxlength="200"
+            placeholder="Ex.: WhatsApp da clínica, site ou formulário"
+          />
+
+          <p class="form-note">
+            O destino será usado no planejamento do criativo. Confirme o endereço final antes de enviar à Meta.
+          </p>
+
+          <label for="briefing-notes">Observações</label>
+          <textarea
+            id="briefing-notes"
+            data-briefing="notes"
+            maxlength="500"
+            rows="3"
+            placeholder="Diferenciais, ideias de vídeo e orientações para a campanha"
+          ></textarea>
+        </details>
+
+        <div class="dialog-actions">
+          <button type="button" class="secondary" id="cancel-dialog">
+            Cancelar
+          </button>
+          <button class="primary" type="submit">Salvar rascunho</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  
+  <dialog id="drive-account-dialog" aria-labelledby="drive-account-title">
+    <form id="drive-account-form">
+      <h2 id="drive-account-title">Cadastrar conta</h2>
+      <p class="form-note">Somente identificação. Não informe senha ou token.</p>
+      <label for="drive-account-label">Apelido da conta</label>
+      <input id="drive-account-label" maxlength="120" required placeholder="Ex.: Vídeos Alps 01">
+      <label for="drive-account-email">E-mail da conta (opcional)</label>
+      <input id="drive-account-email" type="email" maxlength="254" placeholder="conta@gmail.com">
+      <p id="drive-account-error" role="alert" class="login-error" hidden></p>
+      <div class="dialog-actions">
+        <button class="secondary" type="button" data-close-media="drive-account-dialog">Cancelar</button>
+        <button class="primary" type="submit">Salvar conta</button>
+      </div>
+    </form>
+  </dialog>
+  <dialog id="media-dialog" aria-labelledby="media-title">
+    <form id="media-form">
+      <h2 id="media-title">Cadastrar mídia</h2>
+      <p class="form-note">Cole o link de um arquivo já salvo no Drive. Nenhum arquivo será enviado ou copiado.</p>
+      <label for="media-name">Nome da mídia</label>
+      <input id="media-name" maxlength="120" required placeholder="Ex.: Implantes — apresentação">
+      <label for="media-kind">Tipo informado</label>
+      <select id="media-kind"><option value="video">Vídeo</option><option value="image">Imagem</option></select>
+      <label for="media-account">Conta onde está salvo</label>
+      <select id="media-account" required></select>
+      <label for="media-url">Link do arquivo no Google Drive</label>
+      <input id="media-url" type="url" maxlength="2048" required placeholder="https://drive.google.com/file/d/.../view">
+      <label for="media-notes">Observações</label>
+      <textarea id="media-notes" maxlength="500" rows="3" placeholder="Ex.: Vertical, versão final"></textarea>
+      <p id="media-error" role="alert" class="login-error" hidden></p>
+      <div class="dialog-actions">
+        <button class="secondary" type="button" data-close-media="media-dialog">Cancelar</button>
+        <button class="primary" type="submit">Salvar mídia</button>
+      </div>
+    </form>
+  </dialog>
+
+</body>
+</html>
+
