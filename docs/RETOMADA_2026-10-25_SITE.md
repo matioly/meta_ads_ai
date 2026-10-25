@@ -1,3 +1,15 @@
+## 25/10/2026 — Destino UNDEFINED no fluxo de site
+O diagnóstico do operador confirmou conta, vínculo, PAUSED, OUTCOME_TRAFFIC e LINK_CLICKS; apenas destination_type veio UNDEFINED. Recriar o rascunho preservou os mesmos IDs e resultado. O print do Gerenciador mostra Site/cliques, embora o ID do conjunto não esteja visível nessa captura.
+
+A validação agora permite o valor literal UNDEFINED somente com OUTCOME_TRAFFIC e LINK_CLICKS. Continua verificando conta, vínculo e status. Campos ausentes e destinos explícitos de outros canais são bloqueados. O diagnóstico mantém o valor real e mostra ATENÇÃO: não interpreta UNDEFINED como confirmação de WEBSITE. O fluxo 5B continua exigindo URL HTTPS e gerando LEARN_MORE, com anúncio PAUSED; a Meta decide a compatibilidade final.
+
+Referência: https://developers.facebook.com/docs/marketing-api/adset/destination_type?locale=es_LA — documenta destination_type opcional e UNDEFINED como retorno de leitura. Essa documentação não garante que este anúncio será aceito. Homologação real ainda pendente.
+
+Após merge/deploy, usar Conferir campos do 5B no rascunho que já contém o vídeo enviado. Se os demais campos estiverem OK, executar 5B com confirmação e verificar ID/PAUSED na Meta. Um rascunho novo não herda o meta_video_id do anterior; preferir o original para evitar reupload. Sem migration ou variável nova.
+
+Testes locais: casos de UNDEFINED, destinos inválidos, ausência de campo, conta/vínculo/status/objetivo/otimização incompatíveis; fluxo simulado verifica CTA HTTPS e anúncio PAUSED, e URL inválida bloqueia escritas. Sem teste em produção.
+
+
 > Atualização de diagnóstico — 25/10/2026: adicionado botão “Conferir campos do 5B (sem criar)”. Após merge e deploy, selecionar o rascunho salvo na etapa 3 e usar esse botão. A consulta GET mostra IDs, contas, vínculo, status, objetivo, destino e otimização com valores recebidos/esperados. Corrigir somente os campos AJUSTAR. A causa em produção continua não confirmada. Não reenviar o vídeo para diagnosticar. A resposta 422 do 5B também inclui o mesmo diagnóstico. Nenhuma migration ou variável nova. Testes locais com respostas Meta simuladas; homologação no Railway pendente.
 
 # Retomada — 25/10/2026, fim da sessão (prioridade máxima)
