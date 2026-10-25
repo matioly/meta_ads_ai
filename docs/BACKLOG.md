@@ -73,8 +73,8 @@ Provedor, modelo e armazenamento ainda precisam ser escolhidos. O briefing inici
 | ID | Prioridade | Trabalho | Dependências | Critério de aceite |
 |---|---|---|---|---|
 | META01 | Alta antes de integração | Inventário dos ativos por clínica | Operador com acesso ao portfólio | Mapear conta de anúncios, página, Instagram e destino/WhatsApp corretos; registrar IDs no local apropriado |
-| META02 | Alta | Conexão/autorização Meta | META01; verificar documentação vigente e permissões do caso | Credenciais somente no servidor, protegidas; vinculação explícita por clínica; reconexão/revogação e erro de expiração tratados |
-| META03 | Alta | Consulta inicial de contas e campanhas | META02 | Listar ativos corretos sem criar anúncios ou alterar orçamento |
+| META02 | Validado: consulta inicial de conta; revogação/reconexão pendentes | Conexão/autorização Meta | META01; verificar documentação vigente e permissões do caso | Credenciais somente no servidor, protegidas; vinculação explícita por clínica; reconexão/revogação e erro de expiração tratados |
+| META03 | Implementado no PR; validação em produção pendente | Consulta inicial de contas e campanhas | META02 | Listar ativos corretos sem criar anúncios ou alterar orçamento |
 | META04 | Alta | Mapear modelo interno para campanha/conjunto/anúncio | B01, M02 e META03 | Objetivo, público, orçamento, posicionamentos, destino e mídia validados; IDs externos separados dos IDs internos |
 | META05 | Alta | Revisão e publicação controlada | META04 e estados de aprovação | Resumo final de clínica/conta/mídia/orçamento; aprovação explícita; evitar duplicação; registrar resultado por etapa e falhas parciais |
 | META06 | Média | Pausar/retomar e consultar status externo | META05 | Estado reconciliado com Meta; autorização e confirmação das alterações sensíveis |
