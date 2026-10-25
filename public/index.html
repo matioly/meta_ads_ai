@@ -367,6 +367,18 @@
     </form>
   </dialog>
 
+<script>
+// Apply the requested view synchronously before deferred application initialization.
+(function(){
+ const view=new URLSearchParams(location.search).get('view');
+ if(!['media','campaigns','integrations'].includes(view))return;
+ const sections={overview:['overview-section'],campaigns:['campaign-section','meta-real-campaigns'],media:['media-section'],integrations:['integrations-section']};
+ for(const [key,ids] of Object.entries(sections))for(const id of ids){const el=document.getElementById(id);if(el)el.hidden=key!==view;}
+ const titles={media:'Biblioteca de mídias',campaigns:'Campanhas',integrations:'Integrações'};
+ document.getElementById('page-title').textContent=titles[view];
+ document.querySelectorAll('[data-view]').forEach(button=>{const active=button.dataset.view===view;button.classList.toggle('active',active);if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
+})();
+</script>
 </body>
 </html>
 
