@@ -1,3 +1,5 @@
+> **25/10/2026 — Retry de deploy:** o primeiro build Railway do PR #65 falhou por erro de infraestrutura (conexão encerrada com o daemon BuildKit), antes de instalar a aplicação. Este commit apenas registra o incidente e provoca novo deploy da mesma versão funcional do código. A correção do painel do PR #65 ainda depende de validação em produção.
+
 > **PONTO DE RETOMADA MAIS RECENTE (25/10/2026, após PR #62):** iniciar por [GUIA_DE_RETOMADA_2026-10-25.md](GUIA_DE_RETOMADA_2026-10-25.md), [TELAS_E_NAVEGACAO.md](TELAS_E_NAVEGACAO.md) e [CADASTRO_CLINICAS_USUARIOS.md](CADASTRO_CLINICAS_USUARIOS.md). PRs #55–#62: cadastro de clínica/usuário, dashboard real de 30 dias, integração e biblioteca modernizadas, sidebar consistente, hotfixes de inicialização e mitigação de flash de Campanhas. **Flash após #62 ainda não homologado.** Bug funcional confirmado: viewer não é aceito pelo CHECK SQL original. O operador já confirmou criação de anúncio PAUSADO com ID Meta em etapa anterior; os trechos antigos que dizem “5B não homologado” representam estados anteriores, não o marco atual.
 
 # ESTADO PRIORITÁRIO — 25/10/2026
