@@ -4,6 +4,8 @@
  const form=$("creative-plan-form"),feedback=$("creative-feedback"),preview=$("creative-preview");
  const mediaSelect=$("creative-media"),saved=$("creative-saved"),campaign=$("creative-campaign"),adset=$("creative-adset");
  let videos=[],drafts=[],campaigns=[],adsets=[],companyId="",sequence=0;
+ const editor=$("creative-editor"),reusePanel=$("creative-reuse-panel"),publishSelect=$("meta-publish-draft");
+ function showEditor(reusing=false){editor.hidden=false;reusePanel.hidden=!reusing;}
  const base=()=>"/api/companies/"+encodeURIComponent(companyId);
  async function api(path,options={}){
   const r=await fetch(base()+path,{credentials:"same-origin",cache:"no-store",...options});
@@ -16,7 +18,7 @@
   for(const item of items)select.append(new Option(label(item),String(item.id)));
  }
  function clearForm(){
-  form.reset();saved.value="";campaign.value="";updateAdsets();preview.hidden=true;feedback.textContent="Novo anúncio. Escolha o vídeo e preencha a mensagem.";
+  showEditor(false);form.reset();saved.value="";campaign.value="";updateAdsets();preview.hidden=true;feedback.textContent="Novo anúncio. Escolha o vídeo e preencha a mensagem.";
   $("creative-primary-text").focus();
  }
  function updateAdsets(){
@@ -30,11 +32,14 @@
  }
  async function loadDrafts(keepId=""){
   const result=await api("/creative-drafts");drafts=result.drafts||[];
-  fill(saved,drafts,d=>d.headline+" · "+d.mediaName,"Novo rascunho");
-  if(keepId&&drafts.some(d=>d.id===keepId))saved.value=keepId;
+  fill(saved,drafts,d=>d.headline+" · "+d.mediaName,"Selecione um anúncio");
+  fill(publishSelect,drafts,d=>d.headline+" · "+d.mediaName,"Selecione um anúncio salvo");
+  if(keepId&&drafts.some(d=>d.id===keepId)){saved.value=keepId;publishSelect.value=keepId;}
+  publishSelect.dispatchEvent(new Event("change"));
  }
  function applyDraft(){
   const d=drafts.find(x=>x.id===saved.value);if(!d)return;
+  showEditor(true);
   mediaSelect.value=d.mediaId;
   $("creative-headline").value=d.headline;
   $("creative-primary-text").value=d.primaryText;
@@ -45,8 +50,8 @@
  }
  async function refresh(){
   const current=++sequence;companyId=select.value;videos=[];drafts=[];campaigns=[];adsets=[];
-  preview.hidden=true;fill(mediaSelect,[],x=>x.name,"Selecione um vídeo");
-  fill(saved,[],x=>x.headline,"Novo rascunho");
+  preview.hidden=true;editor.hidden=true;reusePanel.hidden=true;fill(mediaSelect,[],x=>x.name,"Selecione um vídeo");
+  fill(saved,[],x=>x.headline,"Selecione um anúncio");fill(publishSelect,[],x=>x.headline,"Selecione um anúncio salvo");
   fill(campaign,[],x=>x.name,"Sem vínculo por enquanto");updateAdsets();
   if(!companyId)return;
   feedback.textContent="Carregando vídeos e rascunhos…";
@@ -60,7 +65,8 @@
    videos=(results[0].value.media||[]).filter(m=>m.kind==="video");
    drafts=results[1].value.drafts||[];
    fill(mediaSelect,videos,m=>m.name+" · "+(m.accountLabel||m.accountEmail||"Conta não informada"),"Selecione um vídeo");
-   fill(saved,drafts,d=>d.headline+" · "+d.mediaName,"Novo rascunho");
+   fill(saved,drafts,d=>d.headline+" · "+d.mediaName,"Selecione um anúncio");
+   fill(publishSelect,drafts,d=>d.headline+" · "+d.mediaName,"Selecione um anúncio salvo");
    campaigns=results[2].status==="fulfilled"?(results[2].value.items||[]):[];
    adsets=results[3].status==="fulfilled"?(results[3].value.items||[]):[];
    fill(campaign,campaigns,c=>c.name+" · "+c.id,"Sem vínculo por enquanto");updateAdsets();
@@ -84,6 +90,7 @@
  campaign.addEventListener("change",()=>{updateAdsets();preview.hidden=true;});
  saved.addEventListener("change",()=>{if(saved.value)applyDraft();else clearForm();});
  $("creative-new").addEventListener("click",()=>{clearForm();});
+ $("creative-reuse").addEventListener("click",()=>{reusePanel.hidden=false;editor.hidden=true;saved.value="";feedback.textContent="Escolha um anúncio preparado para editar.";});
  $("creative-save").addEventListener("click",async()=>{
   if(!form.reportValidity()||!previewDraft())return;
   const button=$("creative-save");button.disabled=true;
@@ -99,7 +106,7 @@
   if(!window.confirm("Excluir este rascunho? Nenhum anúncio da Meta será alterado."))return;
   const id=saved.value;
   try{await api("/creative-drafts/"+encodeURIComponent(id),{method:"DELETE",headers:{"Content-Type":"application/json"}});
-   await loadDrafts();clearForm();feedback.textContent="Rascunho excluído do banco.";
+   await loadDrafts();clearForm();feedback.textContent="Anúncio preparado excluído.";
   }catch(e){feedback.textContent=e.message;}
  });
  select.addEventListener("change",refresh);

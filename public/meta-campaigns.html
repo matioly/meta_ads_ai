@@ -55,9 +55,8 @@
 <details class="workflow-accordion" id="workflow-creative"><summary><span class="workflow-icon">03</span><span><strong>Vídeo e mensagem</strong><small>Escolha o criativo, escreva a mensagem e salve o rascunho</small></span><span class="workflow-chevron">⌄</span></summary><div class="workflow-content"><section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="creative-title">
 <h2 id="creative-title">Conte a história do seu anúncio</h2>
 <p>Escolha um vídeo da biblioteca da clínica e prepare a mensagem. <strong>Salve um rascunho antes de enviar o vídeo e criar o anúncio na Meta.</strong> O link do Google Drive ainda não equivale a um vídeo enviado à Meta.</p>
-<form id="creative-plan-form">
-<label for="creative-saved">Rascunhos salvos</label><select id="creative-saved"><option value="">Novo rascunho</option></select>
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button type="button" class="secondary" id="creative-new">Novo</button><button type="button" class="secondary" id="creative-delete">Excluir rascunho selecionado</button></div>
+<div class="creative-choice" id="creative-choice"><button type="button" class="primary" id="creative-new">Criar novo anúncio</button><button type="button" class="secondary" id="creative-reuse">Reutilizar anúncio salvo</button></div><div id="creative-reuse-panel" hidden><label for="creative-saved">Anúncios preparados</label><select id="creative-saved"><option value="">Selecione um anúncio</option></select><button type="button" class="secondary" id="creative-delete">Excluir anúncio selecionado</button></div><div id="creative-editor" hidden><form id="creative-plan-form">
+
 <label for="creative-campaign">Campanha da Meta (opcional)</label><select id="creative-campaign"><option value="">Sem vínculo por enquanto</option></select>
 <label for="creative-adset">Público da Meta (opcional)</label><select id="creative-adset"><option value="">Sem vínculo por enquanto</option></select>
 <label for="creative-media">Vídeo da biblioteca</label><select id="creative-media" required><option value="">Carregando vídeos…</option></select>
@@ -71,11 +70,11 @@
 <h3 id="creative-preview-headline"></h3><p id="creative-preview-text"></p><p id="creative-preview-description"></p>
 <p id="creative-preview-media"></p><a id="creative-preview-link" target="_blank" rel="noopener noreferrer">Abrir vídeo no Drive</a>
 <p><small>Prévia de conteúdo, não uma simulação fiel do anúncio no Instagram ou Facebook.</small></p>
-</div>
+</div></div>
 </section><button type="button" class="secondary workflow-next" data-next="workflow-publish">Continuar para revisão e envio →</button></div></details>
 <details class="workflow-accordion" id="workflow-publish"><summary><span class="workflow-icon">04</span><span><strong>Revisar e enviar à Meta</strong><small>Envie o vídeo e crie o anúncio pausado com segurança</small></span><span class="workflow-chevron">⌄</span></summary><div class="workflow-content"><div style="border:1px solid #ddd;border-radius:12px;padding:16px;margin-top:18px">
 <h3>Finalizar anúncio</h3>
-<p>Selecione um rascunho salvo acima. Primeiro envie o vídeo à Meta, depois crie o anúncio <strong>PAUSADO</strong>. Nenhum anúncio será ativado por estas ações. O Drive deve permitir download público direto; arquivos com confirmação de download não funcionam nesta versão.</p>
+<p>Escolha o anúncio preparado que deseja enviar. O vídeo será enviado primeiro e o anúncio será criado pausado, sem iniciar gastos.</p><label for="meta-publish-draft">Selecione o vídeo e anúncio para enviar à Meta</label><select id="meta-publish-draft"><option value="">Selecione um anúncio salvo</option></select>
 <p id="meta-video-status" role="status" aria-live="polite">Selecione um rascunho salvo.</p>
 <button type="button" id="meta-video-upload" class="secondary">Enviar vídeo à Meta</button>
 <button type="button" id="meta-ad-create" class="primary">Criar anúncio pausado</button>
