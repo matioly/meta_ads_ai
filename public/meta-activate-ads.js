@@ -8,7 +8,7 @@
   for(const a of items){
    const row=document.createElement("label");row.style.cssText="display:block;padding:10px;border-bottom:1px solid #ddd";
    const box=document.createElement("input");box.type="checkbox";box.value=a.id;box.disabled=!a.eligible||busy;box.addEventListener("change",()=>submit.disabled=busy||!selected().length);
-   row.append(box,document.createTextNode(" "+a.name+" · "+a.campaign+" · "+a.adset+" · "+(a.eligible?"Pronto para ativar":"Campanha/conjunto não ativos")));
+   row.append(box,document.createTextNode(" "+a.name+" · "+a.campaign+" · "+a.adset+" · "+(a.eligible?"Pronto para ativar":"Campanha/conjunto indisponíveis")));
    list.append(row);
   }
   submit.disabled=busy||!selected().length;
@@ -25,7 +25,7 @@
  submit.addEventListener("click",async()=>{
   const ids=selected();if(!ids.length||busy)return;
   const names=items.filter(a=>ids.includes(a.id)).map(a=>a.name);
-  if(!window.confirm("ATENÇÃO: ativar "+ids.length+" anúncio(s) pode iniciar gastos imediatamente.\n\n"+names.join("\n")+"\n\nConfirma a ativação?"))return;
+  if(!window.confirm("ATENÇÃO: serão ativados os anúncios selecionados e suas campanhas/conjuntos pausados. Outros anúncios vinculados podem começar a gastar imediatamente.\n\nAtivar "+ids.length+" anúncio(s)?\n\n"+names.join("\n")+"\n\nConfirma a ativação?"))return;
   busy=true;refresh.disabled=true;draw();result.textContent="Ativando anúncios, aguarde…";
   const outcomes=[];
   for(const id of ids){
