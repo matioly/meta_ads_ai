@@ -2,6 +2,18 @@
 
 Referência: 24/10/2026. Configuração de código verificada até 8860d6e. O estado das variáveis e serviços no Railway não foi inspecionado nesta atualização; o histórico de deploy e testes foi informado pelo operador.
 
+## META01 — deploy e aceite confirmado (24/10/2026)
+
+- PR #1 integrado à main pelo operador; Railway serviu `/meta-assets.html`.
+- Migration `007_meta_assets.sql` criou `meta_assets` (registro verificado no painel PostgreSQL).
+- Formulário por clínica em Integrações; GET/PUT `/api/companies/:companyId/meta-assets`; gravação confirmada visualmente para Alps.
+- Print do banco exibiu `whatsapp_business_id`, `whatsapp_phone`, `notes`, `updated_at`. Outros campos requerem conferência adicional se houver divergência.
+- Sem necessidade de `META_ACCESS_TOKEN` para META01. Não criar credenciais até revisar META02.
+- Pendência externa: acesso à página Facebook solicitado e não aprovado; **não bloquear inventário** por isso.
+- Testes pendentes: leitura após F5, validação de entradas inválidas, perfil member, isolamento entre clínicas, regressão e testes automatizados com banco isolado.
+
+Para conferir sem alterar dados: Railway → Postgres → Database → Data → `meta_assets`. Não usar botões Row/Column para verificar. Evitar copiar tokens, cookies ou URLs privadas em screenshots.
+
 ## Ambiente local
 
 Usar Node compatível com Express 5 e node --watch. Os builds compartilhados usaram Node 24; o projeto ainda não fixa engines ou packageManager. Usar npm com package-lock.json.
