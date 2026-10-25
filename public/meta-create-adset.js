@@ -14,7 +14,7 @@
    const value=Number(plan.dailyBudgetBrl);
    if(!Number.isFinite(value))throw Error("Orçamento inválido. Confira o valor informado.");
    status.textContent="Aguardando sua confirmação…";
-   const approved=window.confirm("Confirma criar o público '"+plan.name+"' na Meta?\nIdades: "+plan.ageMin+" a "+plan.ageMax+" anos\nOrçamento diário: R$ "+value.toFixed(2)+"\n\nO conjunto ficará PAUSADO. Nenhum anúncio será veiculado.");
+   const approved=window.confirm("Confirma criar o público '"+plan.name+"' na Meta?\nIdades: "+plan.ageMin+" a "+plan.ageMax+" anos\nLocalização: "+plan.city+" ("+plan.latitude+", "+plan.longitude+") · "+plan.radiusKm+" km\nGênero: "+plan.gender+"\nOrçamento diário: R$ "+value.toFixed(2)+"\n\nO conjunto ficará PAUSADO. Nenhum anúncio será veiculado.");
    if(!approved){status.textContent="Operação cancelada. Nada foi enviado à Meta.";return;}
    button.disabled=true;
    status.textContent="Enviando solicitação à Meta. Aguarde…";

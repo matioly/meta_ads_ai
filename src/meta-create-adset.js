@@ -22,8 +22,9 @@ async function meta(url,token,options={}) {
 }
 router.post("/:companyId/meta-create-adset",access,async(req,res,next)=>{
   if(process.env.META_ADSET_CREATION_ENABLED!=="true")return res.status(503).json({error:"Criação de públicos ainda desabilitada. Ative META_ADSET_CREATION_ENABLED=true no Railway somente após revisar a configuração."});
-  const {campaignId,name,ageMin,ageMax,dailyBudgetBrl,confirm}=req.body||{};
+  const {campaignId,name,ageMin,ageMax,dailyBudgetBrl,confirm,city,latitude,longitude,radiusKm,gender}=req.body||{};
   const key=req.get("Idempotency-Key");
+  if(typeof city!=="string"||!city.trim()||city.length>100||!Number.isFinite(latitude)||!Number.isFinite(longitude)||latitude < -90||latitude > 90||longitude < -180||longitude > 180||![3,5,10,15,20].includes(radiusKm)||!["all","male","female"].includes(gender))return res.status(400).json({error:"Localização ou gênero inválido. A segmentação não será ampliada para o Brasil."});
   if(!digits(campaignId)||typeof name!=="string"||!name.trim()||name.trim().length>120||
     !Number.isInteger(ageMin)||!Number.isInteger(ageMax)||ageMin<18||ageMax>65||ageMin>ageMax||
     typeof dailyBudgetBrl!=="number"||!Number.isFinite(dailyBudgetBrl)||dailyBudgetBrl<10||dailyBudgetBrl>10000||
@@ -33,7 +34,7 @@ router.post("/:companyId/meta-create-adset",access,async(req,res,next)=>{
   const token=process.env.META_ACCESS_TOKEN;
   if(!token)return res.status(503).json({error:"Conexão Meta não configurada."});
   const scope=req.params.companyId+":"+req.session.userId+":"+key;
-  const fingerprint=crypto.createHash("sha256").update(JSON.stringify({campaignId,name:name.trim(),ageMin,ageMax,dailyBudgetBrl})).digest("hex");
+  const fingerprint=crypto.createHash("sha256").update(JSON.stringify({campaignId,name:name.trim(),ageMin,ageMax,dailyBudgetBrl,city,latitude,longitude,radiusKm,gender})).digest("hex");
   const previous=done.get(scope);
   if(previous){
     if(previous.fingerprint!==fingerprint)return res.status(409).json({error:"Essa solicitação já foi usada com outras configurações."});
@@ -64,7 +65,7 @@ router.post("/:companyId/meta-create-adset",access,async(req,res,next)=>{
       bid_strategy:"LOWEST_COST_WITHOUT_CAP",
       destination_type:whatsapp?"WHATSAPP":"WEBSITE",
       daily_budget:String(Math.round(dailyBudgetBrl*100)),
-      targeting:JSON.stringify({geo_locations:{countries:["BR"]},age_min:ageMin,age_max:ageMax,targeting_automation:{advantage_audience:0}})
+      targeting:JSON.stringify({geo_locations:{custom_locations:[{latitude,longitude,radius:radiusKm,distance_unit:"kilometer"}]},age_min:ageMin,age_max:ageMax,...(gender==="all"?{}:{genders:[gender==="male"?1:2]}),targeting_automation:{advantage_audience:0}})
     });
     if(whatsapp)body.set("promoted_object",JSON.stringify({page_id:rows[0].facebook_page_id}));
     let data;
