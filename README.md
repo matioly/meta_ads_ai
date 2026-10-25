@@ -6,6 +6,18 @@ Painel próprio para planejar campanhas de anúncios por clínica, com evoluçã
 
 **O aplicativo ainda não publica anúncios, não consulta resultados do Meta e não gera conteúdo com IA.** O orçamento exibido é planejamento, não gasto real.
 
+## Marco confirmado em produção — META01 (24/10/2026)
+
+**META01 implementada, implantada e com gravação confirmada no Railway.** Após merge do PR #1, o operador abriu `/meta-assets.html`, selecionou Alps Oral Clinic, salvou o inventário e encontrou o registro na tabela `meta_assets` do PostgreSQL. O print confirmou WABA, telefone, observações e `updated_at`; os demais IDs foram informados a partir das telas da Meta, mas não foram todos reconferidos no print do banco.
+
+- Interface: **Integrações → Gerenciar inventário** ou `/meta-assets.html`.
+- API: `GET/PUT /api/companies/:companyId/meta-assets`; acesso por sessão, escopo de clínica e edição para owner/admin.
+- Migration: `007_meta_assets.sql`. **Nenhum token Meta necessário** para esta etapa.
+- Clínica piloto: Alps Oral Clinic; página Facebook com **solicitação de acesso pendente** (resolver posteriormente).
+- Não há autenticação na Marketing API, consulta de campanhas, upload de vídeo para Meta nem publicação. Próxima etapa: **META02**, conexão segura e teste somente leitura; não confundir token do bot WhatsApp com permissão de anúncios.
+
+Leia [Retomada](docs/RETOMADA.md), [Backlog](docs/BACKLOG.md) e [Operação](docs/OPERACAO.md) para continuar. A biblioteca do Drive (L01) também foi confirmada manualmente no Railway: vídeo *Pamela ADS2* cadastrado no banco e selecionado em rascunho. Não há download automático do vídeo.
+
 ## Comece por aqui
 
 | Documento | Conteúdo |
