@@ -4,7 +4,11 @@ const adsetCampaign=document.querySelector("#adset-campaign");
 const adsetFeedback=document.querySelector("#adset-preview-feedback");
 const adsetResult=document.querySelector("#adset-preview-result");
 const adsetButton=document.querySelector("#adset-preview-button");
+let approvedAdsetPreview=null;
+function resetAdsetApproval(){approvedAdsetPreview=null;document.querySelector("#adset-create-actions").hidden=true;}
+for(const element of adsetForm.querySelectorAll("input,select"))element.addEventListener("input",resetAdsetApproval);
 async function refreshAdsetCampaigns(){
+  resetAdsetApproval();
   adsetCampaign.replaceChildren();
   adsetResult.textContent="";
   if(!select.value)return;
@@ -21,6 +25,7 @@ async function refreshAdsetCampaigns(){
 adsetForm.addEventListener("submit",async e=>{
   e.preventDefault();
   if(!adsetCampaign.value)return;
+  resetAdsetApproval();
   adsetButton.disabled=true;adsetResult.textContent="";adsetFeedback.textContent="Validando plano…";
   try{
     const r=await fetch("/api/companies/"+encodeURIComponent(select.value)+"/meta-adset-preview",{
@@ -32,7 +37,9 @@ adsetForm.addEventListener("submit",async e=>{
     });
     const data=await r.json();
     if(!r.ok)throw Error(data.error||"Não foi possível validar.");
-    adsetFeedback.textContent="Tudo certo! Este é apenas um planejamento; nenhum anúncio foi criado.";
+    adsetFeedback.textContent="Simulação concluída. Você pode criar o público pausado.";
+    approvedAdsetPreview={companyId:select.value,campaignId:data.campaignId,name:data.name,ageMin:data.targeting.age_min,ageMax:data.targeting.age_max,dailyBudgetBrl:data.dailyBudgetBrl};
+    document.querySelector("#adset-create-actions").hidden=false;
     adsetResult.textContent=[
       "Campanha escolhida: "+adsetCampaign.selectedOptions[0].textContent,"Nome do público: "+data.name,"Situação: ainda não criado",
        "Localização inicial: Brasil","Faixa etária: "+data.targeting.age_min+"–"+data.targeting.age_max,
