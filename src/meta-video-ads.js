@@ -143,7 +143,7 @@ router.post("/:companyId/creative-drafts/:draftId/meta-paused-ad",access,async(r
   const destination=typeof process.env.META_WEBSITE_URL==="string"?process.env.META_WEBSITE_URL.trim():"";
   let site;
   try{site=new URL(destination);}catch{return res.status(503).json({error:"Configure META_WEBSITE_URL com o endereço HTTPS do site da clínica no Railway."});}
-  if(site.protocol!=="https:"||!site.hostname||site.username||site.password||site.port||site.hash||!/^([a-z0-9-]+\\.)+[a-z]{2,}$/i.test(site.hostname))
+  if(site.protocol!=="https:"||!site.hostname||site.username||site.password||site.port||site.hash||!/^([a-z0-9-]+\.)+[a-z]{2,}$/i.test(site.hostname))
    return res.status(422).json({error:"META_WEBSITE_URL deve ser um endereço HTTPS público válido, sem credenciais, porta ou fragmento."});
   if(d.meta_creative_id)return res.status(409).json({error:"Este rascunho já possui criativo Meta. Confira o destino do criativo existente antes de reutilizá-lo; para alterar destino, crie um novo rascunho."});
   let creativeId=d.meta_creative_id;
