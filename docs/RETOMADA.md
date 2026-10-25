@@ -1,3 +1,7 @@
+## META03.1 — próximo teste operacional
+
+PR META03.1 implementa abas Campanhas, Conjuntos e Anúncios em /meta-campaigns.html, com status/objetivos traduzidos e consulta read-only. Depois de merge/deploy, conferir três abas na Alps, comparando com Gerenciador de Anúncios. O acesso a criativos ou campos de segmentação pode variar conforme permissões; erro da API será mostrado sem revelar token. Não há paginação nem métricas de desempenho nesta etapa.
+
 ## Estado atual — META02 validada / META03 aguardando deploy
 
 Em 24/10/2026, o operador confirmou merge e deploy do PR #2; chamada autenticada `GET /api/companies/:companyId/meta-connection` retornou HTTP 200 e `connected: true` para Alps. Token exclusivo `META_ACCESS_TOKEN` configurado no serviço meta_ads_ai do Railway; nunca expor em logs, prints, commits ou frontend. Não alterar o bot de WhatsApp.
