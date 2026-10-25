@@ -1,3 +1,10 @@
+## 25/10/2026 — Diagnóstico dos campos do passo 5B
+
+- Consulta autenticada por clínica, somente leitura, em GET /api/companies/:companyId/creative-drafts/:draftId/meta-ad-diagnostic.
+- Botão para comparar valores reais de campanha/conjunto com os requisitos de site, sem criar anúncio.
+- Erro 422 de configuração passa a identificar campos incompatíveis; mantém os requisitos de conta, vínculo, PAUSED, OUTCOME_TRAFFIC, WEBSITE e LINK_CLICKS.
+- Testes de divergência, dados ausentes, filtragem de resposta e ausência de escrita Meta no diagnóstico/bloqueio. Produção ainda não validada.
+
 ## 25/10/2026 — Marco META04.2/04.3 e PR #20 META05A/5B
 
 **Validado pelo operador:** campanha e conjunto PAUSADOS criados na Meta (conjunto 120249780122340576); rascunho de criativo com vídeo Pamela ADS2 salvo e recuperado com todos os campos. Erros Meta resolvidos durante testes: 100/4834011 (compartilhamento de orçamento), 100/1815715 (destino), 100/2490487 (bid/ROAS/otimização), 100/1870227 (Advantage+ audience).
