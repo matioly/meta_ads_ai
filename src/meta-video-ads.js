@@ -106,7 +106,16 @@ router.post("/:companyId/creative-drafts/:draftId/meta-paused-ad",access,async(r
   if(!creativeId){
    const spec={page_id:d.facebook_page_id,video_data:{video_id:d.meta_video_id,message:d.primary_text,title:d.headline}};
    if(d.description)spec.video_data.link_description=d.description;
-   if(d.instagram_id&&digits(d.instagram_id))spec.instagram_actor_id=d.instagram_id;
+   // Never assume an inventory Instagram ID is a valid advertising actor.
+   // Meta can expose different IDs for an Instagram profile and its ad actor.
+   if(d.instagram_id){
+    if(!digits(d.instagram_id))return res.status(422).json({error:"ID do Instagram inválido no inventário Meta."});
+    const linked=await graph("act_"+d.ad_account_id+"/instagram_accounts?fields=id,username&limit=100",token);
+    const accounts=Array.isArray(linked.data)?linked.data:[];
+    const match=accounts.find(a=>String(a.id)===String(d.instagram_id));
+    if(!match)return res.status(422).json({error:"O Instagram cadastrado não foi encontrado entre as contas de Instagram autorizadas para esta conta de anúncios. Verifique a vinculação Página–Instagram no Meta Business Suite e confirme o ID de publicidade antes de repetir."});
+    spec.instagram_actor_id=String(match.id);
+   }
    const body=new URLSearchParams({name:d.headline.slice(0,120),object_story_spec:JSON.stringify(spec)});
    const creative=await graph("act_"+d.ad_account_id+"/adcreatives",token,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body});
    creativeId=String(creative.id||"");if(!digits(creativeId))throw Error("Meta não confirmou o criativo. Confira a conta antes de repetir.");
