@@ -185,6 +185,7 @@ function requireLogin(req, res, next) {
 app.use("/api/companies", requireLogin, require("./campaigns"));
 app.use("/api/companies", requireLogin, require("./media"));
 app.use("/api/companies", requireLogin, require("./meta-assets"));
+app.use("/api/companies", requireLogin, require("./meta-connection"));
 
 app.get("/api/me", requireLogin, async (req, res) => {
   const result = await pool.query(
