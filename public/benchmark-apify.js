@@ -4,7 +4,7 @@
  function reset(){window.benchmarkAiReset?.();request++;$("benchmark-auto-refresh").hidden=true;window.benchmarkSelectedCompetitor=null;$("benchmark-auto-results").replaceChildren();}
  window.benchmarkAutoReset=reset;
  window.benchmarkAutoSearch=async competitor=>{
-  window.benchmarkAdsOpen(competitor,true);
+  try{window.benchmarkAdsOpen(competitor,true);}catch(error){console.error("Benchmark painel",error);document.getElementById("benchmark-ads-section").hidden=false;}
   window.benchmarkSelectedCompetitor=competitor;
   $("benchmark-auto-refresh").hidden=false;
   const current=++request;
@@ -37,7 +37,7 @@
     };actions.append(save);card.append(actions);root.append(card);
    }
    window.benchmarkAiLoad?.(competitor,data.ads);
-  }catch(e){if(current===request)status.textContent=e.message;}
+  }catch(e){if(current===request)status.textContent="Não foi possível carregar os anúncios salvos: "+e.message+" Use Atualizar anúncios ou tente novamente."; }
  };
  window.benchmarkAutoRefresh=async()=>{
   const root=$("benchmark-auto-results");
