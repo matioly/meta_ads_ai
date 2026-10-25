@@ -1,3 +1,7 @@
+## 24/10/2026 — META03.1: campanhas, conjuntos e anúncios
+
+Implementação em PR: três abas na tela de campanhas reais, consulta somente leitura por clínica a /campaigns, /adsets e /ads da Graph API, tradução de status/objetivos, resumo de regiões, orçamento, programação e referência ao criativo. Não altera Meta, não publica anúncios e não expõe token. Primeiros 100 itens por nível; paginação e métricas permanecem pendentes. Teste em produção após merge/deploy ainda necessário.
+
 ## 24/10/2026 — META02 validada e META03 em implementação
 
 **META02:** PR #2 integrado e deploy Railway confirmado pelo operador. Teste real no Chrome autenticado retornou HTTP 200 e `{ connected: true, account: {...} }` para Alps Oral Clinic. Isso confirma consulta à conta de anúncios via Graph API usando `META_ACCESS_TOKEN` armazenado no servidor. Não comprova permissões de publicação nem valida acesso à página Facebook.
