@@ -98,6 +98,12 @@ function notify (message) {
   }, 4500)
 }
 
+function pageRoute () {
+  if (location.pathname === '/campaigns.html') return 'campaigns'
+  if (location.pathname === '/integrations.html') return 'integrations'
+  return new URLSearchParams(location.search).get('view') || 'overview'
+}
+
 function changeView (view) {
   if (!pages[view]) view = 'overview'
   currentView = view
@@ -402,6 +408,10 @@ form.addEventListener('submit', async event => {
     editingId = null
     dialog.close()
     search.value = ''
+    if (location.pathname !== '/campaigns.html') {
+      window.location.assign('/campaigns.html')
+      return
+    }
     changeView('campaigns')
 
     notify(isEditing ? 'Alterações salvas.' : 'Rascunho salvo.')
@@ -433,7 +443,7 @@ async function loadProfile () {
   // Establish the requested view before the first network request, not after drafts load.
   // This prevents the default overview state from surviving during initialization.
   if (currentView === null) {
-    changeView(new URLSearchParams(location.search).get('view') || 'overview')
+    changeView(pageRoute())
   }
   busy = true
   render()

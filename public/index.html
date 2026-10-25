@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#171b2e" />
     <title>Meta Ads AI | Painel</title>
-    <script src="/initial-view.js"></script>
+    <script src="/initial-view.js?v=82"></script>
     <link rel="stylesheet" href="/styles.css?v=79" />
-    <script src="/app.js?v=81" defer></script>
+    <script src="/app.js?v=82" defer></script>
     <script src="/media-library.js" defer></script><script src="/home-meta.js" defer></script>
   </head>
   <body>
@@ -26,18 +26,14 @@
 
       <p class="nav-label">PAINEL</p>
       <nav aria-label="Navegação principal">
-        <button
-          class="nav-button active"
-          data-view="overview"
-          aria-current="page"
-        >
-          <span class="nav-icon" aria-hidden="true">◈</span><span>Visão geral</span></button>
-        <button class="nav-button" data-view="campaigns">
-          <span class="nav-icon" aria-hidden="true">◎</span><span>Campanhas</span></button>
+        <a class="nav-button active" href="/" aria-current="page">
+          <span class="nav-icon" aria-hidden="true">◈</span><span>Visão geral</span></a>
+        <a class="nav-button" href="/campaigns.html">
+          <span class="nav-icon" aria-hidden="true">◎</span><span>Campanhas</span></a>
         <a class="nav-button" href="/meta-campaigns.html"><span class="nav-icon" aria-hidden="true">◉</span><span>Gerenciador Meta</span></a>
         <button class="nav-button" data-view="media"><span class="nav-icon" aria-hidden="true">▣</span><span>Biblioteca de mídias</span></button>
-        <button class="nav-button" data-view="integrations">
-          <span class="nav-icon" aria-hidden="true">⇄</span><span>Integrações</span></button>
+        <a class="nav-button" href="/integrations.html">
+          <span class="nav-icon" aria-hidden="true">⇄</span><span>Integrações</span></a>
       <a class="nav-button" href="/benchmark.html"><span class="nav-icon" aria-hidden="true">▤</span><span>Benchmark</span></a></nav>
 
       <p class="nav-label">CONFIGURAÇÕES</p>
