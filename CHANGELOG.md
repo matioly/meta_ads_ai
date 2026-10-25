@@ -1,3 +1,7 @@
+## 24/10/2026 — META04.1 (PR em revisão)
+
+Criação explícita de campanha OUTCOME_ENGAGEMENT com status PAUSED via Marketing API, sem conjunto, criativo ou orçamento. Endpoint POST /api/companies/:companyId/meta-create-campaign, autorização de owner/admin por clínica, confirmação no navegador, flag de segurança META_CAMPAIGN_CREATION_ENABLED=true no Railway (desabilitada por padrão), token apenas no servidor. Repetição de mesma chave protegida apenas em memória no processo (não é idempotência durável entre reinícios/instâncias); respostas incertas exigem conferir lista antes de repetir. Não testar criação sem autorização do operador. Produção ainda não validada.
+
 ## 24/10/2026 — META03.2: indicadores de desempenho (PR em revisão)
 
 Consulta read-only ao Insights da conta de anúncios, com filtros hoje, 7 dias, 30 dias e intervalo personalizado (máximo 366 dias). Indicadores: gasto, alcance, impressões, cliques, cliques no link, CPC calculado e evento de conversas iniciadas quando retornado. Fonte e datas mostradas no painel; token exclusivo no servidor; nenhuma alteração de anúncios. Teste real em produção ainda pendente. Limitações: agregação no nível da conta, sem breakdown por campanha, atribuição conforme Meta, evento de conversas pode não estar disponível.

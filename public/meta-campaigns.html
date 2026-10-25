@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Campanhas reais | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><script src="/meta-campaigns.js" defer></script></head>
+<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Campanhas reais | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><script src="/meta-campaigns.js" defer></script><script src="/meta-create-campaign.js" defer></script></head>
 <body><main style="max-width:1250px;margin:32px auto;padding:20px">
 <p><a href="/">← Voltar ao painel</a></p><p class="eyebrow">META03.2 · CONSULTA SOMENTE LEITURA</p>
 <h1>Campanhas reais da Meta</h1><p>Consulte campanhas, conjuntos e anúncios existentes. Nenhuma alteração é enviada à Meta.</p>
@@ -27,7 +27,16 @@
 <article class="metric"><span>CPC (todos)</span><strong id="insights-cpc">—</strong></article>
 <article class="metric"><span>Conversas iniciadas*</span><strong id="insights-conversations">—</strong></article>
 </div><p><small>*Exibidas apenas quando a Meta retorna o evento específico. Ausência do evento não significa zero conversas. CPC = investimento ÷ cliques (todos).</small></p>
-</section><p id="feedback" role="status" aria-live="polite">Carregando…</p>
+</section><section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="create-title">
+<h2 id="create-title">Criar campanha de teste na Meta · Pausada</h2>
+<p>Cria somente a campanha de Engajamento, sem conjunto de anúncios, orçamento ou criativo. A campanha será enviada como PAUSADA.</p>
+<form id="meta-create-form">
+<label for="meta-create-name">Nome da campanha</label>
+<input id="meta-create-name" required maxlength="120" placeholder="Ex.: TESTE Alps - Integração API">
+<button type="submit" class="primary" id="meta-create-button">Revisar e criar pausada</button>
+</form><p id="meta-create-feedback" role="status" aria-live="polite"></p>
+</section>
+<p id="feedback" role="status" aria-live="polite">Carregando…</p>
 <div class="table-wrapper"><table><caption id="table-caption">Campanhas da Meta</caption><thead><tr id="headers"></tr></thead><tbody id="campaigns"></tbody></table></div>
 <p id="pagination-note"></p><p><small>Orçamentos podem estar definidos em outro nível. Listagem inicial limitada a 100 itens por nível. Público exibido de forma resumida.</small></p>
 </main></body></html>

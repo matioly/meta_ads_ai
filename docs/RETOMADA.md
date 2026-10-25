@@ -1,3 +1,7 @@
+## META04.1 — primeiro teste de criação controlada
+
+PR META04.1 adiciona formulário em /meta-campaigns.html para criar campanha real de Engajamento com status PAUSED, sem conjunto/anúncio/orçamento. A API exige usuário owner/admin, chave de requisição e confirmação. Flag META_CAMPAIGN_CREATION_ENABLED deve estar 'true' no serviço meta_ads_ai do Railway para permitir POST; por padrão, escrita desabilitada. Após merge/deploy, primeiro confirmar que a flag impede criação, depois ativar somente com consentimento do operador e criar uma campanha de teste pausada. Verificar ID retornado e lista de campanhas. Nunca repetir às cegas após erro incerto, pois proteção de repetição é somente em memória.
+
 ## META03.2 — validação pendente
 
 PR META03.2 adiciona endpoint GET /api/companies/:companyId/meta-insights e cards na página /meta-campaigns.html. Testar no Railway após merge/deploy com Alps: 7 dias, 30 dias, hoje e intervalo personalizado. Comparar gastos, alcance e cliques com Gerenciador de Anúncios no mesmo período/fuso. Ausência do evento de conversa é exibida como indisponível, não zero. Nenhum anúncio é alterado. META03.1 já validada manualmente pelo operador: 1 campanha, 1 conjunto com R$30/dia e 5 anúncios.
