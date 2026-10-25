@@ -8,7 +8,7 @@ router.post("/:companyId/meta-adset-preview",access,async(req,res,next)=>{
   try{
     const {campaignId,name,ageMin,ageMax,dailyBudgetBrl,city,latitude,longitude,radiusKm,gender,interests=[]}=req.body||{};
     if(typeof city!=="string"||!city.trim()||city.length>100||!Number.isFinite(latitude)||!Number.isFinite(longitude)||latitude < -90||latitude > 90||longitude < -180||longitude > 180||!([3,5,10,15,20].includes(radiusKm))||!["all","male","female"].includes(gender))return res.status(400).json({error:"Informe cidade, coordenadas válidas, raio e gênero."});
-    if(!Array.isArray(interests)||interests.length>20||interests.some(i=>!i||!/^\\d{1,30}$/.test(String(i.id))||typeof i.name!=="string"||i.name.length>120))return res.status(400).json({error:"Interesses inválidos."});
+    if(!Array.isArray(interests)||interests.length>20||interests.some(i=>!i||!/^\d{1,30}$/.test(String(i.id))||typeof i.name!=="string"||i.name.length>120))return res.status(400).json({error:"Interesses inválidos."});
     if(typeof campaignId!=="string"||!/^[0-9]{10,30}$/.test(campaignId)||
        typeof name!=="string"||!name.trim()||name.trim().length>120||
        !Number.isInteger(ageMin)||!Number.isInteger(ageMax)||
