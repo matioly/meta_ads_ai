@@ -26,17 +26,22 @@
    const r=await fetch(path,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({adIds:[...selected],focus:$("benchmark-ai-focus").value})});
    const data=await r.json();if(!r.ok)throw Error(data.error||"Erro na análise.");
    const a=data.analysis,root=$("benchmark-ai-output");
-   root.append(el("h3","Diagnóstico competitivo"),el("p",a.summary));
-   root.append(el("h3","Padrões identificados"));
-   for(const p of a.patterns||[])root.append(card(p.theme,[["Evidência",p.evidence],["Interpretação",p.interpretation]]));
-   root.append(el("h3","Oportunidades para a clínica"));
-   for(const p of a.opportunities||[])root.append(el("p","• "+p));
-   root.append(el("h3","Roteiros originais para gravar"));
-   for(const s of a.scripts||[])root.append(card((s.duration||"")+" — "+(s.title||"Roteiro"),[["Abertura",s.hook],["Desenvolvimento",s.body],["Chamada para ação",s.cta]]));
-   root.append(el("h3","Ideias de anúncios"));
-   for(const c of a.campaigns||[])root.append(card(c.title,[["Texto principal",c.primaryText],["Título",c.headline],["CTA",c.cta]]));
-   root.append(el("h3","Cuidados antes de publicar"));
-   for(const caution of a.cautions||[])root.append(el("p","• "+caution));
+   const dashboard=el("div");dashboard.className="ai-dashboard";
+   function panel(icon,title,subtitle){const section=el("section");section.className="ai-quadrant";const head=el("header");head.className="ai-quadrant-head";head.append(el("span",icon),el("div"));head.lastChild.append(el("h3",title),el("p",subtitle));section.append(head);dashboard.append(section);return section;}
+   function item(title,content){const article=el("article");article.className="ai-insight";article.append(el("h4",title),el("p",content));return article;}
+   function copyButton(lines){const btn=el("button","📋 Copiar texto");btn.className="secondary ai-copy";btn.type="button";btn.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(lines.filter(Boolean).join("\\n\\n"));btn.textContent="✓ Copiado";setTimeout(()=>btn.textContent="📋 Copiar texto",2200);}catch{btn.textContent="Não foi possível copiar";}});return btn;}
+   const strategy=panel("📊","Estratégia da concorrência","O que os anúncios comunicam");
+   strategy.append(item("Visão geral",a.summary||"Nenhum resumo disponível."));
+   for(const p of a.patterns||[]){const block=el("details");block.className="ai-detail";const summary=el("summary",p.theme||"Padrão observado");block.append(summary,item("Interpretação",p.interpretation||""),item("Evidência",p.evidence||""));strategy.append(block);}
+   const opportunities=panel("🎯","Oportunidades para a clínica","Caminhos para diferenciar sua comunicação");
+   for(const [i,value] of (a.opportunities||[]).entries()){const block=item(String(i+1).padStart(2,"0"),value);block.classList.add("ai-opportunity");opportunities.append(block);}
+   const scripts=panel("🎬","Roteiros para gravar","Ideias originais para vídeos da Pâmela");
+   for(const s of a.scripts||[]){const block=el("details");block.className="ai-detail ai-creative";if(s.duration==="30s"||s.duration==="30 segundos")block.open=true;block.append(el("summary",(s.duration||"Vídeo")+" · "+(s.title||"Roteiro")));const body=el("div");body.className="ai-creative-body";body.append(item("Abertura",s.hook||""),item("Desenvolvimento",s.body||""),item("Chamada para ação",s.cta||""),copyButton([s.title,s.hook,s.body,s.cta]));block.append(body);scripts.append(block);}
+   const campaigns=panel("📢","Textos de campanhas","Sugestões para adaptar aos anúncios Meta");
+   for(const [i,v] of (a.campaigns||[]).entries()){const block=el("details");block.className="ai-detail ai-creative";if(i===0)block.open=true;block.append(el("summary",v.title||"Sugestão "+(i+1)));const body=el("div");body.className="ai-creative-body";body.append(item("Texto principal",v.primaryText||""),item("Título",v.headline||""),item("CTA",v.cta||""),copyButton([v.primaryText,v.headline,v.cta]));block.append(body);campaigns.append(block);}
+   root.append(dashboard);
+   const cautions=a.cautions||[];
+   if(cautions.length){const note=el("details");note.className="ai-safety";note.append(el("summary","⚖️ Cuidados antes de publicar"));for(const v of cautions)note.append(el("p","• "+v));root.append(note);}
    status.textContent="Análise concluída. Revise os roteiros e alegações clínicas antes de publicar.";
   }catch(e){status.textContent=e.message;}finally{button.disabled=false;}
  });
