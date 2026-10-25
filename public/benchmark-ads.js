@@ -25,8 +25,8 @@
   }
  }
  async function load(){feedback("Carregando anúncios…");try{items=(await api(base())).ads;feedback(items.length+" anúncio(s) registrado(s) manualmente.");draw();}catch(e){feedback(e.message);}}
- window.benchmarkAdsOpen=(competitor,write)=>{selected=competitor;canEdit=write;$("benchmark-ads-title").textContent="Anúncios de "+competitor.name;$("benchmark-ad-add").hidden=!write;$("benchmark-ads-section").hidden=false;items=[];draw();load();$("benchmark-ads-section").scrollIntoView({behavior:"smooth",block:"start"});};
- window.benchmarkAdsReset=()=>{selected=null;items=[];$("benchmark-ads-section").hidden=true;};
+ window.benchmarkAdsOpen=(competitor,write)=>{window.benchmarkAutoReset?.();selected=competitor;canEdit=write;$("benchmark-ads-title").textContent="Anúncios de "+competitor.name;$("benchmark-ad-add").hidden=!write;$("benchmark-ads-section").hidden=false;items=[];draw();load();$("benchmark-ads-section").scrollIntoView({behavior:"smooth",block:"start"});};
+ window.benchmarkAdsReset=()=>{window.benchmarkAutoReset?.();selected=null;items=[];$("benchmark-ads-section").hidden=true;};
  $("benchmark-ad-add").onclick=()=>{form.reset();$("benchmark-ad-error").textContent="";modal.showModal();};
  $("benchmark-ad-cancel").onclick=()=>modal.close();
  $("benchmark-ad-close").onclick=()=>{$("benchmark-ads-section").hidden=true;selected=null;};
