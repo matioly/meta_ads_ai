@@ -1,3 +1,18 @@
+# STATUS PRIORITÁRIO — 25/10/2026
+
+- META01 inventário Alps: validado em produção; permissão da Página Facebook a reconfirmar.
+- META02 conexão Marketing API: validada.
+- META03 leitura de campanhas/conjuntos/anúncios e indicadores: implementada; reconciliação das métricas pendente.
+- META04.1 campanha PAUSADA: validada em produção.
+- META04.2 conjunto PAUSADO: validado pelo operador, ID 120249780122340576.
+- META04.3 rascunhos de criativo: salvar e recuperar todos os campos validado pelo operador.
+- META05A envio Drive→Meta: código PR #20, **não homologado**; exige download público direto, limite 75 MB, migration 013.
+- META05B criativo/anúncio PAUSADO: código PR #20, **não homologado**; exige Página Facebook aprovada, compatibilidade de destino e token com permissões.
+
+**Prioridade imediata:** conferir deploy e migration 013; testar 5A, verificar vídeo na Meta; testar 5B, verificar anúncio PAUSADO; revisar permissão de escrita por papel, segurança de upload e idempotência remota. Nunca ativar anúncios sem autorização explícita. Próximos: OAuth Drive multi-conta, upload em streaming, CTA/destino/thumbnail, auditoria, prévia fiel, aprovação humana, geração IA e métricas.
+
+---
+
 ## Atualização vigente — 25/10/2026
 
 - **META04.1 CONCLUÍDA e validada em produção:** campanha real `Teste Integracao API`, ID `120249780034580576`, objetivo Engajamento, status PAUSED, criada e consultada no painel da Alps. Sem conjuntos ou anúncios. Parâmetro exigido pela Meta: `is_adset_budget_sharing_enabled=false` (erro 100/subcódigo 4834011).
