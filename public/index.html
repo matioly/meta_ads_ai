@@ -23,7 +23,7 @@
         </select>
       </div>
 
-      <p class="nav-label">GERENCIAR</p>
+      <p class="nav-label">PAINEL</p>
       <nav aria-label="Navegação principal">
         <button
           class="nav-button active"
@@ -35,12 +35,17 @@
         <button class="nav-button" data-view="campaigns">
           <span aria-hidden="true">◎</span> Campanhas
         </button>
-        <a class="nav-button" href="/meta-campaigns.html" style="display:block;text-decoration:none">↗ Campanhas na Meta</a>
-        <button class="nav-button" data-view="media"><span aria-hidden="true">▣</span> Mídias</button>
+        <a class="nav-button" href="/meta-campaigns.html" style="display:block;text-decoration:none">◉ Gerenciador Meta</a>
+        <button class="nav-button" data-view="media"><span aria-hidden="true">▣</span> Biblioteca de mídias</button>
         <button class="nav-button" data-view="integrations">
           <span aria-hidden="true">⇄</span> Integrações
         </button>
       </nav>
+
+      <p class="nav-label">CONFIGURAÇÕES</p>
+      <div class="sidebar-shortcuts">
+        <a class="nav-button" href="/meta-assets.html">⚙ Contas e ativos Meta</a>
+      </div>
 
       <div class="sidebar-footer">
         <span class="avatar">AI</span>
@@ -64,18 +69,14 @@
       </header>
 
       <main>
-        <div class="notice">
-          <strong>Seu planejamento está salvo</strong>
-          Os rascunhos ficam disponíveis por clínica, mesmo após sair. Nenhum
-          anúncio será publicado nesta etapa.
-        </div>
+        <div class="notice"><strong>Publicação sob seu controle</strong> Prepare campanhas, revise os criativos e envie anúncios pausados para a Meta. A ativação é sempre uma decisão sua.</div>
 
         <div class="page-heading">
           <div>
             <p class="eyebrow">META ADS AI</p>
             <h1 id="page-title">Visão geral</h1>
             <p id="page-description">
-              Organize suas próximas campanhas em um só lugar.
+              Gerencie campanhas, criativos e mídias da clínica em um só lugar.
             </p>
           </div>
           <button class="primary" id="new-campaign">
@@ -93,7 +94,7 @@
                 mantém o controle de cada etapa.
               </p>
               <button class="light-button" id="hero-create">
-                Criar primeiro rascunho <span aria-hidden="true">↗</span>
+                Criar campanha <span aria-hidden="true">↗</span>
               </button>
             </div>
             <div class="hero-art" aria-hidden="true">
@@ -118,12 +119,12 @@
             <article class="metric">
               <span>Campanhas no Meta</span>
               <strong>—</strong>
-              <small>Conecte uma conta para consultar</small>
+              <small>Consulte no Gerenciador Meta</small>
             </article>
             <article class="metric">
               <span>Conversas geradas</span>
               <strong>—</strong>
-              <small>Resultados ainda não disponíveis</small>
+              <small>Acompanhe os resultados na Meta</small>
             </article>
           </div>
         </section>
@@ -132,7 +133,7 @@
           <div class="panel-heading">
             <div>
               <h2>Seus rascunhos</h2>
-              <p>Campanhas salvas da clínica selecionada. Para ver resultados e criar campanhas reais pausadas, acesse <a href="/meta-campaigns.html">Campanhas na Meta →</a>.</p>
+              <p>Campanhas salvas da clínica selecionada. Para consultar e criar anúncios pausados, acesse <a href="/meta-campaigns.html">Campanhas na Meta →</a>.</p>
             </div>
             <label class="search">
               <span class="sr-only">Buscar rascunhos</span>
@@ -207,7 +208,7 @@
           <div class="integration-grid">
             <article class="panel integration-card">
               <span class="integration-logo meta-logo">∞</span>
-              <span class="status">Não conectado</span>
+              <span class="status">Integração Meta</span>
               <h2>Meta Ads</h2>
               <p><a href="/meta-assets.html">Gerenciar inventário de ativos por clínica →</a></p>
               <p><a href="/meta-campaigns.html">Abrir campanhas reais e resultados →</a></p>
@@ -215,9 +216,7 @@
                 Campanhas, contas de anúncios e resultados do Facebook e
                 Instagram em um único painel.
               </p>
-              <button class="secondary" disabled>
-                Conexão disponível em uma próxima etapa
-              </button>
+              <a class="secondary" href="/meta-assets.html">Gerenciar ativos</a>
             </article>
 
             <article class="panel integration-card">
@@ -355,8 +354,7 @@
           />
 
           <p class="form-note">
-            O destino é uma anotação de planejamento. A conexão com a conta será
-            configurada em outra etapa.
+            O destino será usado no planejamento do criativo. Confirme o endereço final antes de enviar à Meta.
           </p>
 
           <label for="briefing-notes">Observações</label>
