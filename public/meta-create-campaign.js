@@ -7,14 +7,14 @@ createForm.addEventListener("submit",async(event)=>{
   event.preventDefault();
   const name=document.querySelector("#meta-create-name").value.trim();
   if(!select.value||!name)return;
-  const accepted=window.confirm("Criar na Meta a campanha '"+name+"' com objetivo Engajamento e status PAUSADA? Nenhum anúncio será veiculado.");
+  const accepted=window.confirm("Criar na Meta a campanha '"+name+"' com objetivo Tráfego e status PAUSADA? Nenhum anúncio será veiculado.");
   if(!accepted)return;
   createButton.disabled=true;
   createFeedback.textContent="Enviando solicitação à Meta…";
   try{
     const response=await fetch("/api/companies/"+encodeURIComponent(select.value)+"/meta-create-campaign",{
       method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json","Idempotency-Key":crypto.randomUUID()},
-      body:JSON.stringify({name,objective:"OUTCOME_ENGAGEMENT",confirm:true})
+      body:JSON.stringify({name,objective:"OUTCOME_TRAFFIC",confirm:true})
     });
     const data=await response.json();
     if(!response.ok){
