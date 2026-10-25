@@ -11,10 +11,10 @@ router.post("/:companyId/meta-create-campaign", access, async (req,res,next)=>{
   const name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
   const objective = req.body?.objective;
   const key = req.get("Idempotency-Key");
-  if (!name || name.length > 120 || objective !== "OUTCOME_ENGAGEMENT" ||
+  if (!name || name.length > 120 || objective !== "OUTCOME_TRAFFIC" ||
       req.body?.confirm !== true || typeof key !== "string" ||
       !/^[a-f0-9-]{36}$/.test(key)) {
-    return res.status(400).json({error:"Informe nome, objetivo Engajamento, confirmação e chave da solicitação."});
+    return res.status(400).json({error:"Informe nome, objetivo Tráfego, confirmação e chave da solicitação."});
   }
   if (process.env.META_CAMPAIGN_CREATION_ENABLED !== "true") {
     return res.status(503).json({error:"Criação de campanhas desabilitada. Ative META_CAMPAIGN_CREATION_ENABLED=true no Railway após revisar o fluxo."});
