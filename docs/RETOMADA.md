@@ -1,3 +1,36 @@
+# ESTADO PRIORITÁRIO — 25/10/2026
+
+Esta atualização prevalece sobre o histórico abaixo. Repositório matioly/meta_ads_ai; Railway com Node.js/Express/PostgreSQL; projeto separado do bot WhatsApp assistente_alps.
+
+## Entregas e testes
+
+- META01: inventário da Alps persistido; Página Facebook 105234548794783 teve solicitação de acesso pendente, confirmar estado atual antes de criar criativos.
+- META02: token exclusivo META_ACCESS_TOKEN no serviço meta_ads_ai do Railway; conexão Marketing API validada. Não divulgar segredo.
+- META03: consultas de campanhas, conjuntos, anúncios e indicadores implementadas. Conferência integral de métricas ainda pendente.
+- META04.1: campanha Teste Integracao API ID 120249780034580576 criada PAUSADA no painel. Correção de erro Meta 100/4834011: is_adset_budget_sharing_enabled=false.
+- META04.2: conjunto 25-55 ID 120249780122340576 criado PAUSADO, vinculado à campanha Teste Meta 2B ID 120249780051470576, conforme print do operador. Erros enfrentados: 100/1815715 destination_type incompatível, 100/2490487 estratégia/ROAS/otimização, 100/1870227 Advantage+ audience. Não extrapolar a correção para outros objetivos.
+- META04.3: vídeo Pamela ADS2, conta Google Drive apelidada Matioly, usado em rascunho; operador confirmou que salvou e recuperou TODOS os campos após recarregar. Tabela creative_drafts, migration 012.
+- META05A/5B: PR #20 criou migration 013_meta_video_ads.sql, endpoints para upload do vídeo Google Drive e criação de criativo/anúncio PAUSADO, com confirmação humana, flags e IDs persistidos. **Implementação no GitHub; upload real e anúncio ainda NÃO HOMOLOGADOS.**
+
+## Próximos passos exatos
+
+1. Conferir PR #20 incorporado à main, deploy Railway saudável e logs com migration 013 aplicada ou já aplicada; pre-deploy deve executar npm run db:migrate.
+2. Verificar variáveis META_VIDEO_UPLOAD_ENABLED=true e META_PAUSED_AD_CREATION_ENABLED=true somente quando for testar, no serviço meta_ads_ai, não no bot; token Meta somente no ambiente seguro.
+3. Abrir /meta-campaigns.html, selecionar Alps e o rascunho salvo na etapa 3, conferir vínculos de campanha/conjunto. Clicar 5A com confirmação manual. Google Drive deve permitir download direto sem login; limite inicial 75 MB, sem OAuth.
+4. Conferir videoId e vídeo na Meta. Em timeout ou resultado incerto, verificar a biblioteca Meta antes de tentar novamente para evitar duplicata.
+5. Para 5B, conferir Página Facebook aprovada e compatibilidade de objetivo/destino/CTA. Criar com confirmação e verificar status PAUSED no Gerenciador; nenhum anúncio será ativado automaticamente.
+6. Recarregar e conferir IDs persistidos, atualizar changelog com resultado e regressão de login, rascunhos e consultas.
+
+## Arquitetura de referência
+
+Servidor: src/server.js; consultas src/meta-campaigns.js e src/meta-insights.js; criação controlada src/meta-create-campaign.js e src/meta-create-adset.js; rascunhos src/creative-drafts.js; fase 5 src/meta-video-ads.js; UI public/meta-campaigns.html, public/meta-creative-plan.js, public/meta-video-ads.js; banco migrations 012 e 013. Sessão e autorização por clínica, origem de escrita verificada, token só no backend. Revisar papéis owner/admin nas novas rotas antes de dar acesso à equipe.
+
+## Riscos e backlog
+
+P0: homologar deploy/migration 013, upload 5A e anúncio PAUSADO 5B, resolver Página Facebook, checar controle de papéis e evitar duplicações após timeout. P1: Google OAuth para arquivos privados em várias contas, upload streaming para vídeos maiores, CTA/thumbnail/destino compatíveis, idempotência durável, histórico. P2: prévia realista, revisão editorial odontológica, aprovação/ativação manual separada, IA de copy, relatórios e expansão multiempresa. Não automatizar investimento.
+
+---
+
 ## Estado confirmado em 25/10/2026 — META04.1 concluída
 
 Alps Oral Clinic: primeira campanha criada pelo próprio painel na Marketing API: **Teste Integracao API**, ID `120249780034580576`, objetivo Engajamento, status PAUSED. Screenshot confirma retorno de sucesso e duas campanhas listadas. Sem conjuntos/anúncios na nova campanha e sem orçamento. Erro Meta 100/4834011 resolvido ao enviar `is_adset_budget_sharing_enabled=false`. O painel passou a exibir código, subcódigo e descrição sanitizada dos erros Meta. A variável `META_CAMPAIGN_CREATION_ENABLED=true` foi corrigida no Railway (nome deve terminar com ENABLED). A proteção de idempotência da criação de campanhas é apenas em memória, portanto não repetir chamadas após resultado incerto.
