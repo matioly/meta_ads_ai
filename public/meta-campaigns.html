@@ -47,14 +47,12 @@
 </section><button type="button" class="secondary workflow-next" data-next="workflow-audience">Continuar para público e orçamento →</button></div></details>
 <details class="workflow-accordion" id="workflow-audience"><summary><span class="workflow-icon">02</span><span><strong>Público e orçamento</strong><small>Defina quem verá o anúncio e o investimento diário</small></span><span class="workflow-chevron">⌄</span></summary><div class="workflow-content"><section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="adset-preview-title">
 <h2 id="adset-preview-title">Quem você deseja alcançar?</h2>
-<p>Escolha quem poderá ver seus anúncios e quanto pretende investir por dia. <strong>Confira os dados e confirme a criação. O público ficará pausado e nenhum anúncio será ativado.</strong> A localização é definida por coordenadas do ponto central e raio. Sem coordenadas válidas, o público não será criado.</p>
+<p>Escolha quem poderá ver seus anúncios e quanto pretende investir por dia. <strong>Confira os dados e confirme a criação. O público ficará pausado e nenhum anúncio será ativado.</strong> Nesta versão, o raio é medido a partir do centro de Campinas, não do Swiss Park. Outras cidades e bairros serão adicionados depois.</p>
 <form id="adset-preview-form">
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
 <label>Escolha a campanha<select id="adset-campaign" required><option value="">Carregando campanhas…</option></select></label>
 <label>Nome do público<input id="adset-name" maxlength="120" required placeholder="Ex.: Adultos de 25 a 55 anos"></label>
-<label>Cidade de referência<input id="adset-city" value="Campinas, SP" maxlength="100" required></label>
-<label>Latitude do centro<input id="adset-lat" type="number" min="-90" max="90" step="any" placeholder="Ex.: coordenada do Swiss Park" required></label>
-<label>Longitude do centro<input id="adset-lon" type="number" min="-180" max="180" step="any" placeholder="Ex.: coordenada do Swiss Park" required></label>
+<label>Cidade de referência<select id="adset-city" required><option value="campinas-sp">Campinas, SP (centro)</option></select></label>
 <label>Raio (km)<select id="adset-radius"><option>3</option><option>5</option><option>10</option><option>15</option><option>20</option></select></label>
 <label>Gênero<select id="adset-gender"><option value="all">Todos</option><option value="male">Masculino</option><option value="female">Feminino</option></select></label>
 <label>Idade mínima<input id="adset-age-min" type="number" min="18" max="65" value="25" required></label>
