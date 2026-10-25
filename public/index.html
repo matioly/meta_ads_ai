@@ -16,10 +16,11 @@
     </script>
     <style>
       /* Never paint the default overview while another view is requested. */
+      /* Only affect the initial paint; never override JS navigation after ready. */
       html:not([data-view-ready]) .main main { visibility: hidden; }
-      html[data-initial-view="campaigns"] #overview-section,
-      html[data-initial-view="media"] #overview-section,
-      html[data-initial-view="integrations"] #overview-section { display: none !important; }
+      html:not([data-view-ready])[data-initial-view="campaigns"] #overview-section,
+      html:not([data-view-ready])[data-initial-view="media"] #overview-section,
+      html:not([data-view-ready])[data-initial-view="integrations"] #overview-section { display: none !important; }
     </style>
     <link rel="stylesheet" href="/styles.css" />
     <script src="/app.js" defer></script>
