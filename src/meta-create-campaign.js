@@ -45,8 +45,28 @@ router.post("/:companyId/meta-create-campaign", access, async (req,res,next)=>{
     }
     const data = await response.json();
     if (!response.ok) {
-      const code = Number(data?.error?.code);
-      return res.status(502).json({error:"A Meta recusou a criação. Confira permissões e configuração da conta.",metaErrorCode:Number.isFinite(code)?code:null});
+      const metaError = data?.error || {};
+      const code = Number(metaError.code);
+      const subcode = Number(metaError.error_subcode);
+      // Never forward arbitrary Meta response objects or access tokens to the browser.
+      // error_user_msg is intended for display; message is sanitized and length-limited.
+      const clean = (value) => typeof value === "string"
+        ? value.replace(/EAA[A-Za-z0-9_-]{12,}/g, "[REDACTED]")
+          .replace(/(?:access_token|appsecret_proof|client_secret)\s*[=:]\s*[^\s&,;]+/gi, "[REDACTED]")
+          .replace(/https?:\/\/\S+/gi, "[link omitido]")
+          .slice(0, 350)
+        : null;
+      const detail = clean(metaError.error_user_msg) || clean(metaError.message);
+      const traceId = typeof metaError.fbtrace_id === "string"
+        ? metaError.fbtrace_id.slice(0, 80) : null;
+      return res.status(502).json({
+        error: "A Meta recusou a criação da campanha.",
+        metaErrorCode: Number.isFinite(code) ? code : null,
+        metaErrorSubcode: Number.isFinite(subcode) && subcode > 0 ? subcode : null,
+        metaErrorType: typeof metaError.type === "string" ? metaError.type.slice(0, 80) : null,
+        metaErrorDetail: detail,
+        metaTraceId: traceId
+      });
     }
     if (!/^[0-9]+$/.test(String(data.id||""))) return res.status(502).json({error:"Resposta inesperada da Meta. Verifique a lista antes de repetir.",uncertain:true});
     const result = {created:true,id:data.id,name,objective,status:"PAUSED"};
