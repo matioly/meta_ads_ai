@@ -1,7 +1,7 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gerenciar anúncios | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><script src="/meta-campaigns.js" defer></script><script src="/meta-create-campaign.js" defer></script><script src="/meta-adset-preview.js" defer></script><script src="/meta-create-adset.js" defer></script><script src="/meta-creative-plan.js" defer></script><script src="/meta-video-ads.js" defer></script></head>
+<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gerenciar anúncios | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/meta-workflow.css"><script src="/meta-workflow.js" defer></script><script src="/meta-campaigns.js" defer></script><script src="/meta-create-campaign.js" defer></script><script src="/meta-adset-preview.js" defer></script><script src="/meta-create-adset.js" defer></script><script src="/meta-creative-plan.js" defer></script><script src="/meta-video-ads.js" defer></script></head>
 <body><main style="max-width:1250px;margin:32px auto;padding:20px">
 <p><a href="/">← Voltar ao painel</a></p><p class="eyebrow">GERENCIAR ANÚNCIOS</p>
-<h1>Gerenciar anúncios</h1><p>Acompanhe seus resultados e prepare campanhas para a clínica. Tudo que for criado nesta etapa fica pausado até sua decisão.</p>
+<h1>Seu gerenciador de anúncios</h1><p>Prepare uma campanha no seu ritmo. Abra apenas a seção que deseja editar e avance quando estiver pronto. Tudo é criado pausado na Meta.</p>
 <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:18px 0">
 <label for="meta-company">Clínica</label><select id="meta-company"><option>Carregando…</option></select>
 <button id="refresh" class="primary" type="button">Atualizar dados</button></div>
@@ -9,7 +9,7 @@
 <button type="button" class="secondary" data-type="campaigns" aria-pressed="true">Campanhas</button>
 <button type="button" class="secondary" data-type="adsets" aria-pressed="false">Públicos e orçamento</button>
 <button type="button" class="secondary" data-type="ads" aria-pressed="false">Anúncios</button></div>
-<section class="panel" aria-labelledby="insights-title" style="padding:20px;margin:20px 0">
+<details class="workflow-accordion" id="workflow-results"><summary><span class="workflow-icon">↗</span><span><strong>Resultados e desempenho</strong><small>Consulte investimento, alcance e cliques da conta</small></span><span class="workflow-chevron">⌄</span></summary><div class="workflow-content"><section class="panel" aria-labelledby="insights-title" style="padding:20px;margin:20px 0">
 <h2 id="insights-title">Como estão meus anúncios?</h2>
 <p>Indicadores da conta selecionada, conforme o período e a atribuição informados pela Meta. Valores não representam orçamento planejado.</p>
 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -27,17 +27,17 @@
 <article class="metric"><span>CPC (todos)</span><strong id="insights-cpc">—</strong></article>
 <article class="metric"><span>Conversas iniciadas*</span><strong id="insights-conversations">—</strong></article>
 </div><p><small>*Exibidas apenas quando a Meta retorna o evento específico. Ausência do evento não significa zero conversas. CPC = investimento ÷ cliques (todos).</small></p>
-</section><section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="create-title">
-<h2 id="create-title">1. Criar nova campanha</h2>
+</section></div></details><div class="workflow-intro"><p class="eyebrow">CRIAR E PREPARAR</p><h2>Monte seu próximo anúncio</h2><p>Complete as informações por assunto. Suas configurações permanecem disponíveis ao voltar a uma seção.</p></div><details class="workflow-accordion" id="workflow-campaign"><summary><span class="workflow-icon">01</span><span><strong>Campanha</strong><small>Dê um nome à campanha e crie sua estrutura</small></span><span class="workflow-chevron">⌄</span></summary><div class="workflow-content"><section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="create-title">
+<h2 id="create-title">Informações da campanha</h2>
 <p>Crie a estrutura inicial da campanha. Ela ficará <strong>pausada</strong>, sem anúncios e sem investimento até você configurar as próximas etapas.</p>
 <form id="meta-create-form">
 <label for="meta-create-name">Nome da campanha</label>
 <input id="meta-create-name" required maxlength="120" placeholder="Ex.: TESTE Alps - Integração API">
 <button type="submit" class="primary" id="meta-create-button">Criar campanha pausada</button>
 </form><p id="meta-create-feedback" role="status" aria-live="polite"></p>
-</section>
-<section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="adset-preview-title">
-<h2 id="adset-preview-title">2. Configurar público e orçamento</h2>
+</section><button type="button" class="secondary workflow-next" data-next="workflow-audience">Continuar para público e orçamento →</button></div></details>
+<details class="workflow-accordion" id="workflow-audience"><summary><span class="workflow-icon">02</span><span><strong>Público e orçamento</strong><small>Defina quem verá o anúncio e o investimento diário</small></span><span class="workflow-chevron">⌄</span></summary><div class="workflow-content"><section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="adset-preview-title">
+<h2 id="adset-preview-title">Quem você deseja alcançar?</h2>
 <p>Escolha quem poderá ver seus anúncios e quanto pretende investir por dia. <strong>Confira a simulação antes de criar o público pausado na Meta. Nenhum anúncio será publicado.</strong> Por enquanto, a região disponível é Brasil.</p>
 <form id="adset-preview-form">
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
@@ -49,12 +49,12 @@
 </div>
 <button type="submit" class="secondary" id="adset-preview-button" style="margin-top:12px">Conferir configurações</button>
 </form><p id="adset-preview-feedback" role="status" aria-live="polite"></p>
-<p style="margin-top:14px">3. Adicionar vídeo e texto: configure abaixo, em modo de planejamento.</p><p>4. Revisar e publicar: em breve, sempre com confirmação manual.</p>
+
 <div id="adset-create-actions" hidden><button type="button" id="adset-create-button" class="primary">Criar público pausado na Meta</button><p id="adset-create-feedback" role="status"></p></div><pre id="adset-preview-result" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
-</section>
-<section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="creative-title">
-<h2 id="creative-title">3. Preparar vídeo e texto</h2>
-<p>Escolha um vídeo da biblioteca da clínica e prepare a mensagem. <strong>O conteúdo pode ser salvo no banco, mas nenhum anúncio ou vídeo é enviado à Meta.</strong> O link do Google Drive ainda não equivale a um vídeo enviado à Meta.</p>
+</section><button type="button" class="secondary workflow-next" data-next="workflow-creative">Continuar para vídeo e mensagem →</button></div></details>
+<details class="workflow-accordion" id="workflow-creative"><summary><span class="workflow-icon">03</span><span><strong>Vídeo e mensagem</strong><small>Escolha o criativo, escreva a mensagem e salve o rascunho</small></span><span class="workflow-chevron">⌄</span></summary><div class="workflow-content"><section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="creative-title">
+<h2 id="creative-title">Conte a história do seu anúncio</h2>
+<p>Escolha um vídeo da biblioteca da clínica e prepare a mensagem. <strong>Salve um rascunho antes de enviar o vídeo e criar o anúncio na Meta.</strong> O link do Google Drive ainda não equivale a um vídeo enviado à Meta.</p>
 <form id="creative-plan-form">
 <label for="creative-saved">Rascunhos salvos</label><select id="creative-saved"><option value="">Novo rascunho</option></select>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button type="button" class="secondary" id="creative-new">Novo</button><button type="button" class="secondary" id="creative-delete">Excluir rascunho selecionado</button></div>
@@ -72,15 +72,15 @@
 <p id="creative-preview-media"></p><a id="creative-preview-link" target="_blank" rel="noopener noreferrer">Abrir vídeo no Drive</a>
 <p><small>Prévia de conteúdo, não uma simulação fiel do anúncio no Instagram ou Facebook.</small></p>
 </div>
-<div style="border:1px solid #ddd;border-radius:12px;padding:16px;margin-top:18px">
-<h3>5. Enviar vídeo e criar anúncio pausado</h3>
+</section><button type="button" class="secondary workflow-next" data-next="workflow-publish">Continuar para revisão e envio →</button></div></details>
+<details class="workflow-accordion" id="workflow-publish"><summary><span class="workflow-icon">04</span><span><strong>Revisar e enviar à Meta</strong><small>Envie o vídeo e crie o anúncio pausado com segurança</small></span><span class="workflow-chevron">⌄</span></summary><div class="workflow-content"><div style="border:1px solid #ddd;border-radius:12px;padding:16px;margin-top:18px">
+<h3>Finalizar anúncio</h3>
 <p>Selecione um rascunho salvo acima. Primeiro envie o vídeo à Meta, depois crie o anúncio <strong>PAUSADO</strong>. Nenhum anúncio será ativado por estas ações. O Drive deve permitir download público direto; arquivos com confirmação de download não funcionam nesta versão.</p>
 <p id="meta-video-status" role="status" aria-live="polite">Selecione um rascunho salvo.</p>
-<button type="button" id="meta-video-upload" class="secondary">5A · Enviar vídeo para a Meta</button>
-<button type="button" id="meta-ad-create" class="primary">5B · Criar anúncio pausado</button>
-</div>
-</section>
-<p id="feedback" role="status" aria-live="polite">Carregando…</p>
+<button type="button" id="meta-video-upload" class="secondary">Enviar vídeo à Meta</button>
+<button type="button" id="meta-ad-create" class="primary">Criar anúncio pausado</button>
+</div></div></details>
+<details class="workflow-accordion" id="workflow-list"><summary><span class="workflow-icon">☷</span><span><strong>Campanhas e anúncios existentes</strong><small>Consulte os registros da conta Meta</small></span><span class="workflow-chevron">⌄</span></summary><div class="workflow-content"><p id="feedback" role="status" aria-live="polite">Carregando…</p>
 <div class="table-wrapper"><table><caption id="table-caption">Campanhas da Meta</caption><thead><tr id="headers"></tr></thead><tbody id="campaigns"></tbody></table></div>
-<p id="pagination-note"></p><p><small>Orçamentos podem estar definidos em outro nível. Listagem inicial limitada a 100 itens por nível. Público exibido de forma resumida.</small></p>
+<p id="pagination-note"></p><p><small>Orçamentos podem estar definidos em outro nível. Listagem inicial limitada a 100 itens por nível. Público exibido de forma resumida.</small></p></div></details>
 </main></body></html>
