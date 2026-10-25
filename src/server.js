@@ -185,6 +185,7 @@ function requireLogin(req, res, next) {
 app.use("/api/companies", requireLogin, require("./campaigns"));
 app.use("/api/companies", requireLogin, require("./media"));
 app.use("/api/companies", requireLogin, require("./benchmark"));
+app.use("/api/companies", requireLogin, require("./benchmark-ads"));
 app.use("/api/companies", requireLogin, require("./meta-assets"));
 app.use("/api", requireLogin, require("./workspace-admin"));
 app.use("/api/companies", requireLogin, require("./meta-connection"));
