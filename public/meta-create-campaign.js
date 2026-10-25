@@ -30,6 +30,7 @@ createForm.addEventListener("submit",async(event)=>{
     }
     createFeedback.textContent="Campanha criada e pausada! ID Meta: "+data.id+". Atualize a lista para conferir.";
     await load();
+    if(typeof refreshAdsetCampaigns==="function")await refreshAdsetCampaigns();
   }catch(error){createFeedback.textContent=error.message;}
   finally{createButton.disabled=false;}
 });
