@@ -82,36 +82,16 @@
         </div>
 
         <section id="overview-section">
-          <div class="hero">
-            <div>
-              <span class="hero-tag">DO PLANEJAMENTO AO RESULTADO</span>
-              <h2>Sua próxima campanha<br />começa com uma boa ideia.</h2>
-              <p>
-                Escolha a clínica, defina o objetivo e prepare o rascunho. Você
-                mantém o controle de cada etapa.
-              </p>
-              <button class="light-button" id="hero-create">
-                Criar campanha <span aria-hidden="true">↗</span>
-              </button>
-            </div>
-            <div class="hero-art" aria-hidden="true">
-              <div class="orbit orbit-one"></div>
-              <div class="orbit orbit-two"></div>
-              <span class="art-center">ai</span>
-              <span class="art-note">IDEIA → CAMPANHA</span>
-            </div>
-          </div>
-
-          <div class="metrics">
+          <div class="dashboard-welcome"><div><p class="eyebrow">DESEMPENHO DA CLÍNICA</p><h2>Resultados dos últimos 30 dias</h2><p>Dados reais da conta Meta selecionada. Atualize os indicadores ou abra o gerenciador para criar e ativar anúncios.</p></div><a class="primary" href="/meta-campaigns.html">Gerenciar anúncios ↗</a></div><div class="metrics">
             <article class="metric">
-              <span>Rascunhos salvos</span>
-              <strong id="draft-count">0</strong>
-              <small>Da clínica selecionada</small>
+              <span>Investimento · 30 dias</span>
+              <strong id="dashboard-spend">—</strong><span id="draft-count" hidden></span>
+              <small>Valor gasto na Meta</small>
             </article>
             <article class="metric">
-              <span>Orçamento diário planejado</span>
-              <strong id="planned-budget">R$ 0,00</strong>
-              <small>Soma dos rascunhos · não é gasto real</small>
+              <span>Alcance · 30 dias</span>
+              <strong id="dashboard-reach">—</strong><span id="planned-budget" hidden></span>
+              <small>Pessoas alcançadas</small>
             </article>
             <article class="metric">
               <span>Campanhas no Meta</span>
@@ -124,7 +104,7 @@
               <small>Quantidade de anúncios retornados</small>
             </article>
           </div>
-          <p id="meta-home-feedback" role="status" class="meta-home-feedback">Carregando dados da Meta…</p>
+          <div class="dashboard-insights"><article class="metric"><span>Impressões · 30 dias</span><strong id="dashboard-impressions">—</strong></article><article class="metric"><span>Cliques no link · 30 dias</span><strong id="dashboard-links">—</strong></article><article class="metric"><span>Conversas iniciadas · 30 dias</span><strong id="dashboard-conversations">—</strong><small>Quando disponível na Meta</small></article></div><p id="meta-home-feedback" role="status" class="meta-home-feedback">Carregando dados da Meta…</p>
         </section>
 
         <section class="panel" id="meta-real-campaigns"><div class="panel-heading"><div><h2>Campanhas reais na Meta</h2><p>Dados da conta selecionada. Campanhas pausadas não geram gastos.</p></div><a class="secondary" href="/meta-campaigns.html">Abrir Gerenciador Meta ↗</a></div><div class="table-wrapper"><table><thead><tr><th>Campanha</th><th>Objetivo</th><th>Status</th><th>Orçamento/dia</th></tr></thead><tbody id="meta-home-rows"></tbody></table></div><p id="meta-campaigns-feedback" class="meta-home-feedback" role="status"></p></section>
@@ -204,35 +184,7 @@
         </details>
       </section>
 
-<section id="integrations-section" hidden>
-          <div class="integration-grid">
-            <article class="panel integration-card">
-              <span class="integration-logo meta-logo">∞</span>
-              <span class="status">Integração Meta</span>
-              <h2>Meta Ads</h2>
-              <p><a href="/meta-assets.html">Gerenciar inventário de ativos por clínica →</a></p>
-              <p><a href="/meta-campaigns.html">Abrir campanhas reais e resultados →</a></p>
-              <p>
-                Campanhas, contas de anúncios e resultados do Facebook e
-                Instagram em um único painel.
-              </p>
-              <a class="secondary" href="/meta-assets.html">Gerenciar ativos</a>
-            </article>
-
-            <article class="panel integration-card">
-              <span class="integration-logo ai-logo">AI</span>
-              <span class="status">Não configurado no aplicativo</span>
-              <h2>Assistente de campanhas</h2>
-              <p>
-                Apoio para preparar textos e variações de anúncios, com revisão
-                antes da publicação.
-              </p>
-              <button class="secondary" disabled>
-                Integração disponível em uma próxima etapa
-              </button>
-            </article>
-          </div>
-        </section>
+<section id="integrations-section" hidden><div class="integration-grid"><article class="panel integration-card"><span class="integration-logo meta-logo">∞</span><span class="status">Meta Marketing API</span><h2>Meta Ads</h2><p>Configure os identificadores de cada clínica e consulte campanhas, anúncios e resultados em tempo real.</p><div class="integration-actions"><a class="secondary" href="/meta-assets.html">Configurar conta e ativos</a><a class="primary" href="/meta-campaigns.html">Abrir gerenciador ↗</a></div></article><article class="panel integration-card"><span class="integration-logo ai-logo">AI</span><span class="status">Em planejamento</span><h2>Assistente de campanhas</h2><p>Uma futura integração para sugerir textos e variações de criativos. A publicação continua sob seu controle.</p><span class="integration-soon">Disponível em uma próxima etapa</span></article></div></section>
 
         <footer class="page-footer">
           Meta Ads AI <span>Seu planejamento, sob seu controle.</span>
