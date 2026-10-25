@@ -42,7 +42,7 @@ router.post("/:companyId/meta-create-adset",access,async(req,res,next)=>{
   if(locks.has(scope))return res.status(409).json({error:"Solicitação em andamento. Aguarde e confira os públicos antes de tentar novamente."});
   locks.set(scope,true);
   try{
-    const {rows}=await pool.query("SELECT ad_account_id FROM meta_assets WHERE company_id=$1",[req.params.companyId]);
+    const {rows}=await pool.query("SELECT ad_account_id,facebook_page_id,facebook_page_status FROM meta_assets WHERE company_id=$1",[req.params.companyId]);
     const accountId=rows[0]?.ad_account_id;
     if(!digits(accountId))return res.status(422).json({error:"Conta de anúncios não cadastrada."});
     const root=`https://graph.facebook.com/${version()}`;
@@ -53,16 +53,20 @@ router.post("/:companyId/meta-create-adset",access,async(req,res,next)=>{
     if(account.id!==`act_${accountId}`||account.currency!=="BRL")
       return res.status(422).json({error:"A conta de anúncios deve estar configurada em reais (BRL)."});
     if(String(campaign.account_id||"").replace(/^act_/,"")!==accountId||
-       campaign.status!=="PAUSED"||campaign.objective!=="OUTCOME_TRAFFIC")
-      return res.status(422).json({error:"Escolha uma campanha de Tráfego pausada, pertencente à conta selecionada."});
+       campaign.status!=="PAUSED"||!["OUTCOME_TRAFFIC","OUTCOME_ENGAGEMENT"].includes(campaign.objective))
+      return res.status(422).json({error:"Escolha uma campanha pausada de Tráfego ou Engajamento pertencente à conta selecionada."});
+    const whatsapp=campaign.objective==="OUTCOME_ENGAGEMENT";
+    if(whatsapp&&(!digits(rows[0].facebook_page_id)||rows[0].facebook_page_status!=="approved"))
+      return res.status(422).json({error:"Vincule uma Página do Facebook aprovada para campanhas de WhatsApp."});
     const body=new URLSearchParams({
       name:name.trim(),campaign_id:campaignId,status:"PAUSED",
-      billing_event:"IMPRESSIONS",optimization_goal:"LINK_CLICKS",
+      billing_event:"IMPRESSIONS",optimization_goal:whatsapp?"CONVERSATIONS":"LINK_CLICKS",
       bid_strategy:"LOWEST_COST_WITHOUT_CAP",
-      destination_type:"WEBSITE",
+      destination_type:whatsapp?"WHATSAPP":"WEBSITE",
       daily_budget:String(Math.round(dailyBudgetBrl*100)),
       targeting:JSON.stringify({geo_locations:{countries:["BR"]},age_min:ageMin,age_max:ageMax,targeting_automation:{advantage_audience:0}})
     });
+    if(whatsapp)body.set("promoted_object",JSON.stringify({page_id:rows[0].facebook_page_id}));
     let data;
     try{
       data=await meta(`${root}/act_${accountId}/adsets`,token,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body});
