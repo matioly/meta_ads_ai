@@ -60,6 +60,39 @@ const failure=(res,e,stage)=>{
  if(["TimeoutError","AbortError"].includes(e.name))return res.status(504).json({error:"Tempo limite na etapa "+stage+". Confira a Meta antes de tentar novamente."});
  return res.status(422).json({error:clean(e.message)||"Não foi possível concluir."});
 };
+// Read-only diagnostic: expose IDs and matching status, never credentials.
+router.get("/:companyId/meta-instagram-diagnostic",access,async(req,res)=>{
+ const token=process.env.META_ACCESS_TOKEN;
+ if(!token)return res.status(503).json({error:"Token Meta não configurado."});
+ try{
+  const r=await pool.query("SELECT ad_account_id,instagram_id,facebook_page_id FROM meta_assets WHERE company_id=$1",[req.params.companyId]);
+  const a=r.rows[0];
+  if(!a||!digits(a.ad_account_id))return res.status(422).json({error:"Cadastre uma conta de anúncios válida."});
+  const [adAccounts,page]=await Promise.allSettled([
+   graph("act_"+a.ad_account_id+"/instagram_accounts?fields=id,username&limit=100",token),
+   digits(a.facebook_page_id)?graph(a.facebook_page_id+"?fields=id,instagram_business_account{id,username},connected_instagram_account{id,username}",token):Promise.resolve(null)
+  ]);
+  const accounts=adAccounts.status==="fulfilled"&&Array.isArray(adAccounts.value.data)?adAccounts.value.data:[];
+  const safeAccounts=accounts.map(x=>({id:String(x.id||""),username:typeof x.username==="string"?x.username:null}));
+  const pageData=page.status==="fulfilled"?page.value:null;
+  const safeIg=x=>x&&x.id?{id:String(x.id),username:typeof x.username==="string"?x.username:null}:null;
+  const inventoryId=String(a.instagram_id||"");
+  return res.json({
+   inventory:{instagramId:inventoryId,facebookPageId:a.facebook_page_id,adAccountId:a.ad_account_id},
+   authorizedInstagramAccounts:safeAccounts,
+   inventoryIdAuthorized:safeAccounts.some(x=>x.id===inventoryId),
+   accountListHasNextPage:Boolean(adAccounts.status==="fulfilled"&&adAccounts.value.paging?.next),
+   pageInstagram:pageData?{businessAccount:safeIg(pageData.instagram_business_account),connectedAccount:safeIg(pageData.connected_instagram_account)}:null,
+   checks:{
+    adAccountInstagramQuery:adAccounts.status,
+    facebookPageQuery:page.status,
+    adAccountError:adAccounts.status==="rejected"?(adAccounts.reason.meta||{detail:"Falha na consulta."}):null,
+    facebookPageError:page.status==="rejected"?(page.reason.meta||{detail:"Falha na consulta."}):null
+   },
+   note:"Diagnóstico somente leitura. IDs da API de anúncios e do perfil podem ser diferentes; não atualize o inventário sem confirmar."
+  });
+ }catch(e){return failure(res,e,"de diagnóstico do Instagram");}
+});
 router.post("/:companyId/creative-drafts/:draftId/meta-video",access,async(req,res,next)=>{
  if(process.env.META_VIDEO_UPLOAD_ENABLED!=="true")return res.status(503).json({error:"Envio de vídeo desabilitado. Configure META_VIDEO_UPLOAD_ENABLED=true no Railway após revisar o fluxo."});
  if(!uuid.test(req.params.draftId)||req.body?.confirm!==true)return res.status(400).json({error:"Selecione o rascunho e confirme o envio do vídeo."});
