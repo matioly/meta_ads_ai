@@ -13,6 +13,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('[data-next]').forEach(button=>{
     button.addEventListener('click',()=>openPanel(document.getElementById(button.dataset.next)));
   });
-  const first=document.getElementById('workflow-creative');
-  if(first)first.open=true;
+  // Begin with every section collapsed; open only on explicit user action.
+  panels.forEach(panel=>{panel.open=false;});
 });

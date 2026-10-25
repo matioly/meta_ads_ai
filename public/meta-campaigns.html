@@ -1,12 +1,67 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gerenciar anúncios | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/meta-workflow.css"><script src="/meta-workflow.js" defer></script><script src="/meta-campaigns.js" defer></script><script src="/meta-create-campaign.js" defer></script><script src="/meta-interests.js" defer></script><script src="/meta-adset-preview.js" defer></script><script src="/meta-create-adset.js" defer></script><script src="/meta-creative-plan.js" defer></script><script src="/meta-video-ads.js?v=20261025-debug1" defer></script><style>
+<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gerenciar anúncios | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/meta-workflow.css"><link rel="stylesheet" href="/meta-shell.css"><script src="/meta-shell.js" defer></script><script src="/meta-workflow.js" defer></script><script src="/meta-campaigns.js" defer></script><script src="/meta-create-campaign.js" defer></script><script src="/meta-interests.js" defer></script><script src="/meta-adset-preview.js" defer></script><script src="/meta-create-adset.js" defer></script><script src="/meta-creative-plan.js" defer></script><script src="/meta-video-ads.js?v=20261025-debug1" defer></script><style>
 .workflow-content [role="status"]:not(:empty){display:block;margin:16px 0 8px;padding:13px 16px;border-radius:12px;border:1px solid #c7d8f7;background:#edf4ff;color:#244875;font-size:14px;font-weight:500;line-height:1.55;overflow-wrap:anywhere;white-space:pre-line}
 .workflow-content [role="status"].status-success{background:#eaf8ef;border-color:#a9dfba;color:#17633b}
 .workflow-content [role="status"].status-error{background:#fff0f0;border-color:#f0b7b7;color:#9c3030}
 .workflow-content [role="status"].status-pending{background:#fff8e8;border-color:#f0d69a;color:#865900}
 .workflow-content [role="status"].status-info{background:#edf4ff;border-color:#c7d8f7;color:#244875}
 </style></head>
-<body><main style="max-width:1250px;margin:32px auto;padding:20px">
-<p><a href="/">← Voltar ao painel</a></p><p class="eyebrow">GERENCIAR ANÚNCIOS</p>
+<body><aside class="sidebar">
+      <a class="brand" href="/">
+        <span class="brand-symbol">ai</span>
+        <span>Meta Ads <strong>AI</strong></span>
+      </a>
+
+      <div class="workspace">
+        <label for="company">ESPAÇO DE TRABALHO</label>
+        <select id="company">
+          <option value="">Carregando clínicas…</option>
+        </select>
+      </div>
+
+      <p class="nav-label">PAINEL</p>
+      <nav aria-label="Navegação principal">
+        <button
+          class="nav-button"
+          data-view="overview"
+          
+        >
+          <span class="nav-icon" aria-hidden="true">◈</span><span>Visão geral</span></button>
+        <button class="nav-button" data-view="campaigns">
+          <span class="nav-icon" aria-hidden="true">◎</span><span>Campanhas</span></button>
+        <a class="nav-button active" aria-current="page" href="/meta-campaigns.html"><span class="nav-icon" aria-hidden="true">◉</span><span>Gerenciador Meta</span></a>
+        <button class="nav-button" data-view="media"><span class="nav-icon" aria-hidden="true">▣</span><span>Biblioteca de mídias</span></button>
+        <button class="nav-button" data-view="integrations">
+          <span class="nav-icon" aria-hidden="true">⇄</span><span>Integrações</span></button>
+      </nav>
+
+      <p class="nav-label">CONFIGURAÇÕES</p>
+      <div class="sidebar-shortcuts">
+        <a class="nav-button" href="/meta-assets.html"><span class="nav-icon" aria-hidden="true">⚙</span><span>Contas e ativos Meta</span></a>
+      </div>
+
+      <div class="sidebar-footer">
+        <span class="avatar">AI</span>
+        <div>
+          <strong>Seu centro de campanhas</strong>
+          <small>Planeje. Revise. Publique.</small>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <span
+          >Workspace <span class="separator">/</span>
+          <strong id="company-name">Sorriso de Campinas</strong>
+        </span>
+        <div class="topbar-actions">
+          <span class="preview-badge" id="user-name">Carregando…</span>
+          <button class="secondary" id="logout" type="button">Sair</button>
+        </div>
+      </header>
+
+      <main class="meta-manager-main">
+<p class="eyebrow">GERENCIAR ANÚNCIOS</p>
 <h1>Seu gerenciador de anúncios</h1><p>Prepare uma campanha no seu ritmo. Abra apenas a seção que deseja editar e avance quando estiver pronto. Tudo é criado pausado na Meta.</p>
 <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:18px 0">
 <label for="meta-company">Clínica</label><select id="meta-company"><option>Carregando…</option></select>
@@ -95,7 +150,7 @@
 <details class="workflow-accordion" id="workflow-list"><summary><span class="workflow-icon">☷</span><span><strong>Campanhas e anúncios existentes</strong><small>Consulte os registros da conta Meta</small></span><span class="workflow-chevron">⌄</span></summary><div class="workflow-content"><p id="feedback" role="status" aria-live="polite">Carregando…</p>
 <div class="table-wrapper"><table><caption id="table-caption">Campanhas da Meta</caption><thead><tr id="headers"></tr></thead><tbody id="campaigns"></tbody></table></div>
 <p id="pagination-note"></p><p><small>Orçamentos podem estar definidos em outro nível. Listagem inicial limitada a 100 itens por nível. Público exibido de forma resumida.</small></p></div></details>
-</main><script>
+</main></div><script>
 (function(){
  const ids=['meta-create-feedback','adset-preview-feedback','adset-create-feedback','creative-feedback','meta-video-status'];
  function refresh(el){
