@@ -34,7 +34,8 @@
   const result=await api("/creative-drafts");drafts=result.drafts||[];
   fill(saved,drafts,d=>d.headline+" · "+d.mediaName,"Selecione um anúncio");
   fill(publishSelect,drafts,d=>d.headline+" · "+d.mediaName,"Selecione um anúncio salvo");
-  if(keepId&&drafts.some(d=>d.id===keepId)){saved.value=keepId;publishSelect.value=keepId;}
+  if(keepId&&drafts.some(d=>String(d.id)===String(keepId))){saved.value=String(keepId);publishSelect.value=String(keepId);}
+  else if(keepId){throw Error("O anúncio não apareceu na lista após salvar. Confira antes de tentar novamente.");}
   publishSelect.dispatchEvent(new Event("change"));
  }
  function applyDraft(){
@@ -97,8 +98,8 @@
   try{
    const id=saved.value,method=id?"PUT":"POST",path="/creative-drafts"+(id?"/"+encodeURIComponent(id):"");
    const result=await api(path,{method,headers:{"Content-Type":"application/json"},body:JSON.stringify(payload())});
-   await loadDrafts(result.id);
-   feedback.textContent="Rascunho salvo no banco! Você pode voltar depois e continuar. Nenhum anúncio foi enviado à Meta.";
+   await loadDrafts(result.id||result.draft?.id);
+   feedback.textContent="Anúncio salvo! Ele já está selecionado na etapa 4 para envio à Meta.";
   }catch(e){feedback.textContent="Não foi possível salvar: "+e.message;}finally{button.disabled=false;}
  });
  $("creative-delete").addEventListener("click",async()=>{
