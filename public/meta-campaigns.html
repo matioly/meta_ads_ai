@@ -1,4 +1,10 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gerenciar anúncios | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/meta-workflow.css"><script src="/meta-workflow.js" defer></script><script src="/meta-campaigns.js" defer></script><script src="/meta-create-campaign.js" defer></script><script src="/meta-adset-preview.js" defer></script><script src="/meta-create-adset.js" defer></script><script src="/meta-creative-plan.js" defer></script><script src="/meta-video-ads.js?v=20261025-2" defer></script></head>
+<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gerenciar anúncios | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/meta-workflow.css"><script src="/meta-workflow.js" defer></script><script src="/meta-campaigns.js" defer></script><script src="/meta-create-campaign.js" defer></script><script src="/meta-adset-preview.js" defer></script><script src="/meta-create-adset.js" defer></script><script src="/meta-creative-plan.js" defer></script><script src="/meta-video-ads.js?v=20261025-2" defer></script><style>
+.workflow-content [role="status"]:not(:empty){display:block;margin:16px 0 8px;padding:13px 16px;border-radius:12px;border:1px solid #c7d8f7;background:#edf4ff;color:#244875;font-size:14px;font-weight:500;line-height:1.55;overflow-wrap:anywhere;white-space:pre-line}
+.workflow-content [role="status"].status-success{background:#eaf8ef;border-color:#a9dfba;color:#17633b}
+.workflow-content [role="status"].status-error{background:#fff0f0;border-color:#f0b7b7;color:#9c3030}
+.workflow-content [role="status"].status-pending{background:#fff8e8;border-color:#f0d69a;color:#865900}
+.workflow-content [role="status"].status-info{background:#edf4ff;border-color:#c7d8f7;color:#244875}
+</style></head>
 <body><main style="max-width:1250px;margin:32px auto;padding:20px">
 <p><a href="/">← Voltar ao painel</a></p><p class="eyebrow">GERENCIAR ANÚNCIOS</p>
 <h1>Seu gerenciador de anúncios</h1><p>Prepare uma campanha no seu ritmo. Abra apenas a seção que deseja editar e avance quando estiver pronto. Tudo é criado pausado na Meta.</p>
@@ -51,8 +57,8 @@
 </form><p id="adset-preview-feedback" role="status" aria-live="polite"></p>
 
 <div id="adset-create-actions" hidden><button type="button" id="adset-create-button" class="primary">Confirmar criação</button><p id="adset-create-feedback" role="status"></p></div><pre id="adset-preview-result" hidden></pre>
-</section><button type="button" class="secondary workflow-next" data-next="workflow-creative">Continuar para vídeo e mensagem →</button></div></details>
-<details class="workflow-accordion" id="workflow-creative"><summary><span class="workflow-icon">03</span><span><strong>Vídeo e mensagem</strong><small>Escolha o criativo, escreva a mensagem e salve o rascunho</small></span><span class="workflow-chevron">⌄</span></summary><div class="workflow-content"><section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="creative-title">
+</section><button type="button" class="secondary workflow-next" data-next="workflow-creative">Continuar para criação do anúncio →</button></div></details>
+<details class="workflow-accordion" id="workflow-creative"><summary><span class="workflow-icon">03</span><span><strong>Criação do anúncio</strong><small>Escolha o vídeo, prepare a mensagem e personalize seu anúncio</small></span><span class="workflow-chevron">⌄</span></summary><div class="workflow-content"><section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="creative-title">
 <h2 id="creative-title">Conte a história do seu anúncio</h2>
 <p>Escolha um vídeo da biblioteca da clínica e prepare a mensagem. <strong>Salve um rascunho antes de enviar o vídeo e criar o anúncio na Meta.</strong> O link do Google Drive ainda não equivale a um vídeo enviado à Meta.</p>
 <div class="creative-choice" id="creative-choice"><button type="button" class="primary" id="creative-new">Criar novo anúncio</button><button type="button" class="secondary" id="creative-reuse">Reutilizar anúncio salvo</button></div><div id="creative-reuse-panel" hidden><label for="creative-saved">Anúncios preparados</label><select id="creative-saved"><option value="">Selecione um anúncio</option></select><button type="button" class="secondary" id="creative-delete">Excluir anúncio selecionado</button></div><div id="creative-editor" hidden><form id="creative-plan-form">
@@ -82,4 +88,14 @@
 <details class="workflow-accordion" id="workflow-list"><summary><span class="workflow-icon">☷</span><span><strong>Campanhas e anúncios existentes</strong><small>Consulte os registros da conta Meta</small></span><span class="workflow-chevron">⌄</span></summary><div class="workflow-content"><p id="feedback" role="status" aria-live="polite">Carregando…</p>
 <div class="table-wrapper"><table><caption id="table-caption">Campanhas da Meta</caption><thead><tr id="headers"></tr></thead><tbody id="campaigns"></tbody></table></div>
 <p id="pagination-note"></p><p><small>Orçamentos podem estar definidos em outro nível. Listagem inicial limitada a 100 itens por nível. Público exibido de forma resumida.</small></p></div></details>
-</main></body></html>
+</main><script>
+(function(){
+ const ids=['meta-create-feedback','adset-preview-feedback','adset-create-feedback','creative-feedback','meta-video-status'];
+ function refresh(el){
+  const value=(el.textContent||'').trim(); if(!value){el.classList.remove('status-success','status-error','status-pending','status-info');return;}
+  const type=/erro|falh|não foi possível|incompatível|inválid|não conseguiu/i.test(value)?'error':/processando|aguard|verificando|preparando|carregando/i.test(value)?'pending':/sucesso|criad[oa]|salv[oa]|pronto|enviado|PAUSADO/i.test(value)?'success':'info';
+  el.classList.remove('status-success','status-error','status-pending','status-info');el.classList.add('status-'+type);
+ }
+ ids.forEach(id=>{const el=document.getElementById(id);if(!el)return;refresh(el);new MutationObserver(()=>refresh(el)).observe(el,{childList:true,characterData:true,subtree:true});});
+})();
+</script></body></html>
