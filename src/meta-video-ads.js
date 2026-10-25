@@ -155,8 +155,7 @@ router.post("/:companyId/creative-drafts/:draftId/meta-paused-ad",access,async(r
    const selected=images.find(t=>t.is_preferred&&typeof t.uri==="string"&&t.uri.startsWith("https://"))||images.find(t=>typeof t.uri==="string"&&t.uri.startsWith("https://"));
    if(!selected)return res.status(422).json({error:"A Meta ainda não disponibilizou uma capa para este vídeo. Aguarde o processamento do vídeo e tente criar o anúncio novamente, sem reenviar o arquivo."});
    const spec={page_id:d.facebook_page_id,video_data:{video_id:d.meta_video_id,image_url:selected.uri,message:d.primary_text,title:d.headline,call_to_action:{type:"LEARN_MORE",value:{link:site.href}}}};
-   // Meta only accepts link_description when a call_to_action is provided.
-   // This paused video creative has no destination/CTA configured, so omit it.
+   // Website video creative: explicit CTA destination, with no link_description.
    // Never assume an inventory Instagram ID is a valid advertising actor.
    // Meta can expose different IDs for an Instagram profile and its ad actor.
    if(d.instagram_id){
