@@ -5,7 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#171b2e" />
     <title>Meta Ads AI | Painel</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <script>
+// Resolve the destination before the browser paints the initial overview.
+(function () {
+  const view = new URLSearchParams(location.search).get('view')
+  if (['campaigns', 'media', 'integrations'].includes(view)) {
+    document.documentElement.dataset.initialView = view
+  }
+})()
+</script>
+<style>
+  html[data-initial-view="campaigns"] #overview-section,
+  html[data-initial-view="media"] #overview-section,
+  html[data-initial-view="integrations"] #overview-section { display: none !important; }
+</style>
+<link rel="stylesheet" href="/styles.css" />
     <script src="/app.js" defer></script>
     <script src="/media-library.js" defer></script><script src="/home-meta.js" defer></script>
   </head>
