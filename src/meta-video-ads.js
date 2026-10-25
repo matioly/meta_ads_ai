@@ -140,7 +140,7 @@ router.post("/:companyId/creative-drafts/:draftId/meta-paused-ad",access,async(r
   if(campaign.objective!=="OUTCOME_TRAFFIC"||adset.destination_type!=="WEBSITE"||adset.optimization_goal!=="LINK_CLICKS"){
    return res.status(422).json({error:"Para enviar ao site, selecione uma campanha de Tráfego (OUTCOME_TRAFFIC) e um conjunto com destino WEBSITE e otimização LINK_CLICKS, ambos PAUSADOS. O conjunto antigo de engajamento não é compatível."});
   }
-  const destination=typeof process.env.META_WEBSITE_URL==="string"?process.env.META_WEBSITE_URL.trim():"";
+  const destination=(process.env.META_WEBSITE_URL || "https://alpsclinic.com").trim();
   let site;
   try{site=new URL(destination);}catch{return res.status(503).json({error:"Configure META_WEBSITE_URL com o endereço HTTPS do site da clínica no Railway."});}
   if(site.protocol!=="https:"||!site.hostname||site.username||site.password||site.port||site.hash||!/^([a-z0-9-]+\.)+[a-z]{2,}$/i.test(site.hostname))
