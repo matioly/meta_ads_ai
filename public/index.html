@@ -7,7 +7,7 @@
     <title>Meta Ads AI | Painel</title>
     <link rel="stylesheet" href="/styles.css" />
     <script src="/app.js" defer></script>
-    <script src="/media-library.js" defer></script>
+    <script src="/media-library.js" defer></script><script src="/home-meta.js" defer></script>
   </head>
   <body>
     <aside class="sidebar">
@@ -30,21 +30,18 @@
           data-view="overview"
           aria-current="page"
         >
-          <span aria-hidden="true">◈</span> Visão geral
-        </button>
+          <span class="nav-icon" aria-hidden="true">◈</span><span>Visão geral</span></button>
         <button class="nav-button" data-view="campaigns">
-          <span aria-hidden="true">◎</span> Campanhas
-        </button>
-        <a class="nav-button" href="/meta-campaigns.html" style="display:block;text-decoration:none">◉ Gerenciador Meta</a>
-        <button class="nav-button" data-view="media"><span aria-hidden="true">▣</span> Biblioteca de mídias</button>
+          <span class="nav-icon" aria-hidden="true">◎</span><span>Campanhas</span></button>
+        <a class="nav-button" href="/meta-campaigns.html"><span class="nav-icon" aria-hidden="true">◉</span><span>Gerenciador Meta</span></a>
+        <button class="nav-button" data-view="media"><span class="nav-icon" aria-hidden="true">▣</span><span>Biblioteca de mídias</span></button>
         <button class="nav-button" data-view="integrations">
-          <span aria-hidden="true">⇄</span> Integrações
-        </button>
+          <span class="nav-icon" aria-hidden="true">⇄</span><span>Integrações</span></button>
       </nav>
 
       <p class="nav-label">CONFIGURAÇÕES</p>
       <div class="sidebar-shortcuts">
-        <a class="nav-button" href="/meta-assets.html">⚙ Contas e ativos Meta</a>
+        <a class="nav-button" href="/meta-assets.html"><span class="nav-icon" aria-hidden="true">⚙</span><span>Contas e ativos Meta</span></a>
       </div>
 
       <div class="sidebar-footer">
@@ -118,22 +115,25 @@
             </article>
             <article class="metric">
               <span>Campanhas no Meta</span>
-              <strong>—</strong>
-              <small>Consulte no Gerenciador Meta</small>
+              <strong id="meta-campaign-count">—</strong>
+              <small>Campanhas reais da conta selecionada</small>
             </article>
             <article class="metric">
-              <span>Conversas geradas</span>
-              <strong>—</strong>
-              <small>Acompanhe os resultados na Meta</small>
+              <span>Anúncios na Meta</span>
+              <strong id="meta-ad-count">—</strong>
+              <small>Quantidade de anúncios retornados</small>
             </article>
           </div>
+          <p id="meta-home-feedback" role="status" class="meta-home-feedback">Carregando dados da Meta…</p>
         </section>
+
+        <section class="panel" id="meta-real-campaigns"><div class="panel-heading"><div><h2>Campanhas reais na Meta</h2><p>Dados da conta selecionada. Campanhas pausadas não geram gastos.</p></div><a class="secondary" href="/meta-campaigns.html">Abrir Gerenciador Meta ↗</a></div><div class="table-wrapper"><table><thead><tr><th>Campanha</th><th>Objetivo</th><th>Status</th><th>Orçamento/dia</th></tr></thead><tbody id="meta-home-rows"></tbody></table></div><p id="meta-campaigns-feedback" class="meta-home-feedback" role="status"></p></section>
 
         <section class="panel" id="campaign-section">
           <div class="panel-heading">
             <div>
-              <h2>Seus rascunhos</h2>
-              <p>Campanhas salvas da clínica selecionada. Para consultar e criar anúncios pausados, acesse <a href="/meta-campaigns.html">Campanhas na Meta →</a>.</p>
+              <h2>Rascunhos de planejamento</h2>
+              <p>Planejamentos locais, separados das campanhas reais. Para publicar anúncios pausados, acesse <a href="/meta-campaigns.html">Campanhas na Meta →</a>.</p>
             </div>
             <label class="search">
               <span class="sr-only">Buscar rascunhos</span>

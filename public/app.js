@@ -31,7 +31,7 @@ const pages = {
   },
   campaigns: {
     title: 'Campanhas',
-    description: 'Prepare os rascunhos antes de conectar sua conta de anúncios.'
+    description: 'Consulte campanhas reais na Meta e seus rascunhos de planejamento.'
   },
   integrations: {
     title: 'Integrações',
@@ -102,6 +102,7 @@ function changeView (view) {
 
   $('#overview-section').hidden = view !== 'overview'
   $('#campaign-section').hidden = !['overview', 'campaigns'].includes(view)
+  $('#meta-real-campaigns').hidden = !['overview', 'campaigns'].includes(view)
   $('#media-section').hidden = view !== 'media'
   $('#integrations-section').hidden = view !== 'integrations'
   $('#new-campaign').hidden = !['overview', 'campaigns'].includes(view)
@@ -118,6 +119,7 @@ function changeView (view) {
   })
 
   render()
+  if (typeof window.loadHomeMeta === 'function') window.loadHomeMeta()
 }
 
 function addCell (row, text) {
@@ -411,6 +413,7 @@ document.querySelectorAll('[data-view]').forEach(button => {
 companySelect.addEventListener('change', () => {
   search.value = ''
   loadDrafts()
+  if (typeof window.loadHomeMeta === 'function') window.loadHomeMeta()
 })
 
 search.addEventListener('input', render)
@@ -433,6 +436,7 @@ async function loadProfile () {
     }
 
     await loadDrafts()
+    if (typeof window.loadHomeMeta === 'function') window.loadHomeMeta()
   } catch (error) {
     loadMessage = error.message + ' Atualize a página para tentar novamente.'
   } finally {
