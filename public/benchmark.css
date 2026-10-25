@@ -1,2 +1,32 @@
 .benchmark-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;margin-top:20px}.benchmark-card{padding:24px}.benchmark-card h2{font-size:18px}.benchmark-card p{overflow-wrap:anywhere}.benchmark-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.benchmark-actions a{text-decoration:none;display:inline-flex;align-items:center}.benchmark-intro{padding:24px;margin:22px 0}.benchmark-intro p{margin-bottom:0}#benchmark-form textarea{width:100%;min-height:90px;border:1px solid #dfe2ec;border-radius:8px;padding:12px;font:inherit}#benchmark-form-error{color:#a02f48}.benchmark-card .remove-button{padding:12px}#benchmark-count{color:#747b90}
 #benchmark-ad-form textarea{width:100%;min-height:80px;border:1px solid #dfe2ec;border-radius:8px;padding:12px;font:inherit}#benchmark-ad-form label{display:block;margin-top:14px;font-weight:600}#benchmark-ad-form input,#benchmark-ad-form select{display:block;width:100%;margin-top:6px}#benchmark-ad-error{color:#a02f48}#benchmark-ads-section .benchmark-card{min-width:0}
+
+/* Laboratório de Criativos: painel de leitura rápida */
+#benchmark-ai-lab{padding:28px;margin:20px 0;border:1px solid #e5e7f2;border-radius:18px}
+#benchmark-ai-lab>h2{font-size:25px;line-height:1.3;margin:0 0 8px}
+#benchmark-ai-lab>p{font-size:15px;line-height:1.6}
+#benchmark-ai-lab #benchmark-ai-status{font-size:15px;line-height:1.5;margin:14px 0}
+#benchmark-ai-output{margin-top:20px}
+.ai-dashboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-items:start}
+.ai-quadrant{background:#fff;border:1px solid #e4e6f0;border-radius:18px;padding:26px;min-width:0;box-shadow:0 8px 24px rgba(28,33,69,.045)}
+.ai-quadrant-head{display:flex;align-items:flex-start;gap:14px;padding-bottom:16px;margin-bottom:18px;border-bottom:1px solid #e9eaf2}
+.ai-quadrant-head>span{font-size:28px;line-height:1.2}
+.ai-quadrant-head h3{font-size:21px;line-height:1.3;margin:0;color:#232443}
+.ai-quadrant-head p{font-size:15px;line-height:1.5;color:#626b81;margin:5px 0 0}
+.ai-insight{padding:15px 0;border-bottom:1px solid #eef0f5}
+.ai-insight:last-child{border-bottom:0}
+.ai-insight h4{font-size:16px;color:#3f35a9;margin:0 0 7px}
+.ai-insight p{font-size:16px;line-height:1.7;color:#32394e;margin:0;overflow-wrap:anywhere}
+.ai-opportunity{background:#f8f7ff;border-radius:12px;padding:16px;margin:10px 0;border:0}
+.ai-detail{border:1px solid #e6e7f0;border-radius:12px;margin:12px 0;background:#fafaff;overflow:hidden}
+.ai-detail summary{cursor:pointer;font-size:16px;font-weight:700;line-height:1.5;color:#343154;padding:16px 18px;list-style-position:inside}
+.ai-detail[open] summary{border-bottom:1px solid #e6e7f0}
+.ai-detail>.ai-insight{padding:14px 18px}
+.ai-creative-body{padding:4px 18px 18px}
+.ai-creative-body .ai-insight{padding:14px 0}
+.ai-copy{margin-top:14px;font-size:15px;min-height:40px}
+.ai-safety{margin-top:18px;background:#fffaf0;border:1px solid #f0dcae;border-radius:14px;padding:18px;font-size:15px;line-height:1.6}
+.ai-safety summary{font-weight:700;cursor:pointer}
+.ai-safety p{margin:10px 0}
+@media(max-width:1050px){.ai-dashboard{grid-template-columns:1fr}.ai-quadrant{padding:22px}}
+@media(max-width:600px){#benchmark-ai-lab{padding:16px}.ai-quadrant{padding:18px}.ai-quadrant-head h3{font-size:19px}.ai-insight p{font-size:16px}}
