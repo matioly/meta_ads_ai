@@ -1,0 +1,39 @@
+(() => {
+ const $=id=>document.getElementById(id);
+ let request=0;
+ function reset(){request++;$("benchmark-auto-results").replaceChildren();}
+ window.benchmarkAutoReset=reset;
+ window.benchmarkAutoSearch=async competitor=>{
+  const current=++request;
+  window.benchmarkAdsOpen(competitor,true);
+  const root=$("benchmark-auto-results");root.replaceChildren();
+  const status=document.createElement("p");status.textContent="Consultando anúncios públicos da Meta via Apify. A busca pode levar até dois minutos e pode gerar cobrança na Apify.";root.append(status);
+  if(!competitor.facebookUrl){status.textContent="Edite o concorrente e informe a página do Facebook para realizar a busca automática.";return;}
+  try{
+   const path="/api/companies/"+encodeURIComponent($("company").value)+"/benchmark-competitors/"+encodeURIComponent(competitor.id)+"/auto-ads";
+   const response=await fetch(path,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:"{}"});
+   const data=await response.json();
+   if(current!==request)return;
+   if(!response.ok)throw Error(data.error||"Falha na busca automática.");
+   status.textContent=data.returned+" anúncio(s) encontrado(s). Resultados externos não foram salvos. Confirme que pertencem à clínica.";
+   for(const ad of data.ads){
+    const card=document.createElement("article");card.className="panel benchmark-card";
+    const title=document.createElement("h3");title.textContent=ad.pageName||"Anúncio público";
+    const info=document.createElement("p");info.textContent=[ad.format,ad.startDate?"Início: "+ad.startDate:null].filter(Boolean).join(" · ");
+    card.append(title,info);
+    if(ad.text){const p=document.createElement("p");p.textContent=ad.text;card.append(p);}
+    if(ad.imageUrl){const img=document.createElement("img");img.src=ad.imageUrl;img.alt="Imagem pública do anúncio";img.loading="lazy";img.referrerPolicy="no-referrer";img.style.cssText="width:100%;max-height:260px;object-fit:contain";card.append(img);}
+    const actions=document.createElement("div");actions.className="benchmark-actions";
+    const link=document.createElement("a");link.className="secondary";link.href=ad.adUrl;link.target="_blank";link.rel="noopener noreferrer";link.textContent="Conferir na Meta ↗";actions.append(link);
+    const save=document.createElement("button");save.className="primary";save.textContent="Registrar na biblioteca";save.onclick=()=>{
+     const form=$("benchmark-ad-form");form.reset();
+     form.elements.title.value=(ad.pageName||"Anúncio")+" — "+(ad.externalId||"referência");
+     form.elements.adUrl.value=ad.adUrl;form.elements.format.value=ad.format;
+     form.elements.message.value=ad.text||"";
+     $("benchmark-ad-error").textContent="";
+     $("benchmark-ad-dialog").showModal();
+    };actions.append(save);card.append(actions);root.append(card);
+   }
+  }catch(e){if(current===request)status.textContent=e.message;}
+ };
+})();
