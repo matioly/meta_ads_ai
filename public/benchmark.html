@@ -1,0 +1,38 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Benchmark | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/meta-shell.css"><link rel="stylesheet" href="/benchmark.css"><script src="/benchmark.js" defer></script></head><body><aside class="sidebar">
+      <a class="brand" href="/?view=overview">
+        <span class="brand-symbol">ai</span>
+        <span>Meta Ads <strong>AI</strong></span>
+      </a>
+
+      <div class="workspace">
+        <label for="company">ESPAÇO DE TRABALHO</label>
+        <select id="company">
+          <option value="">Carregando clínicas…</option>
+        </select>
+      </div>
+
+      <p class="nav-label">PAINEL</p>
+      <nav aria-label="Navegação principal">
+        <a class="nav-button" href="/?view=overview">
+          <span class="nav-icon" aria-hidden="true">◈</span><span>Visão geral</span></a>
+        <a class="nav-button" href="/?view=campaigns">
+          <span class="nav-icon" aria-hidden="true">◎</span><span>Campanhas</span></a>
+        <a class="nav-button" href="/meta-campaigns.html"><span class="nav-icon" aria-hidden="true">◉</span><span>Gerenciador Meta</span></a>
+        <a class="nav-button" href="/?view=media"><span class="nav-icon" aria-hidden="true">▣</span><span>Biblioteca de mídias</span></a>
+        <a class="nav-button" href="/?view=integrations">
+          <span class="nav-icon" aria-hidden="true">⇄</span><span>Integrações</span></a>
+      <a class="nav-button active" aria-current="page" href="/benchmark.html"><span class="nav-icon" aria-hidden="true">▤</span><span>Benchmark</span></a></nav>
+
+      <p class="nav-label">CONFIGURAÇÕES</p>
+      <div class="sidebar-shortcuts">
+        <a class="nav-button" href="/meta-assets.html"><span class="nav-icon" aria-hidden="true">⚙</span><span>Contas e ativos Meta</span></a>
+      </div>
+
+      <div class="sidebar-footer">
+        <span class="avatar">AI</span>
+        <div>
+          <strong>Seu centro de campanhas</strong>
+          <small>Planeje. Revise. Publique.</small>
+        </div>
+      </div>
+    </aside><div class="main"><header class="topbar"><span>Workspace <span class="separator">/</span><strong id="company-name">Carregando…</strong></span><div class="topbar-actions"><span class="preview-badge" id="user-name">Carregando…</span><button class="secondary" id="logout" type="button">Sair</button></div></header><main class="meta-manager-main"><p class="eyebrow">INTELIGÊNCIA COMPETITIVA</p><h1>Benchmark de concorrentes</h1><p>Acompanhe clínicas de referência e consulte seus anúncios públicos na Biblioteca da Meta.</p><section class="panel benchmark-intro"><div class="page-heading"><div><h2>Concorrentes cadastrados</h2><p id="benchmark-count">0 de 5 concorrentes</p></div><button id="benchmark-add" class="primary" type="button">＋ Adicionar concorrente</button></div><p>Os cadastros são exclusivos da clínica selecionada. A consulta aos anúncios abre a Biblioteca pública da Meta em outra aba; a importação automática será avaliada em uma próxima etapa.</p><p id="benchmark-feedback" role="status"></p></section><div id="benchmark-list" class="benchmark-grid"></div></main></div><dialog id="benchmark-dialog" aria-labelledby="benchmark-dialog-title"><form id="benchmark-form"><h2 id="benchmark-dialog-title">Novo concorrente</h2><label for="benchmark-name">Nome da clínica *</label><input id="benchmark-name" name="name" maxlength="160" required><label for="benchmark-city">Cidade</label><input id="benchmark-city" name="city" maxlength="120"><label for="benchmark-state">UF</label><input id="benchmark-state" name="state" maxlength="2" placeholder="SP"><label for="benchmark-instagram">Instagram (URL HTTPS)</label><input id="benchmark-instagram" name="instagramUrl" type="url" maxlength="500" placeholder="https://www.instagram.com/..."><label for="benchmark-facebook">Facebook (URL HTTPS)</label><input id="benchmark-facebook" name="facebookUrl" type="url" maxlength="500" placeholder="https://www.facebook.com/..."><label for="benchmark-specialty">Especialidade principal</label><input id="benchmark-specialty" name="specialty" maxlength="120" placeholder="Ex.: Implantes"><label for="benchmark-notes">Observações</label><textarea id="benchmark-notes" name="notes" maxlength="500"></textarea><p id="benchmark-form-error" role="alert"></p><div class="dialog-actions"><button class="secondary" id="benchmark-cancel" type="button">Cancelar</button><button class="primary" type="submit">Salvar concorrente</button></div></form></dialog></body></html>
