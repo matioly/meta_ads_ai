@@ -53,13 +53,13 @@ router.post("/:companyId/meta-create-adset",access,async(req,res,next)=>{
     if(account.id!==`act_${accountId}`||account.currency!=="BRL")
       return res.status(422).json({error:"A conta de anúncios deve estar configurada em reais (BRL)."});
     if(String(campaign.account_id||"").replace(/^act_/,"")!==accountId||
-       campaign.status!=="PAUSED"||campaign.objective!=="OUTCOME_ENGAGEMENT")
-      return res.status(422).json({error:"Escolha uma campanha de Engajamento pausada, pertencente à conta selecionada."});
+       campaign.status!=="PAUSED"||campaign.objective!=="OUTCOME_TRAFFIC")
+      return res.status(422).json({error:"Escolha uma campanha de Tráfego pausada, pertencente à conta selecionada."});
     const body=new URLSearchParams({
       name:name.trim(),campaign_id:campaignId,status:"PAUSED",
-      billing_event:"IMPRESSIONS",optimization_goal:"POST_ENGAGEMENT",
+      billing_event:"IMPRESSIONS",optimization_goal:"LINK_CLICKS",
       bid_strategy:"LOWEST_COST_WITHOUT_CAP",
-      destination_type:"UNDEFINED",
+      destination_type:"WEBSITE",
       daily_budget:String(Math.round(dailyBudgetBrl*100)),
       targeting:JSON.stringify({geo_locations:{countries:["BR"]},age_min:ageMin,age_max:ageMax,targeting_automation:{advantage_audience:0}})
     });
