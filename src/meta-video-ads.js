@@ -112,6 +112,27 @@ router.get("/:companyId/creative-drafts/:draftId/meta-ad-diagnostic",access,asyn
   res.json({diagnostic:diagnose(d,campaign,adset)});
  }catch(e){return failure(res,e,"de diagnóstico do anúncio");}
 });
+// Read-only state for the publishing controls. Never uploads or creates ads.
+router.get("/:companyId/creative-drafts/:draftId/meta-video-status",access,async(req,res)=>{
+ if(!uuid.test(req.params.draftId))return res.status(400).json({error:"Identificador inválido."});
+ res.set("Cache-Control","no-store");
+ try{
+  const d=await context(req.params.companyId,req.params.draftId);
+  if(!d)return res.status(404).json({error:"Anúncio preparado não encontrado."});
+  if(d.meta_ad_id)return res.json({state:"ad_created",adId:d.meta_ad_id,videoId:d.meta_video_id});
+  if(!d.meta_video_id)return res.json({state:"not_uploaded"});
+  const token=process.env.META_ACCESS_TOKEN;
+  if(!token)return res.status(503).json({error:"Token Meta não configurado."});
+  const [video,thumbs]=await Promise.all([
+   graph(d.meta_video_id+"?fields=id,status",token),
+   graph(d.meta_video_id+"/thumbnails?fields=uri,is_preferred&limit=100",token)
+  ]);
+  const images=Array.isArray(thumbs.data)?thumbs.data:[];
+  const ready=images.some(t=>typeof t.uri==="string"&&t.uri.startsWith("https://"));
+  const processing=video.status?.video_status||null;
+  return res.json({state:ready?"ready":"processing",videoId:d.meta_video_id,processing});
+ }catch(e){return failure(res,e,"de consulta do vídeo");}
+});
 router.post("/:companyId/creative-drafts/:draftId/meta-video",access,async(req,res,next)=>{
  if(process.env.META_VIDEO_UPLOAD_ENABLED!=="true")return res.status(503).json({error:"Envio de vídeo desabilitado. Configure META_VIDEO_UPLOAD_ENABLED=true no Railway após revisar o fluxo."});
  if(!uuid.test(req.params.draftId)||req.body?.confirm!==true)return res.status(400).json({error:"Selecione o rascunho e confirme o envio do vídeo."});
