@@ -38,7 +38,7 @@
 </section><button type="button" class="secondary workflow-next" data-next="workflow-audience">Continuar para público e orçamento →</button></div></details>
 <details class="workflow-accordion" id="workflow-audience"><summary><span class="workflow-icon">02</span><span><strong>Público e orçamento</strong><small>Defina quem verá o anúncio e o investimento diário</small></span><span class="workflow-chevron">⌄</span></summary><div class="workflow-content"><section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="adset-preview-title">
 <h2 id="adset-preview-title">Quem você deseja alcançar?</h2>
-<p>Escolha quem poderá ver seus anúncios e quanto pretende investir por dia. <strong>Confira a simulação antes de criar o público pausado na Meta. Nenhum anúncio será publicado.</strong> Por enquanto, a região disponível é Brasil.</p>
+<p>Escolha quem poderá ver seus anúncios e quanto pretende investir por dia. <strong>Confira os dados e confirme a criação. O público ficará pausado e nenhum anúncio será ativado.</strong> Por enquanto, a região disponível é Brasil.</p>
 <form id="adset-preview-form">
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
 <label>Escolha a campanha<select id="adset-campaign" required><option value="">Carregando campanhas…</option></select></label>
@@ -47,10 +47,10 @@
 <label>Idade máxima<input id="adset-age-max" type="number" min="18" max="65" value="55" required></label>
 <label>Orçamento diário (R$)<input id="adset-budget" type="number" min="10" max="10000" step="0.01" value="30" required></label>
 </div>
-<button type="submit" class="secondary" id="adset-preview-button" style="margin-top:12px">Conferir configurações</button>
+<button type="submit" class="primary" id="adset-preview-button" style="margin-top:12px">Criar público pausado</button>
 </form><p id="adset-preview-feedback" role="status" aria-live="polite"></p>
 
-<div id="adset-create-actions" hidden><button type="button" id="adset-create-button" class="primary">Criar público pausado na Meta</button><p id="adset-create-feedback" role="status"></p></div><pre id="adset-preview-result" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+<div id="adset-create-actions" hidden><button type="button" id="adset-create-button" class="primary">Confirmar criação</button><p id="adset-create-feedback" role="status"></p></div><pre id="adset-preview-result" hidden></pre>
 </section><button type="button" class="secondary workflow-next" data-next="workflow-creative">Continuar para vídeo e mensagem →</button></div></details>
 <details class="workflow-accordion" id="workflow-creative"><summary><span class="workflow-icon">03</span><span><strong>Vídeo e mensagem</strong><small>Escolha o criativo, escreva a mensagem e salve o rascunho</small></span><span class="workflow-chevron">⌄</span></summary><div class="workflow-content"><section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="creative-title">
 <h2 id="creative-title">Conte a história do seu anúncio</h2>

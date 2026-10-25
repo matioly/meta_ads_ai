@@ -27,7 +27,7 @@ adsetForm.addEventListener("submit",async e=>{
   e.preventDefault();
   if(!adsetCampaign.value)return;
   resetAdsetApproval();
-  adsetButton.disabled=true;adsetResult.textContent="";adsetFeedback.textContent="Validando plano…";
+  adsetButton.disabled=true;adsetResult.textContent="";adsetFeedback.textContent="Conferindo informações…";
   try{
     const r=await fetch("/api/companies/"+encodeURIComponent(select.value)+"/meta-adset-preview",{
       method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},
@@ -38,9 +38,10 @@ adsetForm.addEventListener("submit",async e=>{
     });
     const data=await r.json();
     if(!r.ok)throw Error(data.error||"Não foi possível validar.");
-    adsetFeedback.textContent="Simulação concluída. Você pode criar o público pausado.";
+    adsetFeedback.textContent="";
     approvedAdsetPreview={companyId:select.value,campaignId:data.campaignId,name:data.name,ageMin:data.targeting.age_min,ageMax:data.targeting.age_max,dailyBudgetBrl:data.dailyBudgetBrl};
-    document.querySelector("#adset-create-actions").hidden=false;
+    document.querySelector("#adset-create-actions").hidden=true;
+    document.querySelector("#adset-create-button").click();
     adsetResult.textContent=[
       "Campanha escolhida: "+adsetCampaign.selectedOptions[0].textContent,"Nome do público: "+data.name,"Situação: ainda não criado",
        "Localização inicial: Brasil","Faixa etária: "+data.targeting.age_min+"–"+data.targeting.age_max,
