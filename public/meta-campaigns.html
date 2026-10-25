@@ -1,16 +1,16 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Campanhas reais | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><script src="/meta-campaigns.js" defer></script><script src="/meta-create-campaign.js" defer></script><script src="/meta-adset-preview.js" defer></script></head>
+<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gerenciar anúncios | Meta Ads AI</title><link rel="stylesheet" href="/styles.css"><script src="/meta-campaigns.js" defer></script><script src="/meta-create-campaign.js" defer></script><script src="/meta-adset-preview.js" defer></script></head>
 <body><main style="max-width:1250px;margin:32px auto;padding:20px">
-<p><a href="/">← Voltar ao painel</a></p><p class="eyebrow">META04 · CONSULTA E CRIAÇÃO CONTROLADA</p>
-<h1>Campanhas reais da Meta</h1><p>Consulte campanhas, conjuntos e anúncios. A criação de campanhas pausadas exige confirmação; o planejamento de conjuntos não envia alterações à Meta.</p>
+<p><a href="/">← Voltar ao painel</a></p><p class="eyebrow">GERENCIAR ANÚNCIOS</p>
+<h1>Gerenciar anúncios</h1><p>Acompanhe seus resultados e prepare campanhas para a clínica. Tudo que for criado nesta etapa fica pausado até sua decisão.</p>
 <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:18px 0">
 <label for="meta-company">Clínica</label><select id="meta-company"><option>Carregando…</option></select>
 <button id="refresh" class="primary" type="button">Atualizar dados</button></div>
-<div style="display:flex;gap:10px;flex-wrap:wrap;margin:16px 0" role="group" aria-label="Nível dos anúncios">
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin:16px 0" role="group" aria-label="Visualização de anúncios">
 <button type="button" class="secondary" data-type="campaigns" aria-pressed="true">Campanhas</button>
-<button type="button" class="secondary" data-type="adsets" aria-pressed="false">Conjuntos de anúncios</button>
+<button type="button" class="secondary" data-type="adsets" aria-pressed="false">Públicos e orçamento</button>
 <button type="button" class="secondary" data-type="ads" aria-pressed="false">Anúncios</button></div>
 <section class="panel" aria-labelledby="insights-title" style="padding:20px;margin:20px 0">
-<h2 id="insights-title">Resultados reais · Meta</h2>
+<h2 id="insights-title">Como estão meus anúncios?</h2>
 <p>Indicadores da conta selecionada, conforme o período e a atribuição informados pela Meta. Valores não representam orçamento planejado.</p>
 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
 <label for="insights-period">Período</label><select id="insights-period"><option value="today">Hoje</option><option value="last_7d" selected>Últimos 7 dias</option><option value="last_30d">Últimos 30 dias</option><option value="custom">Personalizado</option></select>
@@ -28,27 +28,28 @@
 <article class="metric"><span>Conversas iniciadas*</span><strong id="insights-conversations">—</strong></article>
 </div><p><small>*Exibidas apenas quando a Meta retorna o evento específico. Ausência do evento não significa zero conversas. CPC = investimento ÷ cliques (todos).</small></p>
 </section><section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="create-title">
-<h2 id="create-title">Criar campanha de teste na Meta · Pausada</h2>
-<p>Cria somente a campanha de Engajamento, sem conjunto de anúncios, orçamento ou criativo. A campanha será enviada como PAUSADA.</p>
+<h2 id="create-title">1. Criar nova campanha</h2>
+<p>Crie a estrutura inicial da campanha. Ela ficará <strong>pausada</strong>, sem anúncios e sem investimento até você configurar as próximas etapas.</p>
 <form id="meta-create-form">
 <label for="meta-create-name">Nome da campanha</label>
 <input id="meta-create-name" required maxlength="120" placeholder="Ex.: TESTE Alps - Integração API">
-<button type="submit" class="primary" id="meta-create-button">Revisar e criar pausada</button>
+<button type="submit" class="primary" id="meta-create-button">Criar campanha pausada</button>
 </form><p id="meta-create-feedback" role="status" aria-live="polite"></p>
 </section>
 <section class="panel" style="padding:20px;margin:20px 0" aria-labelledby="adset-preview-title">
-<h2 id="adset-preview-title">META04.2A · Planejar conjunto de anúncios</h2>
-<p>Simulação local: valida os campos e mostra o plano. <strong>Não cria conjunto nem altera a Meta.</strong> Região inicial: Brasil. Público: 18 a 65 anos.</p>
+<h2 id="adset-preview-title">2. Configurar público e orçamento</h2>
+<p>Escolha quem poderá ver seus anúncios e quanto pretende investir por dia. <strong>Esta etapa é apenas uma simulação: nada será enviado à Meta.</strong> Por enquanto, a região disponível é Brasil.</p>
 <form id="adset-preview-form">
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
-<label>Campanha pausada<select id="adset-campaign" required><option value="">Carregando campanhas…</option></select></label>
-<label>Nome do conjunto<input id="adset-name" maxlength="120" required placeholder="Ex.: Alps · Brasil · 25–55"></label>
+<label>Escolha a campanha<select id="adset-campaign" required><option value="">Carregando campanhas…</option></select></label>
+<label>Nome do público<input id="adset-name" maxlength="120" required placeholder="Ex.: Adultos de 25 a 55 anos"></label>
 <label>Idade mínima<input id="adset-age-min" type="number" min="18" max="65" value="25" required></label>
 <label>Idade máxima<input id="adset-age-max" type="number" min="18" max="65" value="55" required></label>
 <label>Orçamento diário (R$)<input id="adset-budget" type="number" min="10" max="10000" step="0.01" value="30" required></label>
 </div>
-<button type="submit" class="secondary" id="adset-preview-button" style="margin-top:12px">Revisar configuração (sem criar)</button>
+<button type="submit" class="secondary" id="adset-preview-button" style="margin-top:12px">Conferir configurações</button>
 </form><p id="adset-preview-feedback" role="status" aria-live="polite"></p>
+<div style="margin-top:10px;font-weight:600">3. Adicionar vídeo e texto <span style="font-weight:400">(em breve)</span></div><div style="margin-top:8px;font-weight:600">4. Revisar e publicar <span style="font-weight:400">(em breve; nunca automático)</span></div>
 <pre id="adset-preview-result" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
 </section>
 <p id="feedback" role="status" aria-live="polite">Carregando…</p>
