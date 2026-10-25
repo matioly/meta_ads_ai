@@ -98,6 +98,8 @@ function notify (message) {
 
 function changeView (view) {
   if (!pages[view]) view = 'overview'
+  // Apply route state before updating any visible section to avoid intermediate overview frames.
+  document.documentElement.dataset.activeView = view
   $('#page-title').textContent = pages[view].title
   $('#page-description').textContent = pages[view].description
 
