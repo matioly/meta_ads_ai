@@ -1,7 +1,7 @@
 (() => {
  const $=id=>document.getElementById(id);
  let request=0;
- function reset(){request++;$("benchmark-auto-refresh").hidden=true;window.benchmarkSelectedCompetitor=null;$("benchmark-auto-results").replaceChildren();}
+ function reset(){window.benchmarkAiReset?.();request++;$("benchmark-auto-refresh").hidden=true;window.benchmarkSelectedCompetitor=null;$("benchmark-auto-results").replaceChildren();}
  window.benchmarkAutoReset=reset;
  window.benchmarkAutoSearch=async competitor=>{
   window.benchmarkSelectedCompetitor=competitor;
@@ -36,6 +36,7 @@
      $("benchmark-ad-dialog").showModal();
     };actions.append(save);card.append(actions);root.append(card);
    }
+   window.benchmarkAiLoad?.(competitor,data.ads);
   }catch(e){if(current===request)status.textContent=e.message;}
  };
  window.benchmarkAutoRefresh=async()=>{
