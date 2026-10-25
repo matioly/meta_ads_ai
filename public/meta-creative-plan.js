@@ -16,7 +16,8 @@
   for(const item of items)select.append(new Option(label(item),String(item.id)));
  }
  function clearForm(){
-  saved.value="";form.reset();campaign.value="";updateAdsets();preview.hidden=true;feedback.textContent="Novo rascunho. Preencha os campos e clique em Salvar rascunho.";
+  form.reset();saved.value="";campaign.value="";updateAdsets();preview.hidden=true;feedback.textContent="Novo anúncio. Escolha o vídeo e preencha a mensagem.";
+  $("creative-primary-text").focus();
  }
  function updateAdsets(){
   const filtered=adsets.filter(x=>String(x.campaignId)===campaign.value);
@@ -82,7 +83,7 @@
  form.addEventListener("submit",e=>{e.preventDefault();if(previewDraft())feedback.textContent="Prévia pronta. Clique em Salvar rascunho para guardar os dados.";});
  campaign.addEventListener("change",()=>{updateAdsets();preview.hidden=true;});
  saved.addEventListener("change",()=>{if(saved.value)applyDraft();else clearForm();});
- $("creative-new").addEventListener("click",clearForm);
+ $("creative-new").addEventListener("click",()=>{clearForm();});
  $("creative-save").addEventListener("click",async()=>{
   if(!form.reportValidity()||!previewDraft())return;
   const button=$("creative-save");button.disabled=true;
@@ -94,7 +95,7 @@
   }catch(e){feedback.textContent="Não foi possível salvar: "+e.message;}finally{button.disabled=false;}
  });
  $("creative-delete").addEventListener("click",async()=>{
-  if(!saved.value){feedback.textContent="Selecione um rascunho salvo para excluir.";return;}
+  if(!saved.value){feedback.textContent="Escolha um rascunho na lista antes de excluir.";saved.focus();return;}
   if(!window.confirm("Excluir este rascunho? Nenhum anúncio da Meta será alterado."))return;
   const id=saved.value;
   try{await api("/creative-drafts/"+encodeURIComponent(id),{method:"DELETE",headers:{"Content-Type":"application/json"}});
@@ -103,4 +104,5 @@
  });
  select.addEventListener("change",refresh);
  select.addEventListener("meta-company-ready",refresh);
+ window.addEventListener("meta-adset-created",refresh);
 })();
