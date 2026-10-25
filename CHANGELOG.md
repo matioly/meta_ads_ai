@@ -1,3 +1,13 @@
+## 25/10/2026 — Marco META04.2/04.3 e PR #20 META05A/5B
+
+**Validado pelo operador:** campanha e conjunto PAUSADOS criados na Meta (conjunto 120249780122340576); rascunho de criativo com vídeo Pamela ADS2 salvo e recuperado com todos os campos. Erros Meta resolvidos durante testes: 100/4834011 (compartilhamento de orçamento), 100/1815715 (destino), 100/2490487 (bid/ROAS/otimização), 100/1870227 (Advantage+ audience).
+
+**Implementado, não homologado:** PR #20 adicionou migration 013, IDs Meta no rascunho, envio de vídeo do Google Drive, criação explícita de criativo/anúncio PAUSADO, confirmação manual, flags separadas e controles de interface. Limitações: download público direto sem OAuth, 75 MB, vídeo em memória, Página Facebook aprovada e possíveis campos de criativo adicionais. Timeout pode gerar resultado remoto incerto: conferir Meta antes de repetir. Nenhuma ativação automática.
+
+**Próximo aceite:** confirmar deploy/migration 013; testar upload 5A e anúncio 5B; conferir IDs/status PAUSED e persistência após recarga; regressão e revisão de segurança. Documentação: docs/RETOMADA.md, docs/BACKLOG.md e docs/FASE_5_VIDEO_ANUNCIO.md.
+
+---
+
 ## 25/10/2026 — META04.1 validada em produção; META04.2A em revisão
 
 **Aceite operacional confirmado por screenshot:** a conta Alps criou a campanha real **Teste Integracao API** (ID Meta `120249780034580576`), objetivo OUTCOME_ENGAGEMENT, status PAUSED, sem conjunto, anúncio ou orçamento. Após corrigir erro 100/subcódigo 4834011 com `is_adset_budget_sharing_enabled=false`, a API retornou ID e a lista passou de uma para duas campanhas. O operador confirmou visualmente. Flag `META_CAMPAIGN_CREATION_ENABLED=true` no serviço da aplicação. O token não foi exposto.
