@@ -34,17 +34,17 @@ adsetForm.addEventListener("submit",async e=>{
       body:JSON.stringify({campaignId:adsetCampaign.value,name:document.querySelector("#adset-name").value.trim(),
         ageMin:Number(document.querySelector("#adset-age-min").value),
         ageMax:Number(document.querySelector("#adset-age-max").value),
-        dailyBudgetBrl:Number(document.querySelector("#adset-budget").value),city:document.querySelector("#adset-city").value.trim(),latitude:Number(document.querySelector("#adset-lat").value),longitude:Number(document.querySelector("#adset-lon").value),radiusKm:Number(document.querySelector("#adset-radius").value),gender:document.querySelector("#adset-gender").value})
+        dailyBudgetBrl:Number(document.querySelector("#adset-budget").value),city:document.querySelector("#adset-city").value,radiusKm:Number(document.querySelector("#adset-radius").value),gender:document.querySelector("#adset-gender").value})
     });
     const data=await r.json();
     if(!r.ok)throw Error(data.error||"Não foi possível validar.");
     adsetFeedback.textContent="";
-    approvedAdsetPreview={companyId:select.value,campaignId:data.campaignId,name:data.name,ageMin:data.targeting.age_min,ageMax:data.targeting.age_max,dailyBudgetBrl:data.dailyBudgetBrl,city:data.city,latitude:data.latitude,longitude:data.longitude,radiusKm:data.radiusKm,gender:data.gender};
+    approvedAdsetPreview={companyId:select.value,campaignId:data.campaignId,name:data.name,ageMin:data.targeting.age_min,ageMax:data.targeting.age_max,dailyBudgetBrl:data.dailyBudgetBrl,city:data.city,radiusKm:data.radiusKm,gender:data.gender};
     document.querySelector("#adset-create-actions").hidden=true;
     document.querySelector("#adset-create-button").click();
     adsetResult.textContent=[
       "Campanha escolhida: "+adsetCampaign.selectedOptions[0].textContent,"Nome do público: "+data.name,"Situação: ainda não criado",
-       "Localização: "+data.city+" ("+data.latitude+", "+data.longitude+") · raio "+data.radiusKm+" km","Gênero: "+data.gender,"Faixa etária: "+data.targeting.age_min+"–"+data.targeting.age_max,
+       "Localização: "+data.city+" · raio "+data.radiusKm+" km","Gênero: "+data.gender,"Faixa etária: "+data.targeting.age_min+"–"+data.targeting.age_max,
        "Investimento diário planejado: "+new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(data.dailyBudgetBrl),
       "Antes de criar anúncios, ainda precisamos:",...data.pending.map(p=>"• "+p)
     ].join("\n");
