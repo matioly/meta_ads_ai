@@ -3,7 +3,7 @@ const pool=require("./db");
 const access=require("./company-access");
 const {rateLimit}=require("express-rate-limit");
 const router=express.Router();
-const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const limiter=rateLimit({windowMs:3600000,limit:12,standardHeaders:"draft-7",legacyHeaders:false,message:{error:"Limite de análises atingido. Aguarde uma hora."}});
 router.post("/:companyId/benchmark-competitors/:competitorId/ai-analysis",access,limiter,async(req,res,next)=>{
  if(!uuid.test(req.params.competitorId))return res.status(400).json({error:"Concorrente inválido."});
