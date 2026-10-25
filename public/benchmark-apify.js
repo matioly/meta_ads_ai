@@ -1,14 +1,15 @@
 (() => {
  const $=id=>document.getElementById(id);
  let request=0;
- function reset(){request++;window.benchmarkSelectedCompetitor=null;$("benchmark-auto-results").replaceChildren();}
+ function reset(){request++;$("benchmark-auto-refresh").hidden=true;window.benchmarkSelectedCompetitor=null;$("benchmark-auto-results").replaceChildren();}
  window.benchmarkAutoReset=reset;
  window.benchmarkAutoSearch=async competitor=>{
   window.benchmarkSelectedCompetitor=competitor;
   window.benchmarkAdsOpen(competitor,true);
+  $("benchmark-auto-refresh").hidden=false;
   const current=++request;
   const root=$("benchmark-auto-results");root.replaceChildren();
-  const status=document.createElement("p");status.textContent="Consultando anúncios públicos da Meta via Apify. A busca pode levar até dois minutos e pode gerar cobrança na Apify.";root.append(status);
+  const status=document.createElement("p");status.textContent="Carregando anúncios salvos…";root.append(status);
   try{
    const path="/api/companies/"+encodeURIComponent($("company").value)+"/benchmark-competitors/"+encodeURIComponent(competitor.id)+"/auto-ads";
    const response=await fetch(path,{method:"GET",credentials:"same-origin"});
