@@ -1,5 +1,7 @@
 // META04.2A is read-only. Never send a request to create an ad set.
 const adsetForm=document.querySelector("#adset-preview-form");
+// Coordenadas internas: o usuário seleciona apenas a cidade.
+const adsetCityCoordinates={"campinas-sp":{latitude:-22.9056,longitude:-47.0608}};
 const adsetCampaign=document.querySelector("#adset-campaign");
 const adsetFeedback=document.querySelector("#adset-preview-feedback");
 const adsetResult=document.querySelector("#adset-preview-result");
@@ -27,6 +29,9 @@ adsetForm.addEventListener("submit",async e=>{
   e.preventDefault();
   if(!adsetCampaign.value)return;
   resetAdsetApproval();
+  const city=document.querySelector("#adset-city").value;
+  const coordinates=adsetCityCoordinates[city];
+  if(!coordinates){adsetFeedback.textContent="Selecione uma cidade disponível.";return;}
   adsetButton.disabled=true;adsetResult.textContent="";adsetFeedback.textContent="Conferindo informações…";
   try{
     const r=await fetch("/api/companies/"+encodeURIComponent(select.value)+"/meta-adset-preview",{
@@ -34,12 +39,12 @@ adsetForm.addEventListener("submit",async e=>{
       body:JSON.stringify({campaignId:adsetCampaign.value,name:document.querySelector("#adset-name").value.trim(),
         ageMin:Number(document.querySelector("#adset-age-min").value),
         ageMax:Number(document.querySelector("#adset-age-max").value),
-        dailyBudgetBrl:Number(document.querySelector("#adset-budget").value),city:document.querySelector("#adset-city").value,radiusKm:Number(document.querySelector("#adset-radius").value),gender:document.querySelector("#adset-gender").value,interests:window.getAdsetInterests()})
+        dailyBudgetBrl:Number(document.querySelector("#adset-budget").value),city,...coordinates,radiusKm:Number(document.querySelector("#adset-radius").value),gender:document.querySelector("#adset-gender").value,interests:window.getAdsetInterests()})
     });
     const data=await r.json();
     if(!r.ok)throw Error(data.error||"Não foi possível validar.");
     adsetFeedback.textContent="";
-    approvedAdsetPreview={companyId:select.value,campaignId:data.campaignId,name:data.name,ageMin:data.targeting.age_min,ageMax:data.targeting.age_max,dailyBudgetBrl:data.dailyBudgetBrl,city:data.city,radiusKm:data.radiusKm,gender:data.gender,interests:data.interests};
+    approvedAdsetPreview={companyId:select.value,campaignId:data.campaignId,name:data.name,ageMin:data.targeting.age_min,ageMax:data.targeting.age_max,dailyBudgetBrl:data.dailyBudgetBrl,city:data.city,latitude:data.latitude,longitude:data.longitude,radiusKm:data.radiusKm,gender:data.gender,interests:data.interests};
     document.querySelector("#adset-create-actions").hidden=true;
     document.querySelector("#adset-create-button").click();
     adsetResult.textContent=[
