@@ -1,3 +1,5 @@
+> Atualização de diagnóstico — 25/10/2026: adicionado botão “Conferir campos do 5B (sem criar)”. Após merge e deploy, selecionar o rascunho salvo na etapa 3 e usar esse botão. A consulta GET mostra IDs, contas, vínculo, status, objetivo, destino e otimização com valores recebidos/esperados. Corrigir somente os campos AJUSTAR. A causa em produção continua não confirmada. Não reenviar o vídeo para diagnosticar. A resposta 422 do 5B também inclui o mesmo diagnóstico. Nenhuma migration ou variável nova. Testes locais com respostas Meta simuladas; homologação no Railway pendente.
+
 # Retomada — 25/10/2026, fim da sessão (prioridade máxima)
 
 ## Objetivo imediato

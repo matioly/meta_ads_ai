@@ -3,6 +3,7 @@ const express=require("express");
 const pool=require("./db");
 const access=require("./company-access");
 const router=express.Router();
+const {diagnose}=require("./meta-ad-diagnostic");
 const {uuid}=require("./media-validation");
 const digits=v=>typeof v==="string"&&/^\d{10,30}$/.test(v);
 const version=()=>/^v\d+\.\d+$/.test(process.env.META_API_VERSION||"")?process.env.META_API_VERSION:"v24.0";
@@ -93,6 +94,24 @@ router.get("/:companyId/meta-instagram-diagnostic",access,async(req,res)=>{
   });
  }catch(e){return failure(res,e,"de diagnóstico do Instagram");}
 });
+// Read-only preflight: no uploads, Meta writes or local mutations.
+router.get("/:companyId/creative-drafts/:draftId/meta-ad-diagnostic",access,async(req,res)=>{
+ if(!uuid.test(req.params.draftId))return res.status(400).json({error:"Identificador inválido."});
+ const token=process.env.META_ACCESS_TOKEN;
+ if(!token)return res.status(503).json({error:"Token Meta não configurado."});
+ res.set("Cache-Control","no-store");
+ try{
+  const d=await context(req.params.companyId,req.params.draftId);
+  if(!d)return res.status(404).json({error:"Rascunho ou conta Meta não encontrados."});
+  if(!digits(d.ad_account_id)||!digits(d.campaign_meta_id)||!digits(d.adset_meta_id))
+   return res.status(422).json({error:"Salve os vínculos de campanha e conjunto na etapa 3 antes de conferir."});
+  const [campaign,adset]=await Promise.all([
+   graph(d.campaign_meta_id+"?fields=id,account_id,status,objective",token),
+   graph(d.adset_meta_id+"?fields=id,account_id,campaign_id,status,destination_type,optimization_goal",token)
+  ]);
+  res.json({diagnostic:diagnose(d,campaign,adset)});
+ }catch(e){return failure(res,e,"de diagnóstico do anúncio");}
+});
 router.post("/:companyId/creative-drafts/:draftId/meta-video",access,async(req,res,next)=>{
  if(process.env.META_VIDEO_UPLOAD_ENABLED!=="true")return res.status(503).json({error:"Envio de vídeo desabilitado. Configure META_VIDEO_UPLOAD_ENABLED=true no Railway após revisar o fluxo."});
  if(!uuid.test(req.params.draftId)||req.body?.confirm!==true)return res.status(400).json({error:"Selecione o rascunho e confirme o envio do vídeo."});
@@ -132,14 +151,11 @@ router.post("/:companyId/creative-drafts/:draftId/meta-paused-ad",access,async(r
    graph(d.campaign_meta_id+"?fields=id,account_id,status,objective",token),
    graph(d.adset_meta_id+"?fields=id,account_id,campaign_id,status,destination_type,optimization_goal",token)
   ]);
-  if(String(campaign.account_id).replace(/^act_/,"")!==d.ad_account_id||campaign.status!=="PAUSED"||
-     String(adset.account_id).replace(/^act_/,"")!==d.ad_account_id||adset.campaign_id!==d.campaign_meta_id||adset.status!=="PAUSED")
-    return res.status(422).json({error:"Campanha e público precisam pertencer à mesma conta e estar pausados."});
-  // Website ads need a traffic campaign and a compatible website ad set.
-  // The older POST_ENGAGEMENT/UNDEFINED set cannot be reused.
-  if(campaign.objective!=="OUTCOME_TRAFFIC"||adset.destination_type!=="WEBSITE"||adset.optimization_goal!=="LINK_CLICKS"){
-   return res.status(422).json({error:"Para enviar ao site, selecione uma campanha de Tráfego (OUTCOME_TRAFFIC) e um conjunto com destino WEBSITE e otimização LINK_CLICKS, ambos PAUSADOS. O conjunto antigo de engajamento não é compatível."});
-  }
+  const diagnostic=diagnose(d,campaign,adset);
+  if(!diagnostic.compatible)return res.status(422).json({
+   error:"Configuração incompatível para anúncio de site. Confira os campos abaixo.",
+   diagnostic
+  });
   const destination=(process.env.META_WEBSITE_URL || "https://alpsclinic.com").trim();
   let site;
   try{site=new URL(destination);}catch{return res.status(503).json({error:"Configure META_WEBSITE_URL com o endereço HTTPS do site da clínica no Railway."});}
