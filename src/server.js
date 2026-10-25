@@ -251,6 +251,12 @@ app.get(["/", "/index.html"], (req, res) => {
   res.sendFile(path.join(publicDir, "index.html"));
 });
 
+app.get(["/campaigns.html", "/integrations.html"], (req, res) => {
+  res.set("Cache-Control", "no-store");
+  if (!req.session.userId) return res.redirect("/login");
+  res.sendFile(path.join(publicDir, req.path));
+});
+
 app.use(express.static(publicDir, {
   index: false,
   dotfiles: "deny"
