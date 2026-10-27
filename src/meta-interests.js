@@ -54,7 +54,7 @@ router.get("/:companyId/meta-location-center",access,async(req,res,next)=>{
   const candidates=await response.json();
   const norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
   const match=(Array.isArray(candidates)?candidates:[]).find(x=>{
-    const a=x.address||{},foundCity=a.city||a.town||a.municipality||a.village||"";
+    const a=x.address||{};
     const foundName=a.suburb||a.neighbourhood||a.quarter||a.residential||x.name||"";
     return norm(foundCity)===norm(city)&&norm(foundName)===norm(name)&&Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lon));
   });
