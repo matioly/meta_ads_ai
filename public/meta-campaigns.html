@@ -102,7 +102,7 @@
 <form id="adset-preview-form">
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
 <label>Escolha a campanha<select id="adset-campaign" required><option value="">Carregando campanhas…</option></select></label>
-<label>Nome do público<input id="adset-name" maxlength="120" required placeholder="Ex.: Adultos de 25 a 55 anos"></label>
+<label>Nome do conjunto de anúncios<input id="adset-name" maxlength="120" required placeholder="Ex.: Implantes — Campinas — 25 a 55 anos"></label>
 <label>Cidade de referência<select id="adset-city" required><option value="campinas-sp">Campinas, SP (centro)</option></select></label>
 <label>Raio (km)<select id="adset-radius"><option>3</option><option>5</option><option>10</option><option>15</option><option>20</option></select></label>
 <label>Gênero<select id="adset-gender"><option value="all">Todos</option><option value="male">Masculino</option><option value="female">Feminino</option></select></label>
@@ -111,7 +111,7 @@
 <label>Interesses (opcional)<input id="adset-interest-search" type="search" placeholder="Ex.: viagens, beleza" autocomplete="off"></label>
 <label>Orçamento diário (R$)<input id="adset-budget" type="number" min="10" max="10000" step="0.01" value="30" required></label>
 </div><div id="adset-interest-results" role="status"></div><div id="adset-selected-interests" aria-live="polite"></div>
-<button type="submit" class="primary" id="adset-preview-button" style="margin-top:12px">Criar público pausado</button>
+<button type="submit" class="primary" id="adset-preview-button" style="margin-top:12px">Criar conjunto pausado</button>
 </form><p id="adset-preview-feedback" role="status" aria-live="polite"></p>
 
 <div id="adset-create-actions" hidden><button type="button" id="adset-create-button" class="primary">Confirmar criação</button></div><p id="adset-create-feedback" role="status" aria-live="polite"></p><pre id="adset-preview-result" hidden></pre>
