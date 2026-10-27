@@ -63,15 +63,24 @@ function updateCampaignMediaLink() {
 }
 
 function renderMedia() {
+  const originFilter = document.getElementById('media-origin-filter')
+  if (originFilter) {
+    const selected = originFilter.value
+    originFilter.replaceChildren(new Option('Todas as contas de origem', ''))
+    for (const account of driveAccounts) originFilter.add(new Option(account.label + (account.email ? ' · ' + account.email : ''), String(account.id)))
+    originFilter.value = [...originFilter.options].some(option => option.value === selected) ? selected : ''
+  }
+  const visibleMedia = originFilter?.value ? mediaList.filter(item => String(item.accountId) === originFilter.value) : mediaList
   $('#new-drive-account').disabled = busy || !loaded || !canWrite()
   $('#new-media').disabled = busy || !loaded || !canWrite() || !driveAccounts.length
   $('#media-feedback').textContent = !loaded ? loadMessage : !mediaList.length
     ? (driveAccounts.length ? 'Nenhuma mídia cadastrada. Cadastre um link do Drive.' : 'Comece cadastrando a conta onde os arquivos estão salvos.')
     : ''
   $('#media-table-wrapper').hidden = !mediaList.length
+  if (originFilter && mediaList.length && !visibleMedia.length) $('#media-feedback').textContent = 'Nenhuma mídia cadastrada nesta conta de origem.'
   const rows = $('#media-rows')
   rows.replaceChildren()
-  for (const item of mediaList) {
+  for (const item of visibleMedia) {
     const row = document.createElement('tr')
     addCell(row, item.name)
     addCell(row, item.kind === 'video' ? 'Vídeo' : 'Imagem')
@@ -201,6 +210,7 @@ async function deleteLibraryItem(part, item) {
   }
 }
 
+document.getElementById('media-origin-filter')?.addEventListener('change', renderMedia)
 $('#new-drive-account').addEventListener('click', () => openAccount())
 $('#new-media').addEventListener('click', () => openMedia())
 $('#campaign-media').addEventListener('change', updateCampaignMediaLink)
