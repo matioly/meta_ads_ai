@@ -15,11 +15,22 @@
   coords.textContent="Centro: "+pin.latitude.toFixed(6)+", "+pin.longitude.toFixed(6);
   confirmed=null;confirm.disabled=false;feedback.textContent="Confirme este ponto para utilizá-lo no público.";notify();
  }
+ async function loadTiles(){
+  try{
+   const response=await fetch("/api/map-config",{credentials:"same-origin"});
+   if(!response.ok)throw Error("Configuração do mapa indisponível.");
+   const data=await response.json();
+   if(!data.key)throw Error("Configure MAPTILER_API_KEY no Railway.");
+   const tiles=L.tileLayer("https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key="+encodeURIComponent(data.key),{maxZoom:19,attribution:"&copy; MapTiler &copy; OpenStreetMap contributors"});
+   let errors=0;tiles.on("tileerror",()=>{if(++errors>=3)feedback.textContent="Não foi possível carregar as imagens do mapa. Verifique a chave MapTiler e os domínios autorizados.";});
+   tiles.on("tileload",()=>{if(errors)errors=0;});tiles.addTo(map);
+  }catch(e){feedback.textContent=e.message;}
+ }
  function init(){
   if(map)return;
   if(typeof L==="undefined"){feedback.textContent="Não foi possível carregar o mapa interativo. Tente atualizar a página.";return;}
   map=L.map("adset-manual-map").setView([-22.9056,-47.0608],11);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; OpenStreetMap contributors &copy; CARTO'}).addTo(map);
+  loadTiles();
   map.on("click",e=>draw(e.latlng));
  }
  function setMode(value){
