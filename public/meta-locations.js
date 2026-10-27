@@ -9,7 +9,7 @@
  const label=document.createElement("span");label.textContent=item.name+(item.region?", "+item.region:"")+(item.type==="custom"?" (pino)":"");
  const radius=document.createElement("select");radius.setAttribute("aria-label","Raio para "+item.name);
  for(const km of [3,5,10,15,20]){const option=document.createElement("option");option.value=km;option.textContent=km+" km";radius.append(option);}
- radius.value=String(item.radiusKm);radius.disabled=item.type==="neighborhood"||item.type==="subcity"||item.type==="region";radius.title=radius.disabled?"Área definida pela Meta":"Raio em quilômetros";radius.addEventListener("change",()=>{item.radiusKm=Number(radius.value);changed();});
+ radius.value=String(item.radiusKm);radius.disabled=item.type==="region"||((item.type==="neighborhood"||item.type==="subcity")&&!Number.isFinite(Number(item.latitude)))||((item.type==="neighborhood"||item.type==="subcity")&&!Number.isFinite(Number(item.longitude)));radius.title=radius.disabled?"Esta localidade não possui coordenadas para configurar um raio":"Raio em quilômetros";radius.addEventListener("change",()=>{item.radiusKm=Number(radius.value);changed();});
  const remove=document.createElement("button");remove.type="button";remove.className="secondary";remove.textContent="Remover";remove.addEventListener("click",()=>{chosen.delete(key);render();changed();});
  row.append(label,radius,remove);selected.append(row);
  }}
@@ -24,12 +24,4 @@
  }catch(e){if(seq===sequence)results.textContent=e.message;}},350);
  });
  document.querySelector("#meta-company")?.addEventListener("change",()=>{chosen.clear();render();results.replaceChildren();input.value="";changed();});
-const addPin=document.querySelector("#adset-add-pin");
- addPin?.addEventListener("click",()=>{
- const name=String(document.querySelector("#adset-pin-name")?.value||"").trim();
- const latitude=Number(document.querySelector("#adset-pin-lat")?.value),longitude=Number(document.querySelector("#adset-pin-lng")?.value);
- if(!name||name.length>120||!Number.isFinite(latitude)||!Number.isFinite(longitude)||Math.abs(latitude)>90||Math.abs(longitude)>180||!document.querySelector("#adset-pin-lat")?.value||!document.querySelector("#adset-pin-lng")?.value){results.textContent="Informe nome, latitude e longitude válidos para o pino.";return;}
- if(chosen.size>=10){results.textContent="Limite de 10 localidades.";return;}
- const key="pin:"+latitude+":"+longitude;chosen.set(key,{key,type:"custom",name,latitude,longitude,radiusKm:3});render();results.textContent="Pino adicionado. Ajuste o raio abaixo.";changed();
- });
 })();
