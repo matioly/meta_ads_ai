@@ -1,47 +1,61 @@
-// Manual radius targeting: a confirmed pin is required before submitting.
+// OpenFreeMap vector basemap, MapLibre interaction, confirmed radius for Meta targeting.
 (function(){
  const meta=document.querySelector("#adset-mode-meta"),manual=document.querySelector("#adset-mode-manual");
  const metaFields=document.querySelector("#adset-meta-location-fields"),manualFields=document.querySelector("#adset-manual-location-fields");
  const coords=document.querySelector("#adset-manual-coordinates"),feedback=document.querySelector("#adset-manual-feedback");
  const km=document.querySelector("#adset-manual-km"),confirm=document.querySelector("#adset-manual-confirm");
  if(!meta||!manual||!window.getAdsetLocations)return;
- const original=window.getAdsetLocations;let active=false,map,marker,circle,pin=null,confirmed=null;
+ const original=window.getAdsetLocations;let active=false,map,marker,pin=null,confirmed=null;
+ const circleSource="custom-radius-circle";
  function notify(){document.querySelector("#adset-preview-form")?.dispatchEvent(new Event("input",{bubbles:true}));}
- function draw(latlng){
-  pin={latitude:Number(latlng.lat.toFixed(6)),longitude:Number(latlng.lng.toFixed(6))};
-  if(marker)marker.setLatLng(latlng);else marker=L.marker(latlng,{draggable:true}).addTo(map).on("dragend",()=>draw(marker.getLatLng()));
-  if(circle)circle.setLatLng(latlng).setRadius(Number(km.value)*1000);
-  else circle=L.circle(latlng,{radius:Number(km.value)*1000,color:"#6746c8",fillOpacity:0.12}).addTo(map);
-  coords.textContent="Centro: "+pin.latitude.toFixed(6)+", "+pin.longitude.toFixed(6);
-  confirmed=null;confirm.disabled=false;feedback.textContent="Confirme este ponto para utilizá-lo no público.";notify();
+ function circleGeo(){
+  if(!pin)return {type:"FeatureCollection",features:[]};
+  const radius=Number(km.value),lat=pin.latitude,lon=pin.longitude,pts=[];
+  for(let i=0;i<=96;i++){
+   const angle=i*2*Math.PI/96;
+   const dLat=(radius/111.32)*Math.cos(angle);
+   const dLon=(radius/(111.32*Math.max(.01,Math.cos(lat*Math.PI/180))))*Math.sin(angle);
+   pts.push([lon+dLon,lat+dLat]);
+  }
+  return {type:"FeatureCollection",features:[{type:"Feature",geometry:{type:"Polygon",coordinates:[pts]},properties:{}}]};
  }
- async function loadTiles(){
-  try{
-   const response=await fetch("/api/map-config",{credentials:"same-origin"});
-   if(!response.ok)throw Error("Configuração do mapa indisponível.");
-   const data=await response.json();
-   if(!data.key)throw Error("Configure MAPTILER_API_KEY no Railway.");
-   const tiles=L.tileLayer("https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key="+encodeURIComponent(data.key),{maxZoom:19,attribution:"&copy; MapTiler &copy; OpenStreetMap contributors"});
-   let errors=0;tiles.on("tileerror",()=>{if(++errors>=3)feedback.textContent="Não foi possível carregar as imagens do mapa. Verifique a chave MapTiler e os domínios autorizados.";});
-   tiles.on("tileload",()=>{if(errors)errors=0;});tiles.addTo(map);
-  }catch(e){feedback.textContent=e.message;}
+ function updateCircle(){
+  if(!map||!map.isStyleLoaded())return;
+  const source=map.getSource(circleSource);
+  if(source)source.setData(circleGeo());
+ }
+ function setPin(lngLat){
+  const latitude=Number(lngLat.lat.toFixed(6)),longitude=Number(lngLat.lng.toFixed(6));
+  pin={latitude,longitude};
+  if(marker)marker.setLngLat([longitude,latitude]);
+  else marker=new maplibregl.Marker({draggable:true,color:"#6746c8"}).setLngLat([longitude,latitude]).addTo(map).on("dragend",()=>setPin(marker.getLngLat()));
+  coords.textContent="Centro: "+latitude.toFixed(6)+", "+longitude.toFixed(6);
+  confirmed=null;confirm.disabled=false;feedback.textContent="Confirme este ponto para utilizá-lo no público.";
+  updateCircle();notify();
  }
  function init(){
   if(map)return;
-  if(typeof L==="undefined"){feedback.textContent="Não foi possível carregar o mapa interativo. Tente atualizar a página.";return;}
-  map=L.map("adset-manual-map").setView([-22.9056,-47.0608],11);
-  loadTiles();
-  map.on("click",e=>draw(e.latlng));
+  if(typeof maplibregl==="undefined"){feedback.textContent="Não foi possível carregar a biblioteca do mapa. Atualize a página.";return;}
+  map=new maplibregl.Map({container:"adset-manual-map",style:"https://tiles.openfreemap.org/styles/liberty",center:[-47.0608,-22.9056],zoom:11,attributionControl:true});
+  map.addControl(new maplibregl.NavigationControl(),"top-right");
+  map.on("load",()=>{
+   map.addSource(circleSource,{type:"geojson",data:circleGeo()});
+   map.addLayer({id:"custom-radius-fill",type:"fill",source:circleSource,paint:{"fill-color":"#6746c8","fill-opacity":0.14}});
+   map.addLayer({id:"custom-radius-outline",type:"line",source:circleSource,paint:{"line-color":"#6746c8","line-width":2}});
+   updateCircle();
+  });
+  map.on("error",e=>{if(e.error)feedback.textContent="Não foi possível carregar parte do mapa. Verifique a conexão e tente novamente.";});
+  map.on("click",e=>setPin(e.lngLat));
  }
  function setMode(value){
   active=value==="manual";metaFields.hidden=active;manualFields.hidden=!active;
   meta.className=active?"secondary":"primary";manual.className=active?"primary":"secondary";
   meta.setAttribute("aria-pressed",String(!active));manual.setAttribute("aria-pressed",String(active));
-  if(active){init();setTimeout(()=>map?.invalidateSize(),60);}
+  if(active){init();setTimeout(()=>map?.resize(),80);}
   notify();
  }
  meta.addEventListener("click",()=>setMode("meta"));manual.addEventListener("click",()=>setMode("manual"));
- km.addEventListener("change",()=>{if(pin&&map)draw(L.latLng(pin.latitude,pin.longitude));});
+ km.addEventListener("change",()=>{confirmed=null;confirm.disabled=!pin;updateCircle();feedback.textContent=pin?"Confirme novamente o raio atualizado.":"";notify();});
  confirm.addEventListener("click",()=>{
   if(!pin)return;
   confirmed={...pin,radiusKm:Number(km.value)};
