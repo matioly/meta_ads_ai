@@ -31,6 +31,7 @@ adsetForm.addEventListener("submit",async e=>{
   resetAdsetApproval();
   const locations=window.getAdsetLocations();
   if(!locations.length){adsetFeedback.textContent="Selecione ao menos uma localização.";return;}
+  if(locations.some(l=>l.mode==="radius"&&l.type!=="city"&&(!Number.isFinite(l.latitude)||!Number.isFinite(l.longitude)))){adsetFeedback.textContent="Aguarde a localização do centro do bairro ou escolha Bairro inteiro (Meta).";return;}
   adsetButton.disabled=true;adsetResult.textContent="";adsetFeedback.textContent="Conferindo informações…";
   try{
     const r=await fetch("/api/companies/"+encodeURIComponent(select.value)+"/meta-adset-preview",{
