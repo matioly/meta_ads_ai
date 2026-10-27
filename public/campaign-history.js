@@ -4,7 +4,7 @@
  if(!$("history-rows"))return;
  const company=$("company"),search=$("history-search"),status=$("history-status"),objective=$("history-objective"),sort=$("history-sort");
  let items=[],activeCompany="",requestId=0,loaded=false;
- const expandedCampaigns=new Set(),expandedAdsets=new Set(),childrenCache=new Map();
+ const expandedCampaigns=new Set(),expandedAdsets=new Set(),childrenCache=new Map(),performanceCache=null,performancePending=null;
  const formatDate=value=>{if(!value)return "—";const d=new Date(value);return Number.isNaN(d.getTime())?"—":new Intl.DateTimeFormat("pt-BR",{dateStyle:"short"}).format(d);};
  const money=value=>value==null?"—":new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(Number(value)/100);
  const statusLabels={ACTIVE:"Ativa",PAUSED:"Pausada",ARCHIVED:"Arquivada",DELETED:"Excluída",CAMPAIGN_PAUSED:"Campanha pausada",ADSET_PAUSED:"Conjunto pausado",WITH_ISSUES:"Com problemas",IN_PROCESS:"Em processamento",PENDING_REVIEW:"Em análise",DISAPPROVED:"Reprovada"};
@@ -27,15 +27,29 @@
   }catch(e){if(companyId!==activeCompany)return;childrenCache.set(key,{error:e.name==="AbortError"?"A consulta demorou demais. Feche e abra para tentar novamente.":e.message});}
   render();
  }
+ async function loadPerformance(){
+  if(performanceCache||performancePending)return performancePending;
+  const companyId=activeCompany;
+  performancePending=(async()=>{
+   try{
+    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),18000);
+    let response;try{response=await fetch("/api/companies/"+encodeURIComponent(companyId)+"/meta-performance?level=ad&period=last_30d",{credentials:"same-origin",cache:"no-store",signal:controller.signal});}finally{clearTimeout(timer);}
+    const data=await response.json();if(!response.ok)throw Error(data.error||"Falha na consulta de resultados.");
+    if(data.hasMore)throw Error("Resultados parciais: paginação da Meta incompleta.");
+    if(companyId===activeCompany)performanceCache={byId:new Map((data.items||[]).map(item=>[String(item.id),item]))};
+   }catch(error){if(companyId===activeCompany)performanceCache={error:error.name==="AbortError"?"Tempo limite na consulta de resultados.":error.message};}
+   finally{performancePending=null;if(companyId===activeCompany)render();}
+  })();return performancePending;
+ }
  function detail(parent,level,items,key){
   const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=7;td.className="history-detail";
   const result=childrenCache.get(key);
   if(!result){td.textContent="Carregando "+(level==="adsets"?"conjuntos":"anúncios")+"…";tr.append(td);parent.append(tr);return;}
   if(result.error){td.textContent="Erro: "+result.error;tr.append(td);parent.append(tr);return;}
   if(!result.items.length){td.textContent="Nenhum "+(level==="adsets"?"conjunto":"anúncio")+" encontrado.";tr.append(td);parent.append(tr);return;}
-  const table=document.createElement("table");table.className="history-nested";
+  const table=document.createElement("table");table.className="history-nested";if(level==="ads"&&!performanceCache&&!performancePending)void loadPerformance();
   const thead=document.createElement("thead"),head=document.createElement("tr");
-  for(const name of [level==="adsets"?"Conjunto de anúncios":"Anúncio","Status","Status efetivo","Orçamento / Criativo"]){const th=document.createElement("th");th.textContent=name;head.append(th);}thead.append(head);table.append(thead);
+  for(const name of (level==="adsets"?["Conjunto de anúncios","Status","Status efetivo","Orçamento"]:["Anúncio","Status","Status efetivo","Criativo","Resultados · 30 dias","Atualizado em"])){const th=document.createElement("th");th.textContent=name;head.append(th);}thead.append(head);table.append(thead);
   const tbody=document.createElement("tbody");
   for(const item of result.items){
    const row=document.createElement("tr"),name=document.createElement("td");
@@ -45,6 +59,11 @@
    const small=document.createElement("small");small.textContent="ID: "+item.id;small.style.display="block";name.append(small);row.append(name);
    cell(row,label(item.status));cell(row,label(item.effectiveStatus));
    cell(row,level==="adsets"?(item.dailyBudget!=null?money(item.dailyBudget)+" / dia":item.lifetimeBudget!=null?money(item.lifetimeBudget)+" total":"—"):(item.creativeName||"—"));
+   if(level==="ads"){
+    const metric=performanceCache?.byId?.get(String(item.id));
+    const resultText=performanceCache?.error?"Indisponível":!performanceCache?"Carregando…":!metric?"Sem dados":metric.conversations!=null?new Intl.NumberFormat("pt-BR").format(metric.conversations)+" conversas":new Intl.NumberFormat("pt-BR").format(metric.linkClicks||0)+" cliques no link";
+    cell(row,resultText);cell(row,formatDate(item.updatedAt));
+   }
    tbody.append(row);
    if(level==="adsets"&&expandedAdsets.has(item.id))detail(tbody,"ads",null,"ads:"+item.id);
   }
@@ -69,7 +88,7 @@
  }
  async function load(){
   const id=company.value;if(!id)return;
-  const seq=++requestId;activeCompany=id;loaded=false;items=[];expandedCampaigns.clear();expandedAdsets.clear();childrenCache.clear();render();$("history-feedback").textContent="Consultando histórico na Meta…";
+  const seq=++requestId;activeCompany=id;loaded=false;items=[];expandedCampaigns.clear();expandedAdsets.clear();childrenCache.clear();performanceCache=null;performancePending=null;render();$("history-feedback").textContent="Consultando histórico na Meta…";
   try{
    const response=await fetch("/api/companies/"+encodeURIComponent(id)+"/meta-campaign-history",{credentials:"same-origin",cache:"no-store"});
    const data=await response.json();if(seq!==requestId||company.value!==id)return;
