@@ -53,7 +53,7 @@ router.get("/:companyId/meta-location-center",access,async(req,res,next)=>{
   if(!response.ok)return res.status(502).json({error:"Serviço de mapas indisponível no momento."});
   const candidates=await response.json();
   const norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
-  const match=(Array.isArray(candidates)?candidates:[]).find(x=>{
+  const findMatch=list=>(Array.isArray(list)?list:[]).find(x=>{
     const a=x.address||{};
     const names=[a.suburb,a.neighbourhood,a.quarter,a.residential,a.city_district,a.hamlet,x.name].filter(Boolean);
     const cities=[a.city,a.town,a.municipality,a.village,a.county].filter(Boolean);
@@ -62,6 +62,20 @@ router.get("/:companyId/meta-location-center",access,async(req,res,next)=>{
     const stateMatches=!states.length||states.some(v=>norm(v)===norm(state)||norm(state)==="sp"&&norm(v)==="sao paulo");
     return cityMatches&&stateMatches&&names.some(v=>norm(v)===norm(name))&&Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lon));
   });
+  let match=findMatch(candidates);
+  // Nominatim may not index the exact "bairro, cidade" query. Retry using
+  // the city as the search context, but accept only an exact neighborhood name
+  // in the requested city/state. Never silently substitute a different bairro.
+  if(!match){
+    await new Promise(resolve=>setTimeout(resolve,1150));
+    lastGeoRequest=Date.now();
+    const fallback=new URL("https://nominatim.openstreetmap.org/search");
+    fallback.searchParams.set("q",[name,city,"Brasil"].join(", "));
+    fallback.searchParams.set("format","jsonv2");fallback.searchParams.set("addressdetails","1");
+    fallback.searchParams.set("limit","20");fallback.searchParams.set("countrycodes","br");
+    const fallbackResponse=await fetch(fallback,{headers:{"User-Agent":"MetaAdsAI/1.0 (business location geocoding; contact: "+(process.env.GEOCODER_CONTACT_EMAIL||process.env.APP_URL||"MetaAdsAI")+")","Accept-Language":"pt-BR"},signal:AbortSignal.timeout(10000)});
+    if(fallbackResponse.ok)match=findMatch(await fallbackResponse.json());
+  }
   const value=match?{found:true,latitude:Number(match.lat),longitude:Number(match.lon),source:"OpenStreetMap / Nominatim",displayName:match.display_name}:{found:false,message:"Não encontramos coordenadas confiáveis para esse bairro em "+city+". O bairro inteiro da Meta permanece disponível; o raio personalizado exige um centro confirmado."};
   geoCache.set(cacheKey,{value,until:Date.now()+(match?7*86400000:3600000)});
   if(geoCache.size>500)geoCache.delete(geoCache.keys().next().value);
