@@ -82,7 +82,7 @@ router.get("/:companyId/meta-campaign-children",access,async(req,res,next)=>{
   if(!accountId||!/^[0-9]{1,30}$/.test(accountId))return res.status(422).json({error:"Conta de anúncios não configurada."});
   const version=/^v\d+\.\d+$/.test(process.env.META_API_VERSION||"")?process.env.META_API_VERSION:"v24.0";
   const url=new URL("https://graph.facebook.com/"+version+"/act_"+accountId+"/"+type);
-  url.searchParams.set("fields",type==="adsets"?"id,name,campaign_id,status,effective_status,daily_budget,lifetime_budget":"id,name,campaign_id,adset_id,status,effective_status,creative{id,name}");
+  url.searchParams.set("fields",type==="adsets"?"id,name,campaign_id,status,effective_status,daily_budget,lifetime_budget":"id,name,campaign_id,adset_id,status,effective_status,updated_time,creative{id,name}");
   url.searchParams.set("filtering",JSON.stringify([{field:type==="adsets"?"campaign.id":"adset.id",operator:"EQUAL",value:parentId}]));
   url.searchParams.set("limit","100");
   const items=[];let nextUrl=url.toString(),pages=0;
@@ -95,7 +95,7 @@ router.get("/:companyId/meta-campaign-children",access,async(req,res,next)=>{
    if(!Array.isArray(data.data))return res.status(502).json({error:"Resposta inesperada da Meta."});
    for(const item of data.data){
     if(String(type==="adsets"?item.campaign_id:item.adset_id)!==parentId)continue;
-    items.push({id:item.id,name:item.name,status:item.status,effectiveStatus:item.effective_status,dailyBudget:item.daily_budget??null,lifetimeBudget:item.lifetime_budget??null,creativeName:item.creative?.name??null});
+    items.push({id:item.id,name:item.name,status:item.status,effectiveStatus:item.effective_status,dailyBudget:item.daily_budget??null,lifetimeBudget:item.lifetime_budget??null,creativeName:item.creative?.name??null,updatedAt:item.updated_time??null});
    }
    nextUrl=data.paging?.next||null;pages++;
   }
