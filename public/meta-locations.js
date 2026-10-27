@@ -76,6 +76,8 @@
    if(item.resolving||item.error){const msg=document.createElement("small");msg.className="adset-location-message";msg.textContent=item.resolving?"Localizando centro do bairro…":item.error;row.append(msg);}
    selected.append(row);
   }
+  input.disabled=chosen.size>0;
+  input.placeholder=chosen.size?"Remova a localização selecionada para buscar outra.":"Pesquise uma cidade ou bairro";
   drawMap();
  }
  input.addEventListener("input",()=>{clearTimeout(timer);const q=input.value.trim(),seq=++sequence;results.replaceChildren();if(q.length<2){if(q.length)results.textContent="Digite pelo menos 2 caracteres para buscar.";return;}
@@ -88,7 +90,7 @@
     if(!item.key||!["city","region","neighborhood","subcity"].includes(item.type)||chosen.has(item.key))continue;
     const button=document.createElement("button");button.type="button";button.className="secondary";button.textContent="+ "+item.name+(item.region?", "+item.region:"");
     button.addEventListener("click",()=>{
-     if(chosen.size>=10){results.textContent="Limite de 10 localidades.";return;}
+     if(chosen.size){results.textContent="Remova a localização atual antes de escolher outra.";return;}
      const location={key:item.key,type:item.type,name:item.name,region:item.region,radiusKm:3,latitude:item.latitude,longitude:item.longitude,mode:item.type==="region"?"native":"radius",resolving:false,error:""};
      chosen.set(item.key,location);clearTimeout(timer);sequence++;results.replaceChildren();input.value="";
      if(["neighborhood","subcity"].includes(item.type)&&!coords(location))resolve(location,item.key);
@@ -98,6 +100,7 @@
    if(!results.children.length)results.textContent="Nenhuma localidade disponível para esta busca. Tente apenas o nome do bairro (ex.: Taquaral).";
   }catch(e){if(seq===sequence)results.textContent=e.message;}},350);
  });
+ render();
  document.querySelector("#meta-company")?.addEventListener("change",()=>{clearTimeout(timer);sequence++;chosen.clear();render();results.replaceChildren();input.value="";changed();});
  document.querySelector("#adset-location-city")?.addEventListener("change",()=>{for(const [key,item] of chosen){if(["neighborhood","subcity"].includes(item.type)){item.latitude=null;item.longitude=null;item.mode="native";item.error="Cidade de referência alterada. Selecione raio personalizado para localizar novamente.";}}render();changed();});
 })();
