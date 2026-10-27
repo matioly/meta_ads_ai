@@ -45,8 +45,9 @@ adsetForm.addEventListener("submit",async e=>{
     if(!r.ok)throw Error(data.error||"Não foi possível validar.");
     adsetFeedback.textContent="";
     approvedAdsetPreview={companyId:select.value,campaignId:data.campaignId,name:data.name,ageMin:data.targeting.age_min,ageMax:data.targeting.age_max,dailyBudgetBrl:data.dailyBudgetBrl,locations:data.locations,gender:data.gender,interests:data.interests};
-    document.querySelector("#adset-create-actions").hidden=false;
-    adsetFeedback.textContent="Prévia validada. Clique em Confirmar criação do conjunto pausado para enviar à Meta.";
+    document.querySelector("#adset-create-actions").hidden=true;
+    adsetFeedback.textContent="Prévia validada. Confirme a criação na janela a seguir.";
+    await window.submitApprovedAdset();
     adsetResult.textContent=[
       "Campanha escolhida: "+adsetCampaign.selectedOptions[0].textContent,"Nome do público: "+data.name,"Situação: ainda não criado",
        "Localizações: "+data.locations.map(l=>l.name+" · "+l.radiusKm+" km").join("; "),"Gênero: "+data.gender,"Interesses: "+(data.interests.length?data.interests.map(i=>i.name).join(", "):"Nenhum"),"Faixa etária: "+data.targeting.age_min+"–"+data.targeting.age_max,
