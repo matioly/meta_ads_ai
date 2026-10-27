@@ -38,7 +38,7 @@ const cookieOptions = {
 
 app.disable("x-powered-by");
 app.set("trust proxy", 1);
-app.use(helmet());
+app.use(helmet({contentSecurityPolicy:{directives:{"frame-src":["'self'","https://www.openstreetmap.org"]}}}));
 app.use(express.json({ limit: "16kb" }));
 
 app.get("/health", (req, res) => {
