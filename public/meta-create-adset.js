@@ -23,7 +23,7 @@
     "Orçamento diário: R$ "+value.toFixed(2),
     "",
     "O conjunto ficará PAUSADO. Nenhum anúncio será veiculado."
-   ].join("\\n");
+   ].join("\n");
    const approved=window.confirm(confirmationMessage);
    if(!approved){status.textContent="Operação cancelada. Nada foi enviado à Meta.";return;}
    button.disabled=true;
