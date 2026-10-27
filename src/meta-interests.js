@@ -38,7 +38,7 @@ const geoCache=new Map();
 let lastGeoRequest=0;
 router.get("/:companyId/meta-location-center",access,async(req,res,next)=>{
  try{
-  const name=String(req.query.name||"").trim(),city=String(req.query.city||"").trim(),state=String(req.query.state||"São Paulo").trim();
+  const name=String(req.query.name||"").trim(),city=String(req.query.city||"").trim(),state=String(req.query.state||"São Paulo").replace(/\s*\([^)]*\)/g,"").trim();
   if(!name||name.length>100||city.length<2||city.length>80||state.length>80)return res.status(400).json({error:"Informe o bairro e a cidade para localizar o centro."});
   const cacheKey=[name,city,state].map(x=>x.toLocaleLowerCase("pt-BR")).join("|");
   const cached=geoCache.get(cacheKey);
@@ -49,7 +49,7 @@ router.get("/:companyId/meta-location-center",access,async(req,res,next)=>{
   const url=new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("q",[name,city,state,"Brasil"].filter(Boolean).join(", "));
   url.searchParams.set("format","jsonv2");url.searchParams.set("addressdetails","1");url.searchParams.set("limit","5");url.searchParams.set("countrycodes","br");
-  const response=await fetch(url,{headers:{"User-Agent":"MetaAdsAI/1.0 (business location geocoding; contact: "+(process.env.GEOCODER_CONTACT_EMAIL||"admin@example.org")+")","Accept-Language":"pt-BR"},signal:AbortSignal.timeout(10000)});
+  const response=await fetch(url,{headers:{"User-Agent":"MetaAdsAI/1.0 (business location geocoding; contact: "+(process.env.GEOCODER_CONTACT_EMAIL||process.env.APP_URL||"MetaAdsAI")+")","Accept-Language":"pt-BR"},signal:AbortSignal.timeout(10000)});
   if(!response.ok)return res.status(502).json({error:"Serviço de mapas indisponível no momento."});
   const candidates=await response.json();
   const norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
