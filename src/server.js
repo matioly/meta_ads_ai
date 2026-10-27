@@ -41,11 +41,6 @@ app.set("trust proxy", 1);
 app.use(helmet({contentSecurityPolicy:{directives:{"frame-src":["'self'","https://www.openstreetmap.org"],"script-src":["'self'","https://unpkg.com"],"style-src":["'self'","'unsafe-inline'","https://unpkg.com"],"img-src":["'self'","data:","https://*.tile.openstreetmap.org","https://*.basemaps.cartocdn.com","https://api.maptiler.com","https://unpkg.com"]}}}));
 app.use(express.json({ limit: "16kb" }));
 
-app.get("/api/map-config", requireLogin, (req,res) => {
-  res.set("Cache-Control","no-store");
-  res.json({key:process.env.MAPTILER_API_KEY||""});
-});
-
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
@@ -186,6 +181,11 @@ function requireLogin(req, res, next) {
 
   next();
 }
+
+app.get("/api/map-config", requireLogin, (req,res) => {
+  res.set("Cache-Control","no-store");
+  res.json({key:process.env.MAPTILER_API_KEY||""});
+});
 
 app.use("/api/companies", requireLogin, require("./campaigns"));
 app.use("/api/companies", requireLogin, require("./media"));
