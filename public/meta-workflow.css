@@ -19,3 +19,18 @@
 .workflow-next{margin-top:12px}
 .workflow-accordion>summary:focus-visible{outline:3px solid #7454d6;outline-offset:-4px}
 @media(max-width:650px){.workflow-accordion>summary{padding:16px;gap:10px}.workflow-content{padding:0 14px 18px}.workflow-icon{width:36px;height:36px}.workflow-accordion>summary strong{font-size:15px}}
+
+/* Audience form: explicit rows prevent search results from becoming grid cells. */
+.adset-fields-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;align-items:start}
+.adset-fields-grid>label,.adset-location-field{min-width:0;margin:0}
+.adset-fields-grid label input,.adset-fields-grid label select{width:100%;min-width:0;margin-top:6px}
+.adset-campaign-field,.adset-name-field{grid-column:span 6}
+.adset-location-field{grid-column:1/-1}
+.adset-location-field>label{display:block;max-width:600px}
+#adset-location-results{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+#adset-location-results:empty{display:none}
+#adset-selected-locations{margin-top:8px}
+#adset-selected-locations>div{background:#f7f5ff;border:1px solid #e4ddfa;border-radius:10px;padding:8px 12px}
+.adset-age-field{grid-column:span 2}.adset-gender-field{grid-column:span 2}.adset-interest-field{grid-column:span 4}.adset-budget-field{grid-column:span 2}
+@media(max-width:850px){.adset-fields-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.adset-fields-grid>label{grid-column:span 1}.adset-location-field{grid-column:1/-1}}
+@media(max-width:520px){.adset-fields-grid{grid-template-columns:1fr}.adset-fields-grid>label,.adset-location-field{grid-column:1/-1}}
