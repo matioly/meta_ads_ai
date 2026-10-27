@@ -23,16 +23,42 @@
    }));
    if($("company").value!==company)return;
    const [campaigns,ads,insights]=results;
+   let fallbackUsed=false;
+   let fallbackError="";
    if(insights.status==="fulfilled"){
     const d=insights.value;const n=new Intl.NumberFormat("pt-BR");
-    $("dashboard-spend").textContent=new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(d.spend);
-    $("dashboard-reach").textContent=n.format(d.reach);
-    $("dashboard-impressions").textContent=n.format(d.impressions);
-    $("dashboard-links").textContent=n.format(d.linkClicks);
-    $("dashboard-conversations").textContent=d.messagingConversationsStarted===null?"Não disponível":n.format(d.messagingConversationsStarted);
-   }else{
-    for(const id of ["dashboard-spend","dashboard-reach","dashboard-impressions","dashboard-links","dashboard-conversations"])$(id).textContent="—";
-   }
+    if(d.hasData){
+     $("dashboard-spend").textContent=new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(d.spend);
+     $("dashboard-reach").textContent=n.format(d.reach);
+     $("dashboard-impressions").textContent=n.format(d.impressions);
+     $("dashboard-links").textContent=n.format(d.linkClicks);
+     $("dashboard-conversations").textContent=d.messagingConversationsStarted===null?"Não disponível":n.format(d.messagingConversationsStarted);
+    }else fallbackUsed=true;
+   }else fallbackUsed=true;
+   if(fallbackUsed){
+    // The account-level Insights query may fail even when ad-level insights work.
+    // Reuse the same 30-day source as the performance table; do not sum reach,
+    // because people reached across ads are not unique.
+    try{
+     const response=await fetch("/api/companies/"+encodeURIComponent(company)+"/meta-performance?level=ad&period=last_30d",{credentials:"same-origin",cache:"no-store"});
+     const data=await response.json();
+     if(!response.ok)throw Error(data.error||"Falha ao consultar desempenho por anúncio.");
+     if(data.hasMore)throw Error("A consulta por anúncio foi paginada parcialmente; totais não podem ser calculados com segurança.");
+     if($("company").value!==company)return;
+     const items=data.items||[];
+     const sum=key=>items.reduce((total,item)=>total+Number(item[key]||0),0);
+     const n=new Intl.NumberFormat("pt-BR");
+     $("dashboard-spend").textContent=new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(sum("spend"));
+     $("dashboard-reach").textContent="—";
+     $("dashboard-reach").title="Alcance único não pode ser somado entre anúncios.";
+     $("dashboard-impressions").textContent=n.format(sum("impressions"));
+     $("dashboard-links").textContent=n.format(sum("linkClicks"));
+     $("dashboard-conversations").textContent=items.some(item=>item.conversations!==null&&item.conversations!==undefined)?n.format(sum("conversations")):"Não disponível";
+    }catch(error){
+     fallbackError=error.message;
+     for(const id of ["dashboard-spend","dashboard-reach","dashboard-impressions","dashboard-links","dashboard-conversations"])$(id).textContent="—";
+    }
+   }else $("dashboard-reach").removeAttribute("title");
    const rows=$("meta-home-rows");rows.replaceChildren();
    if(campaigns.status==="fulfilled"){
     const items=campaigns.value.items||[];
@@ -49,7 +75,7 @@
    }
    if(ads.status==="fulfilled")$("meta-ad-count").textContent=(ads.value.items||[]).length+(ads.value.hasMore?"+":"");
    else $("meta-ad-count").textContent="—";
-   status("meta-home-feedback",insights.status==="fulfilled"?"Desempenho dos últimos 30 dias · Fonte: Meta Marketing API.":"Resultados de 30 dias indisponíveis: "+insights.reason.message);
+   status("meta-home-feedback",fallbackUsed?(fallbackError?"Resultados de 30 dias indisponíveis: "+fallbackError:"Desempenho dos últimos 30 dias · Totais por anúncio (alcance único indisponível)."):"Desempenho dos últimos 30 dias · Fonte: Meta Marketing API.");
    lastCompany=company;loadedAt=Date.now();
   }catch(e){status("meta-home-feedback","Não foi possível carregar a Meta: "+e.message);}
   finally{if(pending===company)pending=null;}
