@@ -1,6 +1,7 @@
 // Read-only Meta overview: never creates or activates campaigns.
 (function(){
  let lastCompany="",pending=null,loadedAt=0;
+ const withTimeout=async(url)=>{const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),18000);try{return await fetch(url,{credentials:"same-origin",cache:"no-store",signal:controller.signal});}finally{clearTimeout(timer);}};
  const $=id=>document.getElementById(id);
  function status(id,message){$(id).textContent=message;}
  function cell(row,value){const td=document.createElement("td");td.textContent=String(value??"—");row.append(td);}
@@ -16,7 +17,7 @@
   try{
    const base="/api/companies/"+encodeURIComponent(company)+"/meta-campaigns?type=";
    const results=await Promise.allSettled(["campaigns","ads","insights"].map(async type=>{
-    const response=await fetch(type==="insights"?"/api/companies/"+encodeURIComponent(company)+"/meta-insights?period=last_30d":base+type,{credentials:"same-origin",cache:"no-store"});
+    const response=await withTimeout(type==="insights"?"/api/companies/"+encodeURIComponent(company)+"/meta-insights?period=last_30d":base+type);
     const data=await response.json();
     if(!response.ok)throw Error(data.error||"Falha na consulta à Meta");
     return data;
@@ -40,7 +41,7 @@
     // Reuse the same 30-day source as the performance table; do not sum reach,
     // because people reached across ads are not unique.
     try{
-     const response=await fetch("/api/companies/"+encodeURIComponent(company)+"/meta-performance?level=ad&period=last_30d",{credentials:"same-origin",cache:"no-store"});
+     const response=await withTimeout("/api/companies/"+encodeURIComponent(company)+"/meta-performance?level=ad&period=last_30d");
      const data=await response.json();
      if(!response.ok)throw Error(data.error||"Falha ao consultar desempenho por anúncio.");
      if(data.hasMore)throw Error("A consulta por anúncio foi paginada parcialmente; totais não podem ser calculados com segurança.");
@@ -77,8 +78,10 @@
    else $("meta-ad-count").textContent="—";
    status("meta-home-feedback",fallbackUsed?(fallbackError?"Resultados de 30 dias indisponíveis: "+fallbackError:"Desempenho dos últimos 30 dias · Totais por anúncio (alcance único indisponível)."):"Desempenho dos últimos 30 dias · Fonte: Meta Marketing API.");
    lastCompany=company;loadedAt=Date.now();
-  }catch(e){status("meta-home-feedback","Não foi possível carregar a Meta: "+e.message);}
+  }catch(e){status("meta-home-feedback","Não foi possível carregar a Meta: "+(e.name==="AbortError"?"tempo limite excedido. Tente atualizar a página.":e.message));}
   finally{if(pending===company)pending=null;}
  }
  window.loadHomeMeta=load;
+ // The workspace is populated asynchronously; ensure overview starts even if the initial callback ran too early.
+ if($("overview-section")){let attempts=0;const ready=setInterval(()=>{if($("company")?.value){clearInterval(ready);load();}else if(++attempts>=100){clearInterval(ready);status("meta-home-feedback","Selecione uma clínica para consultar os dados da Meta.");}},200);}
 })();
