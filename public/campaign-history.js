@@ -50,7 +50,7 @@
   if(!result.items.length){td.textContent="Nenhum "+(level==="adsets"?"conjunto":"anúncio")+" encontrado.";tr.append(td);parent.append(tr);return;}
   const table=document.createElement("table");table.className="history-nested";if(level==="ads"&&!performanceCache&&!performancePending)void loadPerformance();
   const thead=document.createElement("thead"),head=document.createElement("tr");
-  for(const name of (level==="adsets"?["Conjunto de anúncios","Status","Status efetivo","Orçamento"]:["Anúncio","Status","Status efetivo","Criativo","Resultados · 30 dias","Atualizado em"])){const th=document.createElement("th");th.textContent=name;head.append(th);}thead.append(head);table.append(thead);
+  for(const name of (level==="adsets"?["Conjunto de anúncios","Status","Orçamento"]:["Anúncio","Status","Resultados · 30 dias","Atualizado em"])){const th=document.createElement("th");th.textContent=name;head.append(th);}thead.append(head);table.append(thead);
   const tbody=document.createElement("tbody");
   for(const item of result.items){
    const row=document.createElement("tr"),name=document.createElement("td");
@@ -58,8 +58,8 @@
     const button=document.createElement("button");button.type="button";button.className="history-expand";button.setAttribute("aria-expanded",String(expandedAdsets.has(item.id)));button.textContent=(expandedAdsets.has(item.id)?"▼ ":"▶ ")+(item.name||"Sem nome");button.addEventListener("click",()=>expand("ads",item.id));name.append(button);
    }else{const strong=document.createElement("strong");strong.textContent=item.name||"Sem nome";name.append(strong);}
    const small=document.createElement("small");small.textContent="ID: "+item.id;small.style.display="block";name.append(small);row.append(name);
-   cell(row,label(item.status));cell(row,label(item.effectiveStatus));
-   cell(row,level==="adsets"?(item.dailyBudget!=null?money(item.dailyBudget)+" / dia":item.lifetimeBudget!=null?money(item.lifetimeBudget)+" total":"—"):(item.creativeName||"—"));
+   cell(row,label(item.status));
+   if(level==="adsets")cell(row,item.dailyBudget!=null?money(item.dailyBudget)+" / dia":item.lifetimeBudget!=null?money(item.lifetimeBudget)+" total":"—");
    if(level==="ads"){
     const metric=performanceCache?.byId?.get(String(item.id));
     const resultText=performanceCache?.error?"Indisponível":!performanceCache?"Carregando…":!metric?"Sem dados":metric.conversations!=null?new Intl.NumberFormat("pt-BR").format(metric.conversations)+" conversas":new Intl.NumberFormat("pt-BR").format(metric.linkClicks||0)+" cliques no link";
