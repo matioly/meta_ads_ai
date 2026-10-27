@@ -8,7 +8,7 @@
     <script src="/initial-view.js?v=82"></script>
     <link rel="stylesheet" href="/styles.css?v=79" />
     <script src="/app.js?v=82" defer></script>
-    <script src="/media-library.js" defer></script><script src="/home-meta.js" defer></script>
+    <script src="/performance.js?v=1" defer></script><script src="/media-library.js" defer></script><script src="/home-meta.js" defer></script>
   </head>
   <body>
     <aside class="sidebar">
@@ -103,6 +103,8 @@
           </div>
           <div class="dashboard-insights"><article class="metric"><span>Impressões · 30 dias</span><strong id="dashboard-impressions">—</strong></article><article class="metric"><span>Cliques no link · 30 dias</span><strong id="dashboard-links">—</strong></article><article class="metric"><span>Conversas iniciadas · 30 dias</span><strong id="dashboard-conversations">—</strong><small>Quando disponível na Meta</small></article></div><p id="meta-home-feedback" role="status" class="meta-home-feedback">Carregando dados da Meta…</p>
         </section>
+
+        <section class="panel" id="performance-panel"><details id="performance-details"><summary style="cursor:pointer;font-weight:700;font-size:1.15rem">📊 Performance por campanha, conjunto ou anúncio ▾</summary><p>Compare resultados reais da Meta sem sair do painel.</p><div class="performance-controls" style="display:flex;flex-wrap:wrap;gap:12px;margin:16px 0"><label>Período <select id="perf-period"><option value="last_7d">7 dias</option><option value="last_30d" selected>30 dias</option><option value="today">Hoje</option></select></label><label>Nível <select id="perf-level"><option value="campaign">Campanhas</option><option value="adset">Conjuntos</option><option value="ad" selected>Anúncios</option></select></label><label>Campanha <select id="perf-campaign"><option value="">Todas</option></select></label><label>Conjunto <select id="perf-adset"><option value="">Todos</option></select></label><button class="secondary" id="perf-refresh" type="button">Atualizar</button></div><p id="perf-feedback" role="status"></p><div class="table-wrapper"><table><thead><tr><th>Nome</th><th>Investimento</th><th>Alcance</th><th>Impressões</th><th>Cliques no link</th><th>CTR</th><th>CPC link</th><th>Conversas</th><th>Custo/conversa</th></tr></thead><tbody id="perf-rows"></tbody></table></div><small>Conversas são eventos reportados pela Meta, quando disponíveis. Resultados podem sofrer atraso de atribuição.</small></details></section>
 
         <section class="panel" id="meta-real-campaigns"><div class="panel-heading"><div><h2>Campanhas reais na Meta</h2><p>Dados da conta selecionada. Campanhas pausadas não geram gastos.</p></div><a class="secondary" href="/meta-campaigns.html">Abrir Gerenciador Meta ↗</a></div><div class="table-wrapper"><table><thead><tr><th>Campanha</th><th>Objetivo</th><th>Status</th><th>Orçamento/dia</th></tr></thead><tbody id="meta-home-rows"></tbody></table></div><p id="meta-campaigns-feedback" class="meta-home-feedback" role="status"></p></section>
 
