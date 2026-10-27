@@ -10,15 +10,32 @@
   const points=[...chosen.values()].filter(coords);
   if(!points.length){map.hidden=true;map.replaceChildren();return;}
   const point=points[points.length-1],lat=point.latitude,lon=point.longitude;
-  const delta=Math.max(.018,(point.mode==="radius"?point.radiusKm:3)/80);
+  const radius=point.radiusKm||3,showCircle=point.mode==="radius";
+  // The embedded OSM map is illustrative. A transparent overlay shows the
+  // selected radius approximately; it is not a precise Meta delivery boundary.
+  const latDelta=Math.max(.035,radius/55);
+  const lonDelta=latDelta/Math.max(.2,Math.cos(lat*Math.PI/180));
   const url=new URL("https://www.openstreetmap.org/export/embed.html");
-  url.searchParams.set("bbox",[lon-delta,lat-delta,lon+delta,lat+delta].join(","));
+  url.searchParams.set("bbox",[lon-lonDelta,lat-latDelta,lon+lonDelta,lat+latDelta].join(","));
   url.searchParams.set("layer","mapnik");url.searchParams.set("marker",lat+","+lon);
   map.replaceChildren();
   const heading=document.createElement("strong");heading.textContent="Prévia do mapa — "+point.name;
-  const frame=document.createElement("iframe");frame.title="Mapa de "+point.name;frame.loading="lazy";frame.referrerPolicy="no-referrer";frame.src=url.toString();frame.style.cssText="width:100%;height:250px;border:0;border-radius:10px;margin-top:8px";
-  const note=document.createElement("small");note.textContent="Marcador do centro da localização. O mapa é ilustrativo: não representa o alcance exato nem desenha o círculo de segmentação. © OpenStreetMap contributors.";
-  map.append(heading,frame,note);map.hidden=false;
+  const container=document.createElement("div");container.className="adset-map-container";
+  const frame=document.createElement("iframe");frame.title="Mapa de "+point.name;frame.loading="lazy";frame.referrerPolicy="no-referrer";frame.src=url.toString();
+  container.append(frame);
+  if(showCircle){
+   const overlay=document.createElement("div");overlay.className="adset-map-radius";
+   overlay.setAttribute("aria-label","Área aproximada do raio de "+radius+" quilômetros");
+   const circle=document.createElement("div");circle.className="adset-map-circle";
+   // Width scales with longitude in Mercator; clamp to the available viewport.
+   const diameter=Math.min(88,Math.max(12,100*radius/(111.32*lonDelta)));
+   circle.style.width=diameter+"%";circle.style.aspectRatio="1";
+   const badge=document.createElement("span");badge.className="adset-map-radius-badge";badge.textContent=radius+" km de raio";
+   overlay.append(circle,badge);container.append(overlay);
+  }
+  const note=document.createElement("small");
+  note.textContent=showCircle?"Círculo ilustrativo do raio escolhido, centrado no marcador. A área exata de entrega é definida pela Meta. © OpenStreetMap contributors.":"Marcador do centro da localização. Bairro inteiro segue a área definida pela Meta. © OpenStreetMap contributors.";
+  map.append(heading,container,note);map.hidden=false;
  }
  async function resolve(item,key){
   if(coords(item)){item.mode="radius";render();changed();return;}
