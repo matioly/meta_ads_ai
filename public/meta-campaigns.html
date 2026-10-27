@@ -100,16 +100,16 @@
 <h2 id="adset-preview-title">Quem você deseja alcançar?</h2>
 <p>Escolha quem poderá ver seus anúncios e quanto pretende investir por dia. <strong>Confira os dados e confirme a criação. O público ficará pausado e nenhum anúncio será ativado.</strong> Pesquise cidades e regiões disponíveis na Meta e configure o raio de cada local.</p>
 <form id="adset-preview-form">
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
-<label>Escolha a campanha<select id="adset-campaign" required><option value="">Carregando campanhas…</option></select></label>
-<label>Nome do conjunto de anúncios<input id="adset-name" maxlength="120" required placeholder="Ex.: Implantes — Campinas — 25 a 55 anos"></label>
-<label>Localizações<input id="adset-location-search" type="search" placeholder="Pesquisar cidade ou região..." autocomplete="off"></label><div id="adset-location-results" role="status"></div><div id="adset-selected-locations" aria-live="polite"></div>
+<div class="adset-fields-grid">
+<label class="adset-campaign-field">Escolha a campanha<select id="adset-campaign" required><option value="">Carregando campanhas…</option></select></label>
+<label class="adset-name-field">Nome do conjunto de anúncios<input id="adset-name" maxlength="120" required placeholder="Ex.: Implantes — Campinas — 25 a 55 anos"></label>
+<div class="adset-location-field"><label>Localizações<input id="adset-location-search" type="search" placeholder="Pesquisar cidade ou região..." autocomplete="off"></label><div id="adset-location-results" role="status"></div><div id="adset-selected-locations" aria-live="polite"></div></div>
 
-<label>Gênero<select id="adset-gender"><option value="all">Todos</option><option value="male">Masculino</option><option value="female">Feminino</option></select></label>
-<label>Idade mínima<input id="adset-age-min" type="number" min="18" max="65" value="25" required></label>
-<label>Idade máxima<input id="adset-age-max" type="number" min="18" max="65" value="55" required></label>
-<label>Interesses (opcional)<input id="adset-interest-search" type="search" placeholder="Ex.: viagens, beleza" autocomplete="off"></label>
-<label>Orçamento diário (R$)<input id="adset-budget" type="number" min="10" max="10000" step="0.01" value="30" required></label>
+<label class="adset-gender-field">Gênero<select id="adset-gender"><option value="all">Todos</option><option value="male">Masculino</option><option value="female">Feminino</option></select></label>
+<label class="adset-age-field">Idade mínima<input id="adset-age-min" type="number" min="18" max="65" value="25" required></label>
+<label class="adset-age-field">Idade máxima<input id="adset-age-max" type="number" min="18" max="65" value="55" required></label>
+<label class="adset-interest-field">Interesses (opcional)<input id="adset-interest-search" type="search" placeholder="Ex.: viagens, beleza" autocomplete="off"></label>
+<label class="adset-budget-field">Orçamento diário (R$)<input id="adset-budget" type="number" min="10" max="10000" step="0.01" value="30" required></label>
 </div><div id="adset-interest-results" role="status"></div><div id="adset-selected-interests" aria-live="polite"></div>
 <button type="submit" class="primary" id="adset-preview-button" style="margin-top:12px">Criar conjunto pausado</button>
 </form><p id="adset-preview-feedback" role="status" aria-live="polite"></p>

@@ -27,10 +27,10 @@ router.get("/:companyId/meta-locations",access,async(req,res,next)=>{try{
  const version=/^v[0-9]+[.][0-9]+$/.test(process.env.META_API_VERSION||"")?process.env.META_API_VERSION:"v24.0";
  const url=new URL("https://graph.facebook.com/"+version+"/search");
  url.searchParams.set("type","adgeolocation");url.searchParams.set("q",q);url.searchParams.set("country_code","BR");
- url.searchParams.set("location_types",JSON.stringify(["city","region"]));url.searchParams.set("limit","25");
+ url.searchParams.set("location_types",JSON.stringify(["city","region","neighborhood","subcity"]));url.searchParams.set("limit","25");
  const response=await fetch(url,{headers:{Authorization:"Bearer "+token},signal:AbortSignal.timeout(12000)});
  const data=await response.json();if(!response.ok)return res.status(502).json({error:"A Meta não disponibilizou a pesquisa de localidades."});
- res.json({items:(Array.isArray(data.data)?data.data:[]).filter(x=>typeof x.name==="string"&&x.key).map(x=>({key:String(x.key),name:x.name,region:x.region||"",country:x.country_name||"Brasil",type:x.type||"",latitude:Number(x.latitude),longitude:Number(x.longitude)}))});
+ res.json({items:(Array.isArray(data.data)?data.data:[]).filter(x=>typeof x.name==="string"&&x.key).map(x=>({key:String(x.key),name:x.name,region:x.region||"",country:x.country_name||"Brasil",type:x.type||"",latitude:Number.isFinite(Number(x.latitude))&&x.latitude!=null?Number(x.latitude):null,longitude:Number.isFinite(Number(x.longitude))&&x.longitude!=null?Number(x.longitude):null}))});
  }catch(e){if(["TimeoutError","AbortError"].includes(e.name))return res.status(504).json({error:"Pesquisa de localidades demorou demais."});next(e);}
 });
 module.exports=router;
