@@ -19,10 +19,10 @@ async function refreshAdsetCampaigns(){
     const r=await fetch("/api/companies/"+encodeURIComponent(select.value)+"/meta-campaigns?type=campaigns",{credentials:"same-origin"});
     const data=await r.json();
     if(!r.ok)throw Error(data.error||"Falha ao consultar campanhas.");
-    const paused=(data.items||[]).filter(c=>c.status==="PAUSED");
+    const available=(data.items||[]).filter(c=>["PAUSED","ACTIVE"].includes(c.status));
     const placeholder=document.createElement("option");placeholder.value="";placeholder.textContent="Escolha uma campanha";adsetCampaign.append(placeholder);
-    for(const campaign of paused){const option=document.createElement("option");option.value=campaign.id;option.textContent=campaign.name+" · "+campaign.id;adsetCampaign.append(option);}
-    adsetFeedback.textContent=paused.length?"Escolha uma campanha para conferir o público e orçamento.":"Nenhuma campanha pausada disponível para configurar.";
+    for(const campaign of available){const option=document.createElement("option");option.value=campaign.id;option.textContent=campaign.name+" · "+(campaign.status==="ACTIVE"?"Ativa":"Pausada")+" · "+campaign.id;adsetCampaign.append(option);}
+    adsetFeedback.textContent=available.length?"Escolha uma campanha ativa ou pausada. O novo conjunto será criado pausado.":"Nenhuma campanha ativa ou pausada disponível.";
   }catch(e){adsetFeedback.textContent=e.message;}
 }
 adsetForm.addEventListener("submit",async e=>{
