@@ -19,7 +19,7 @@ router.get("/:companyId/meta-campaign-history", access, async (req, res, next) =
   const version=/^v\\d+\\.\\d+$/.test(process.env.META_API_VERSION||"")?process.env.META_API_VERSION:"v24.0";
   const url=new URL("https://graph.facebook.com/"+version+"/act_"+id+"/campaigns");
   url.searchParams.set("fields","id,name,objective,status,effective_status,daily_budget,lifetime_budget,created_time,updated_time,start_time,stop_time");
-  url.searchParams.set("filtering",JSON.stringify([{field:"effective_status",operator:"IN",value:["ACTIVE","PAUSED","DELETED","ARCHIVED","CAMPAIGN_PAUSED","ADSET_PAUSED","WITH_ISSUES","IN_PROCESS","PENDING_REVIEW","DISAPPROVED","PREAPPROVED","PENDING_BILLING_INFO"]}]));
+  url.searchParams.set("filtering",JSON.stringify([{field:"status",operator:"IN",value:["ACTIVE","PAUSED","DELETED","ARCHIVED"]}]));
   url.searchParams.set("limit","100");
   const items=[];let next=url.toString();let pages=0;
   while(next&&pages<30){
