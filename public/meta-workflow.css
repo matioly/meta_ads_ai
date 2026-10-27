@@ -34,3 +34,5 @@
 .adset-age-field{grid-column:span 2}.adset-gender-field{grid-column:span 2}.adset-interest-field{grid-column:span 4}.adset-budget-field{grid-column:span 2}
 @media(max-width:850px){.adset-fields-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.adset-fields-grid>label{grid-column:span 1}.adset-location-field{grid-column:1/-1}}
 @media(max-width:520px){.adset-fields-grid{grid-template-columns:1fr}.adset-fields-grid>label,.adset-location-field{grid-column:1/-1}}
+
+.adset-pin-form{margin-top:12px;border:1px solid #e3def1;border-radius:10px;padding:12px;max-width:900px}.adset-pin-form summary{cursor:pointer;font-weight:600}.adset-pin-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}.adset-pin-fields label{min-width:0}.adset-pin-fields input{width:100%}.adset-pin-fields button{align-self:end}@media(max-width:700px){.adset-pin-fields{grid-template-columns:1fr}}
