@@ -33,7 +33,9 @@ createForm.addEventListener("submit",async(event)=>{
       throw Error(diagnostic);
     }
     createFeedback.textContent="Campanha criada e pausada! ID Meta: "+data.id+". Atualize a lista para conferir.";
-    await load();
+    // The old load() belonged to a removed campaign-list view.
+    // Creation succeeded: refresh available ad-set campaigns without masking success.
+    if(typeof window.load==="function")await window.load();
     if(typeof refreshAdsetCampaigns==="function")await refreshAdsetCampaigns();
   }catch(error){createFeedback.textContent=error.message;}
   finally{createButton.disabled=false;}
