@@ -36,7 +36,9 @@
 @media(max-width:520px){.adset-fields-grid{grid-template-columns:1fr}.adset-fields-grid>label,.adset-location-field{grid-column:1/-1}}
 
 .adset-pin-form{margin-top:12px;border:1px solid #e3def1;border-radius:10px;padding:12px;max-width:900px}.adset-pin-form summary{cursor:pointer;font-weight:600}.adset-pin-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}.adset-pin-fields label{min-width:0}.adset-pin-fields input{width:100%}.adset-pin-fields button{align-self:end}@media(max-width:700px){.adset-pin-fields{grid-template-columns:1fr}}
-\n.adset-city-context{display:block;max-width:400px;margin:12px 0;color:#4b5563;font-size:13px}.adset-city-context input{display:block;width:100%;margin-top:6px}.adset-location-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0}.adset-location-row strong{min-width:180px;flex:1}.adset-location-row select{max-width:230px}.adset-location-message{flex-basis:100%;color:#8b5e19}#adset-location-map{margin:16px 0;padding:14px;border:1px solid #e4ddfa;border-radius:12px;max-width:760px}#adset-location-map small{display:block;color:#667085;line-height:1.5}\n
+
+.adset-city-context{display:block;max-width:400px;margin:12px 0;color:#4b5563;font-size:13px}.adset-city-context input{display:block;width:100%;margin-top:6px}.adset-location-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0}.adset-location-row strong{min-width:180px;flex:1}.adset-location-row select{max-width:230px}.adset-location-message{flex-basis:100%;color:#8b5e19}#adset-location-map{margin:16px 0;padding:14px;border:1px solid #e4ddfa;border-radius:12px;max-width:760px}#adset-location-map small{display:block;color:#667085;line-height:1.5}
+
 /* Visual guide for radius targeting. Map remains navigable through its iframe. */
 .adset-map-container{position:relative;margin-top:8px;width:100%;height:280px;border-radius:10px;overflow:hidden;background:#edf2f7}
 .adset-map-container iframe{display:block;width:100%;height:100%;border:0}
@@ -44,3 +46,9 @@
 .adset-map-circle{border:2px solid #6351d5;border-radius:50%;background:rgba(99,81,213,.16);box-shadow:0 0 0 1px rgba(255,255,255,.6)}
 .adset-map-radius-badge{position:absolute;left:50%;top:calc(50% + 12px);transform:translateX(-50%);background:#fff;color:#4735a8;border:1px solid #b5a7ef;border-radius:20px;padding:4px 9px;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px #0002}
 @media(max-width:520px){.adset-map-container{height:240px}}
+
+/* Keep radius preview strictly inside its map viewport, including global-style overrides. */
+#adset-location-map .adset-map-container{position:relative;isolation:isolate;overflow:hidden;max-width:100%;}
+#adset-location-map .adset-map-radius{position:absolute;inset:0;overflow:hidden;pointer-events:none;display:flex;align-items:center;justify-content:center;z-index:1;}
+#adset-location-map .adset-map-circle{position:relative;flex:0 0 auto;max-width:88%;max-height:88%;box-sizing:border-box;}
+#adset-location-map .adset-map-radius-badge{z-index:2;}

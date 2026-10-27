@@ -70,4 +70,37 @@ router.get("/:companyId/meta-campaigns", access, async (req, res, next) => {
     next(error);
   }
 });
+
+router.get("/:companyId/meta-campaign-children",access,async(req,res,next)=>{
+ try{
+  const type=req.query.type,parentId=String(req.query.parentId||"");
+  if(!["adsets","ads"].includes(type)||!/^[0-9]{1,30}$/.test(parentId))return res.status(400).json({error:"Parâmetros inválidos."});
+  const token=process.env.META_ACCESS_TOKEN;
+  if(!token)return res.status(503).json({error:"Conexão Meta não configurada."});
+  const {rows}=await pool.query("SELECT ad_account_id FROM meta_assets WHERE company_id=$1",[req.params.companyId]);
+  const accountId=rows[0]?.ad_account_id;
+  if(!accountId||!/^[0-9]{1,30}$/.test(accountId))return res.status(422).json({error:"Conta de anúncios não configurada."});
+  const version=/^v\d+\.\d+$/.test(process.env.META_API_VERSION||"")?process.env.META_API_VERSION:"v24.0";
+  const url=new URL("https://graph.facebook.com/"+version+"/act_"+accountId+"/"+type);
+  url.searchParams.set("fields",type==="adsets"?"id,name,campaign_id,status,effective_status,daily_budget,lifetime_budget":"id,name,campaign_id,adset_id,status,effective_status,creative{id,name}");
+  url.searchParams.set("filtering",JSON.stringify([{field:type==="adsets"?"campaign.id":"adset.id",operator:"EQUAL",value:parentId}]));
+  url.searchParams.set("limit","100");
+  const items=[];let nextUrl=url.toString(),pages=0;
+  while(nextUrl&&pages<20){
+   const current=new URL(nextUrl);
+   if(current.protocol!=="https:"||current.hostname!=="graph.facebook.com")throw Error("Paginação inválida.");
+   const response=await fetch(current,{headers:{Authorization:"Bearer "+token},signal:AbortSignal.timeout(12000)});
+   const data=await response.json();
+   if(!response.ok)return res.status(502).json({error:"A Meta não permitiu consultar os conjuntos ou anúncios.",metaErrorCode:data?.error?.code??null});
+   if(!Array.isArray(data.data))return res.status(502).json({error:"Resposta inesperada da Meta."});
+   for(const item of data.data){
+    if(String(type==="adsets"?item.campaign_id:item.adset_id)!==parentId)continue;
+    items.push({id:item.id,name:item.name,status:item.status,effectiveStatus:item.effective_status,dailyBudget:item.daily_budget??null,lifetimeBudget:item.lifetime_budget??null,creativeName:item.creative?.name??null});
+   }
+   nextUrl=data.paging?.next||null;pages++;
+  }
+  res.json({items,hasMore:!!nextUrl});
+ }catch(error){if(["TimeoutError","AbortError"].includes(error.name))return res.status(504).json({error:"Tempo limite na consulta à Meta."});next(error);}
+});
+
 module.exports = router;

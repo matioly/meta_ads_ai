@@ -4,11 +4,54 @@
  if(!$("history-rows"))return;
  const company=$("company"),search=$("history-search"),status=$("history-status"),objective=$("history-objective"),sort=$("history-sort");
  let items=[],activeCompany="",requestId=0,loaded=false;
+ const expandedCampaigns=new Set(),expandedAdsets=new Set(),childrenCache=new Map();
  const formatDate=value=>{if(!value)return "—";const d=new Date(value);return Number.isNaN(d.getTime())?"—":new Intl.DateTimeFormat("pt-BR",{dateStyle:"short"}).format(d);};
  const money=value=>value==null?"—":new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(Number(value)/100);
  const statusLabels={ACTIVE:"Ativa",PAUSED:"Pausada",ARCHIVED:"Arquivada",DELETED:"Excluída",CAMPAIGN_PAUSED:"Campanha pausada",ADSET_PAUSED:"Conjunto pausado",WITH_ISSUES:"Com problemas",IN_PROCESS:"Em processamento",PENDING_REVIEW:"Em análise",DISAPPROVED:"Reprovada"};
  const label=value=>statusLabels[value]||value||"—";
  function cell(row,value){const td=document.createElement("td");td.textContent=String(value??"—");row.append(td);}
+ async function expand(type,id){
+  const key=type+":"+id, open=type==="adsets"?expandedCampaigns:expandedAdsets;
+  if(open.has(id)){open.delete(id);render();return;}
+  open.add(id);render();
+  if(childrenCache.has(key))return;
+  const companyId=activeCompany;
+  try{
+   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),18000);
+   let response;
+   try{response=await fetch("/api/companies/"+encodeURIComponent(companyId)+"/meta-campaign-children?type="+encodeURIComponent(type)+"&parentId="+encodeURIComponent(id),{credentials:"same-origin",cache:"no-store",signal:controller.signal});}
+   finally{clearTimeout(timer);}
+   const data=await response.json();if(!response.ok)throw Error(data.error||"Falha ao consultar a Meta.");
+   if(companyId!==activeCompany)return;
+   childrenCache.set(key,{items:data.items||[],hasMore:data.hasMore});
+  }catch(e){if(companyId!==activeCompany)return;childrenCache.set(key,{error:e.name==="AbortError"?"A consulta demorou demais. Feche e abra para tentar novamente.":e.message});}
+  render();
+ }
+ function detail(parent,level,items,key){
+  const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=7;td.className="history-detail";
+  const result=childrenCache.get(key);
+  if(!result){td.textContent="Carregando "+(level==="adsets"?"conjuntos":"anúncios")+"…";tr.append(td);parent.append(tr);return;}
+  if(result.error){td.textContent="Erro: "+result.error;tr.append(td);parent.append(tr);return;}
+  if(!result.items.length){td.textContent="Nenhum "+(level==="adsets"?"conjunto":"anúncio")+" encontrado.";tr.append(td);parent.append(tr);return;}
+  const table=document.createElement("table");table.className="history-nested";
+  const thead=document.createElement("thead"),head=document.createElement("tr");
+  for(const name of [level==="adsets"?"Conjunto de anúncios":"Anúncio","Status","Status efetivo","Orçamento / Criativo"]){const th=document.createElement("th");th.textContent=name;head.append(th);}thead.append(head);table.append(thead);
+  const tbody=document.createElement("tbody");
+  for(const item of result.items){
+   const row=document.createElement("tr"),name=document.createElement("td");
+   if(level==="adsets"){
+    const button=document.createElement("button");button.type="button";button.className="history-expand";button.setAttribute("aria-expanded",String(expandedAdsets.has(item.id)));button.textContent=(expandedAdsets.has(item.id)?"▼ ":"▶ ")+(item.name||"Sem nome");button.addEventListener("click",()=>expand("ads",item.id));name.append(button);
+   }else{const strong=document.createElement("strong");strong.textContent=item.name||"Sem nome";name.append(strong);}
+   const small=document.createElement("small");small.textContent="ID: "+item.id;small.style.display="block";name.append(small);row.append(name);
+   cell(row,label(item.status));cell(row,label(item.effectiveStatus));
+   cell(row,level==="adsets"?(item.dailyBudget!=null?money(item.dailyBudget)+" / dia":item.lifetimeBudget!=null?money(item.lifetimeBudget)+" total":"—"):(item.creativeName||"—"));
+   tbody.append(row);
+   if(level==="adsets"&&expandedAdsets.has(item.id))detail(tbody,"ads",null,"ads:"+item.id);
+  }
+  table.append(tbody);td.append(table);
+  if(result.hasMore){const warning=document.createElement("p");warning.textContent="Histórico parcial: limite de paginação atingido.";td.append(warning);}
+  tr.append(td);parent.append(tr);
+ }
  function render(){
   const q=search.value.trim().toLocaleLowerCase("pt-BR"),st=status.value,obj=objective.value;
   const filtered=items.filter(x=>(!q||(x.name+" "+x.id).toLocaleLowerCase("pt-BR").includes(q))&&(!st||x.status===st||x.effectiveStatus===st)&&(!obj||x.objective===obj));
@@ -16,17 +59,17 @@
   const body=$("history-rows");body.replaceChildren();
   for(const item of filtered){
    const row=document.createElement("tr");
-   const name=document.createElement("td");const strong=document.createElement("strong");strong.textContent=item.name||"Sem nome";const small=document.createElement("small");small.textContent="ID: "+item.id;small.style.display="block";name.append(strong,small);row.append(name);
+   const name=document.createElement("td");const strong=document.createElement("strong");strong.textContent=item.name||"Sem nome";const small=document.createElement("small");small.textContent="ID: "+item.id;small.style.display="block";const button=document.createElement("button");button.type="button";button.className="history-expand";button.textContent=(expandedCampaigns.has(item.id)?"▼ ":"▶ ")+(item.name||"Sem nome");button.setAttribute("aria-expanded",String(expandedCampaigns.has(item.id)));button.addEventListener("click",()=>expand("adsets",item.id));name.append(button,small);row.append(name);
    cell(row,item.objective);cell(row,label(item.status));cell(row,label(item.effectiveStatus));
    cell(row,item.dailyBudget!=null?money(item.dailyBudget)+" / dia":item.lifetimeBudget!=null?money(item.lifetimeBudget)+" total":"—");
-   cell(row,formatDate(item.createdAt));cell(row,formatDate(item.updatedAt));body.append(row);
+   cell(row,formatDate(item.createdAt));cell(row,formatDate(item.updatedAt));body.append(row);if(expandedCampaigns.has(item.id))detail(body,"adsets",null,"adsets:"+item.id);
   }
   $("history-summary").textContent=loaded?filtered.length+" de "+items.length+" campanhas encontradas"+(filtered.length!==items.length?" com os filtros atuais.":"."):"Carregando histórico…";
   if(loaded&&!filtered.length)$("history-feedback").textContent="Nenhuma campanha corresponde aos filtros.";
  }
  async function load(){
   const id=company.value;if(!id)return;
-  const seq=++requestId;activeCompany=id;loaded=false;items=[];render();$("history-feedback").textContent="Consultando histórico na Meta…";
+  const seq=++requestId;activeCompany=id;loaded=false;items=[];expandedCampaigns.clear();expandedAdsets.clear();childrenCache.clear();render();$("history-feedback").textContent="Consultando histórico na Meta…";
   try{
    const response=await fetch("/api/companies/"+encodeURIComponent(id)+"/meta-campaign-history",{credentials:"same-origin",cache:"no-store"});
    const data=await response.json();if(seq!==requestId||company.value!==id)return;
