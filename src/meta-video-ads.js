@@ -26,7 +26,7 @@ function googleHost(url){
  return url.protocol==="https:"&&!url.username&&!url.password&&!url.port&&
  (url.hostname==="drive.google.com"||url.hostname==="docs.google.com"||url.hostname==="drive.usercontent.google.com"||url.hostname==="googleusercontent.com"||url.hostname.endsWith(".googleusercontent.com"));
 }
-async function downloadDrive(id){
+async function downloadDrive(id,kind='video'){
  let url=new URL("https://drive.google.com/uc?export=download&id="+encodeURIComponent(id));
  for(let redirects=0;redirects<6;redirects++){
   if(!googleHost(url))throw Error("Redirecionamento do Drive para domínio não autorizado.");
@@ -36,23 +36,23 @@ async function downloadDrive(id){
    if(!location)throw Error("Redirecionamento do Drive inválido.");
    url=new URL(location,url);continue;
   }
-  if(!response.ok)throw Error("O Drive não permitiu baixar o vídeo. Confira se o arquivo está compartilhado para qualquer pessoa com o link.");
+  if(!response.ok)throw Error("O Drive não permitiu baixar a mídia. Confira se o arquivo está compartilhado para qualquer pessoa com o link.");
   const type=(response.headers.get("content-type")||"").split(";")[0].toLowerCase();
-  if(!type.startsWith("video/")&&type!=="application/octet-stream"){await response.body?.cancel();throw Error("O Drive retornou uma página em vez do vídeo. É necessário um link de download público direto ou futura integração OAuth.");}
+  if(!(kind==="video"?type.startsWith("video/"):["image/jpeg","image/png"].includes(type))&&type!=="application/octet-stream"){await response.body?.cancel();throw Error("O Drive retornou uma página em vez da mídia. É necessário um link de download público direto ou futura integração OAuth.");}
   const max=75*1024*1024;const length=Number(response.headers.get("content-length")||0);
-  if(length>max){await response.body?.cancel();throw Error("Vídeo maior que 75 MB. Use um arquivo menor para este teste.");}
+  if(length>max){await response.body?.cancel();throw Error("Arquivo maior que 75 MB. Use um arquivo menor para este teste.");}
   const chunks=[];let size=0;
   for await(const chunk of response.body){size+=chunk.length;if(size>max)throw Error("Vídeo maior que 75 MB.");chunks.push(chunk);}
-  if(size<1024)throw Error("Arquivo de vídeo vazio ou incompleto.");
-  return new Blob(chunks,{type:type.startsWith("video/")?type:"video/mp4"});
+  if(size<1024)throw Error("Arquivo de mídia vazio ou incompleto.");
+  return new Blob(chunks,{type:type==="application/octet-stream"?(kind==="video"?"video/mp4":"image/jpeg"):type});
  }
  throw Error("O Drive redirecionou muitas vezes; não foi possível obter o arquivo.");
 }
 async function context(companyId,draftId){
  const r=await pool.query(`SELECT d.id,d.headline,d.primary_text,d.description,d.campaign_meta_id,d.adset_meta_id,
- d.meta_video_id,d.meta_creative_id,d.meta_ad_id,d.meta_publish_state,
- m.drive_url,m.name AS media_name,a.ad_account_id,a.facebook_page_id,a.instagram_id,a.facebook_page_status
- FROM creative_drafts d JOIN media m ON m.id=d.media_id AND m.company_id=d.company_id AND m.kind='video'
+ d.meta_video_id,d.meta_image_hash,d.meta_creative_id,d.meta_ad_id,d.meta_publish_state,
+ m.drive_url,m.kind AS media_kind,m.name AS media_name,a.ad_account_id,a.facebook_page_id,a.instagram_id,a.facebook_page_status
+ FROM creative_drafts d JOIN media m ON m.id=d.media_id AND m.company_id=d.company_id AND m.kind IN ('video','image')
  JOIN meta_assets a ON a.company_id=d.company_id WHERE d.company_id=$1 AND d.id=$2`,[companyId,draftId]);
  return r.rows[0];
 }
@@ -119,7 +119,8 @@ router.get("/:companyId/creative-drafts/:draftId/meta-video-status",access,async
  try{
   const d=await context(req.params.companyId,req.params.draftId);
   if(!d)return res.status(404).json({error:"Anúncio preparado não encontrado."});
-  if(d.meta_ad_id)return res.json({state:"ad_created",adId:d.meta_ad_id,videoId:d.meta_video_id});
+  if(d.meta_ad_id)return res.json({state:"ad_created",adId:d.meta_ad_id,videoId:d.meta_video_id,mediaKind:d.media_kind});
+  if(d.media_kind==="image")return res.json({state:d.meta_image_hash?"ready":"not_uploaded",mediaKind:"image"});
   if(!d.meta_video_id)return res.json({state:"not_uploaded"});
   const token=process.env.META_ACCESS_TOKEN;
   if(!token)return res.status(503).json({error:"Token Meta não configurado."});
@@ -143,6 +144,7 @@ router.post("/:companyId/creative-drafts/:draftId/meta-video",access,async(req,r
   locked=lock.rows[0].locked;if(!locked)return res.status(409).json({error:"Este rascunho já está sendo processado. Aguarde."});
   const d=await context(req.params.companyId,req.params.draftId);
   if(!d)return res.status(404).json({error:"Rascunho ou conta Meta não encontrados."});
+  if(d.media_kind!=="video")return res.status(422).json({error:"Esta mídia é uma imagem. Use o envio de imagem."});
   if(d.meta_video_id)return res.json({videoId:d.meta_video_id,reused:true});
   if(!digits(d.ad_account_id))return res.status(422).json({error:"Conta de anúncios inválida."});
   const fileId=driveId(d.drive_url);
@@ -153,6 +155,30 @@ router.post("/:companyId/creative-drafts/:draftId/meta-video",access,async(req,r
   await client.query("UPDATE creative_drafts SET meta_video_id=$3,meta_publish_state='video_uploaded',meta_last_error=NULL,updated_at=NOW() WHERE company_id=$1 AND id=$2",[req.params.companyId,req.params.draftId,String(result.id)]);
   return res.status(201).json({videoId:String(result.id),status:"uploaded"});
  }catch(e){return failure(res,e,"de envio do vídeo");}
+ finally{if(locked)await client.query("SELECT pg_advisory_unlock(hashtext($1),hashtext($2))",[req.params.companyId,req.params.draftId]);client.release();}
+});
+router.post("/:companyId/creative-drafts/:draftId/meta-image",access,async(req,res)=>{
+ if(process.env.META_VIDEO_UPLOAD_ENABLED!=="true")return res.status(503).json({error:"Envio de mídia desabilitado."});
+ if(!uuid.test(req.params.draftId)||req.body?.confirm!==true)return res.status(400).json({error:"Confirme o envio da imagem."});
+ const token=process.env.META_ACCESS_TOKEN;if(!token)return res.status(503).json({error:"Token Meta não configurado."});
+ const client=await pool.connect();let locked=false;
+ try{
+  const lock=await client.query("SELECT pg_try_advisory_lock(hashtext($1),hashtext($2)) AS locked",[req.params.companyId,req.params.draftId]);
+  locked=lock.rows[0].locked;if(!locked)return res.status(409).json({error:"Este rascunho já está sendo processado."});
+  const d=await context(req.params.companyId,req.params.draftId);
+  if(!d)return res.status(404).json({error:"Rascunho não encontrado."});
+  if(d.media_kind!=="image")return res.status(422).json({error:"Esta mídia não é uma imagem."});
+  if(d.meta_image_hash)return res.json({reused:true,status:"uploaded"});
+  if(!digits(d.ad_account_id))return res.status(422).json({error:"Conta de anúncios inválida."});
+  const blob=await downloadDrive(driveId(d.drive_url),"image");
+  if(!["image/jpeg","image/png"].includes(blob.type))return res.status(422).json({error:"Use imagem JPEG ou PNG."});
+  const form=new FormData();form.set("filename",blob,blob.type==="image/png"?"image.png":"image.jpg");
+  const result=await graph("act_"+d.ad_account_id+"/adimages",token,{method:"POST",body:form});
+  const item=Object.values(result.images||{})[0],hash=item?.hash;
+  if(typeof hash!=="string"||!/^[a-f0-9]{32,64}$/i.test(hash))throw Error("Meta não confirmou o hash da imagem. Confira a biblioteca Meta antes de repetir.");
+  await client.query("UPDATE creative_drafts SET meta_image_hash=$3,meta_publish_state='image_uploaded',meta_last_error=NULL,updated_at=NOW() WHERE company_id=$1 AND id=$2",[req.params.companyId,req.params.draftId,hash]);
+  return res.status(201).json({status:"uploaded",mediaKind:"image"});
+ }catch(e){return failure(res,e,"de envio da imagem");}
  finally{if(locked)await client.query("SELECT pg_advisory_unlock(hashtext($1),hashtext($2))",[req.params.companyId,req.params.draftId]);client.release();}
 });
 router.post("/:companyId/creative-drafts/:draftId/meta-paused-ad",access,async(req,res,next)=>{
@@ -166,7 +192,7 @@ router.post("/:companyId/creative-drafts/:draftId/meta-paused-ad",access,async(r
   const d=await context(req.params.companyId,req.params.draftId);
   if(!d)return res.status(404).json({error:"Rascunho ou conta Meta não encontrados."});
   if(d.meta_ad_id)return res.json({adId:d.meta_ad_id,status:"PAUSED",reused:true});
-  if(!digits(d.meta_video_id)||!digits(d.ad_account_id)||!digits(d.campaign_meta_id)||!digits(d.adset_meta_id))return res.status(422).json({error:"Envie o vídeo e vincule campanha e público antes de criar o anúncio."});
+  if(!(d.media_kind==="image"?/^[a-f0-9]{32,64}$/i.test(d.meta_image_hash||""):digits(d.meta_video_id))||!digits(d.ad_account_id)||!digits(d.campaign_meta_id)||!digits(d.adset_meta_id))return res.status(422).json({error:"Envie a mídia e vincule campanha e público antes de criar o anúncio."});
   if(!digits(d.facebook_page_id)||d.facebook_page_status!=="approved")return res.status(422).json({error:"É necessário vincular uma Página do Facebook aprovada para criar o anúncio."});
   const [campaign,adset]=await Promise.all([
    graph(d.campaign_meta_id+"?fields=id,account_id,status,objective",token),
@@ -193,15 +219,15 @@ router.post("/:companyId/creative-drafts/:draftId/meta-paused-ad",access,async(r
    // for the video already uploaded in step 5A, rather than a Drive URL.
    // Meta generates video thumbnails asynchronously. Retry reads only, never upload again.
    let selected;
-   for(let attempt=0;attempt<4&&!selected;attempt++){
+   if(d.media_kind==="video")for(let attempt=0;attempt<4&&!selected;attempt++){
     if(attempt)await new Promise(resolve=>setTimeout(resolve,2000));
     const thumbs=await graph(d.meta_video_id+"/thumbnails?fields=uri,is_preferred&limit=100",token);
     const images=Array.isArray(thumbs.data)?thumbs.data:[];
     selected=images.find(t=>t.is_preferred&&typeof t.uri==="string"&&t.uri.startsWith("https://"))||images.find(t=>typeof t.uri==="string"&&t.uri.startsWith("https://"));
    }
-   if(!selected)return res.status(422).json({error:"A Meta ainda está processando a capa do vídeo. Aguarde alguns minutos e tente criar o anúncio novamente. O vídeo já enviado será reutilizado; não é necessário reenviar.",code:"VIDEO_THUMBNAIL_PENDING",retryable:true});
+   if(d.media_kind==="video"&&!selected)return res.status(422).json({error:"A Meta ainda está processando a capa do vídeo. Aguarde alguns minutos e tente criar o anúncio novamente. O vídeo já enviado será reutilizado; não é necessário reenviar.",code:"VIDEO_THUMBNAIL_PENDING",retryable:true});
    const cta=isWhatsApp?{type:"WHATSAPP_MESSAGE",value:{app_destination:"WHATSAPP"}}:{type:"LEARN_MORE",value:{link:site.href}};
-    const spec={page_id:d.facebook_page_id,video_data:{video_id:d.meta_video_id,image_url:selected.uri,message:d.primary_text,title:d.headline,call_to_action:cta}};
+    const spec=d.media_kind==="image"?{page_id:d.facebook_page_id,link_data:{image_hash:d.meta_image_hash,link:isWhatsApp?undefined:site.href,message:d.primary_text,name:d.headline,description:d.description||undefined,call_to_action:cta}}:{page_id:d.facebook_page_id,video_data:{video_id:d.meta_video_id,image_url:selected.uri,message:d.primary_text,title:d.headline,call_to_action:cta}};
    // WhatsApp engagement uses a message CTA without a website URL; traffic retains the HTTPS site CTA.
    // Never assume an inventory Instagram ID is a valid advertising actor.
    // Meta can expose different IDs for an Instagram profile and its ad actor.

@@ -24,9 +24,9 @@ router.post("/:companyId/creative-drafts",access,async(req,res,next)=>{
  const v=parse(req.body);if(!v)return res.status(400).json({error:"Confira mídia, título, texto e IDs da Meta."});
  try{
  const result=await pool.query(`INSERT INTO creative_drafts(company_id,media_id,campaign_meta_id,adset_meta_id,headline,primary_text,description,created_by)
- SELECT $1,m.id,$3,$4,$5,$6,$7,$8 FROM media m WHERE m.company_id=$1 AND m.id=$2 AND m.kind='video' RETURNING id`,
+ SELECT $1,m.id,$3,$4,$5,$6,$7,$8 FROM media m WHERE m.company_id=$1 AND m.id=$2 AND m.kind IN ('video','image') RETURNING id`,
  [req.params.companyId,v.mediaId,v.campaignMetaId,v.adsetMetaId,v.headline,v.primaryText,v.description,req.session.userId]);
- if(!result.rows.length)return res.status(400).json({error:"Vídeo indisponível nesta clínica."});
+ if(!result.rows.length)return res.status(400).json({error:"Mídia indisponível nesta clínica."});
  res.status(201).json({id:result.rows[0].id});
  }catch(e){next(e);}
 });
@@ -35,9 +35,9 @@ router.put("/:companyId/creative-drafts/:draftId",access,async(req,res,next)=>{
  const v=parse(req.body);if(!v)return res.status(400).json({error:"Confira mídia, título, texto e IDs da Meta."});
  try{
  const result=await pool.query(`UPDATE creative_drafts d SET media_id=$3,campaign_meta_id=$4,adset_meta_id=$5,headline=$6,primary_text=$7,description=$8,updated_at=NOW()
- WHERE d.company_id=$1 AND d.id=$2 AND d.meta_creative_id IS NULL AND (d.meta_video_id IS NULL OR d.media_id=$3) AND EXISTS(SELECT 1 FROM media m WHERE m.company_id=$1 AND m.id=$3 AND m.kind='video') RETURNING d.id`,
+ WHERE d.company_id=$1 AND d.id=$2 AND d.meta_creative_id IS NULL AND ((d.meta_video_id IS NULL AND d.meta_image_hash IS NULL) OR d.media_id=$3) AND EXISTS(SELECT 1 FROM media m WHERE m.company_id=$1 AND m.id=$3 AND m.kind IN ('video','image')) RETURNING d.id`,
  [req.params.companyId,req.params.draftId,v.mediaId,v.campaignMetaId,v.adsetMetaId,v.headline,v.primaryText,v.description]);
- if(!result.rows.length)return res.status(404).json({error:"Rascunho não encontrado, vídeo indisponível, mídia diferente após upload ou criativo já criado na Meta."});
+ if(!result.rows.length)return res.status(404).json({error:"Rascunho não encontrado, mídia indisponível, mídia diferente após upload ou criativo já criado na Meta."});
  res.json({id:result.rows[0].id});
  }catch(e){next(e);}
 });

@@ -3,7 +3,7 @@
  const $=id=>document.getElementById(id);
  const form=$("creative-plan-form"),feedback=$("creative-feedback"),preview=$("creative-preview");
  const mediaSelect=$("creative-media"),saved=$("creative-saved"),campaign=$("creative-campaign"),adset=$("creative-adset");
- let videos=[],drafts=[],campaigns=[],adsets=[],companyId="",sequence=0;
+ let media=[],drafts=[],campaigns=[],adsets=[],companyId="",sequence=0;
  const editor=$("creative-editor"),reusePanel=$("creative-reuse-panel"),publishSelect=$("meta-publish-draft");
  function showEditor(reusing=false){editor.hidden=false;reusePanel.hidden=!reusing;}
  const base=()=>"/api/companies/"+encodeURIComponent(companyId);
@@ -18,7 +18,7 @@
   for(const item of items)select.append(new Option(label(item),String(item.id)));
  }
  function clearForm(){
-  showEditor(false);form.reset();saved.value="";campaign.value="";updateAdsets();preview.hidden=true;feedback.textContent="Novo anúncio. Escolha o vídeo e preencha a mensagem.";
+  showEditor(false);form.reset();saved.value="";campaign.value="";updateAdsets();preview.hidden=true;feedback.textContent="Novo anúncio. Escolha a mídia e preencha a mensagem.";
   $("creative-primary-text").focus();
  }
  function updateAdsets(){
@@ -50,12 +50,12 @@
   preview.hidden=true;feedback.textContent="Rascunho recuperado. Você pode editar e salvar novamente.";
  }
  async function refresh(){
-  const current=++sequence;companyId=select.value;videos=[];drafts=[];campaigns=[];adsets=[];
-  preview.hidden=true;editor.hidden=true;reusePanel.hidden=true;fill(mediaSelect,[],x=>x.name,"Selecione um vídeo");
+  const current=++sequence;companyId=select.value;media=[];drafts=[];campaigns=[];adsets=[];
+  preview.hidden=true;editor.hidden=true;reusePanel.hidden=true;fill(mediaSelect,[],x=>x.name,"Selecione uma mídia");
   fill(saved,[],x=>x.headline,"Selecione um anúncio");fill(publishSelect,[],x=>x.headline,"Selecione um anúncio salvo");
   fill(campaign,[],x=>x.name,"Sem vínculo por enquanto");updateAdsets();
   if(!companyId)return;
-  feedback.textContent="Carregando vídeos e rascunhos…";
+  feedback.textContent="Carregando mídias e rascunhos…";
   try{
    const results=await Promise.allSettled([
     api("/media"),api("/creative-drafts"),api("/meta-campaigns?type=campaigns"),api("/meta-campaigns?type=adsets")
@@ -63,9 +63,9 @@
    if(current!==sequence)return;
    if(results[0].status==="rejected")throw results[0].reason;
    if(results[1].status==="rejected")throw results[1].reason;
-   videos=(results[0].value.media||[]).filter(m=>m.kind==="video");
+   media=(results[0].value.media||[]).filter(m=>m.kind==="video"||m.kind==="image");
    drafts=results[1].value.drafts||[];
-   fill(mediaSelect,videos,m=>m.name+" · "+(m.accountLabel||m.accountEmail||"Conta não informada"),"Selecione um vídeo");
+   fill(mediaSelect,media,m=>(m.kind==="image"?"Imagem: ":"Vídeo: ")+m.name+" · "+(m.accountLabel||m.accountEmail||"Conta não informada"),"Selecione um vídeo");
    fill(saved,drafts,d=>d.headline+" · "+d.mediaName,"Selecione um anúncio");
    fill(publishSelect,drafts,d=>d.headline+" · "+d.mediaName,"Selecione um anúncio salvo");
    campaigns=results[2].status==="fulfilled"?(results[2].value.items||[]):[];
@@ -76,13 +76,13 @@
   }catch(e){feedback.textContent=e.message;}
  }
  function previewDraft(){
-  const p=payload(),m=videos.find(x=>String(x.id)===p.mediaId);
-  if(!m||!p.headline||!p.primaryText){feedback.textContent="Selecione um vídeo e preencha título e texto.";return false;}
-  let url;try{url=new URL(m.url);if(url.protocol!=="https:")throw Error("URL inválida");}catch{feedback.textContent="Link HTTPS do vídeo inválido.";return false;}
+  const p=payload(),m=media.find(x=>String(x.id)===p.mediaId);
+  if(!m||!p.headline||!p.primaryText){feedback.textContent="Selecione uma imagem ou vídeo e preencha título e texto.";return false;}
+  let url;try{url=new URL(m.url);if(url.protocol!=="https:")throw Error("URL inválida");}catch{feedback.textContent="Link HTTPS da mídia inválido.";return false;}
   $("creative-preview-headline").textContent=p.headline;
   $("creative-preview-text").textContent=p.primaryText;
   $("creative-preview-description").textContent=p.description;
-  $("creative-preview-media").textContent="Vídeo: "+m.name+" · Conta: "+(m.accountLabel||m.accountEmail||"Não informada");
+  $("creative-preview-media").textContent=(m.kind==="image"?"Imagem: ":"Vídeo: ")+m.name+" · Conta: "+(m.accountLabel||m.accountEmail||"Não informada");
   $("creative-preview-link").href=url.href;
   preview.hidden=false;return true;
  }
