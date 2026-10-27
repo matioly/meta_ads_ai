@@ -76,6 +76,7 @@
    if(item.resolving||item.error){const msg=document.createElement("small");msg.className="adset-location-message";msg.textContent=item.resolving?"Localizando centro do bairro…":item.error;row.append(msg);if(item.error&&["neighborhood","subcity"].includes(item.type)){const retry=document.createElement("button");retry.type="button";retry.className="secondary";retry.textContent="Tentar localizar novamente";retry.addEventListener("click",()=>resolve(item,key));row.append(retry);}}
    selected.append(row);
   }
+  const cityContext=document.querySelector(".adset-city-context");if(cityContext)cityContext.hidden=![...chosen.values()].some(item=>item.error&&["neighborhood","subcity"].includes(item.type));
   input.disabled=chosen.size>0;
   input.placeholder="Pesquisar cidade ou bairro...";
   drawMap();
