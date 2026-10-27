@@ -34,7 +34,7 @@
    status.textContent="";
    window.dispatchEvent(new Event("meta-adset-created"));
    adsetResult.textContent=adsetResult.textContent.replace("Situação: ainda não criado","Situação: criado e pausado na Meta · ID: "+data.id).replace("Antes de criar anúncios, ainda precisamos:","Próxima etapa: preparar o vídeo e o texto do anúncio.");
-   await load();
+   if(typeof window.load==="function")await window.load();
   }catch(error){
    status.textContent="Não foi possível concluir: "+(error.message||"Erro desconhecido")+". Confira os públicos na Meta antes de tentar novamente.";
   }finally{button.disabled=false;}
