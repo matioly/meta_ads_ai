@@ -4,7 +4,8 @@
  if(!$("history-rows"))return;
  const company=$("company"),search=$("history-search"),status=$("history-status"),objective=$("history-objective"),sort=$("history-sort");
  let items=[],activeCompany="",requestId=0,loaded=false;
- const expandedCampaigns=new Set(),expandedAdsets=new Set(),childrenCache=new Map(),performanceCache=null,performancePending=null;
+ const expandedCampaigns=new Set(),expandedAdsets=new Set(),childrenCache=new Map();
+ let performanceCache=null,performancePending=null;
  const formatDate=value=>{if(!value)return "—";const d=new Date(value);return Number.isNaN(d.getTime())?"—":new Intl.DateTimeFormat("pt-BR",{dateStyle:"short"}).format(d);};
  const money=value=>value==null?"—":new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(Number(value)/100);
  const statusLabels={ACTIVE:"Ativa",PAUSED:"Pausada",ARCHIVED:"Arquivada",DELETED:"Excluída",CAMPAIGN_PAUSED:"Campanha pausada",ADSET_PAUSED:"Conjunto pausado",WITH_ISSUES:"Com problemas",IN_PROCESS:"Em processamento",PENDING_REVIEW:"Em análise",DISAPPROVED:"Reprovada"};
