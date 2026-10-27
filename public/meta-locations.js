@@ -71,14 +71,14 @@
    for(const km of [3,5,10,15,20]){const option=document.createElement("option");option.value=km;option.textContent=km+" km";radius.append(option);}
    radius.value=String(item.radiusKm);radius.disabled=item.mode!=="radius"||item.resolving;
    radius.addEventListener("change",()=>{item.radiusKm=Number(radius.value);drawMap();changed();});
-   const remove=document.createElement("button");remove.type="button";remove.className="secondary";remove.textContent="Remover";remove.addEventListener("click",()=>{chosen.delete(key);render();changed();});
+   const remove=document.createElement("button");remove.type="button";remove.className="secondary";remove.textContent="Remover";remove.addEventListener("click",()=>{chosen.delete(key);clearTimeout(timer);sequence++;results.replaceChildren();input.value="";render();changed();input.focus();});
    row.append(title,mode,radius,remove);
    if(item.resolving||item.error){const msg=document.createElement("small");msg.className="adset-location-message";msg.textContent=item.resolving?"Localizando centro do bairro…":item.error;row.append(msg);}
    selected.append(row);
   }
   drawMap();
  }
- input.addEventListener("input",()=>{clearTimeout(timer);const q=input.value.trim(),seq=++sequence;results.replaceChildren();if(q.length<2)return;
+ input.addEventListener("input",()=>{clearTimeout(timer);const q=input.value.trim(),seq=++sequence;results.replaceChildren();if(q.length<2){if(q.length)results.textContent="Digite pelo menos 2 caracteres para buscar.";return;}
   timer=setTimeout(async()=>{try{
    const company=document.querySelector("#meta-company")?.value;if(!company){results.textContent="Selecione uma clínica.";return;}
    const response=await fetch("/api/companies/"+encodeURIComponent(company)+"/meta-locations?q="+encodeURIComponent(q),{credentials:"same-origin"});
@@ -90,14 +90,14 @@
     button.addEventListener("click",()=>{
      if(chosen.size>=10){results.textContent="Limite de 10 localidades.";return;}
      const location={key:item.key,type:item.type,name:item.name,region:item.region,radiusKm:3,latitude:item.latitude,longitude:item.longitude,mode:item.type==="region"?"native":"radius",resolving:false,error:""};
-     chosen.set(item.key,location);button.remove();
+     chosen.set(item.key,location);clearTimeout(timer);sequence++;results.replaceChildren();input.value="";
      if(["neighborhood","subcity"].includes(item.type)&&!coords(location))resolve(location,item.key);
      else{render();changed();}
     });results.append(button);
    }
-   if(!results.children.length)results.textContent="Nenhuma localidade disponível para esta busca.";
+   if(!results.children.length)results.textContent="Nenhuma localidade disponível para esta busca. Tente apenas o nome do bairro (ex.: Taquaral).";
   }catch(e){if(seq===sequence)results.textContent=e.message;}},350);
  });
- document.querySelector("#meta-company")?.addEventListener("change",()=>{chosen.clear();render();results.replaceChildren();input.value="";changed();});
+ document.querySelector("#meta-company")?.addEventListener("change",()=>{clearTimeout(timer);sequence++;chosen.clear();render();results.replaceChildren();input.value="";changed();});
  document.querySelector("#adset-location-city")?.addEventListener("change",()=>{for(const [key,item] of chosen){if(["neighborhood","subcity"].includes(item.type)){item.latitude=null;item.longitude=null;item.mode="native";item.error="Cidade de referência alterada. Selecione raio personalizado para localizar novamente.";}}render();changed();});
 })();
