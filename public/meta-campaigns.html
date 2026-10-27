@@ -85,7 +85,7 @@
 <div class="adset-fields-grid">
 <label class="adset-campaign-field">Escolha a campanha<select id="adset-campaign" required><option value="">Carregando campanhas…</option></select></label>
 <label class="adset-name-field">Nome do conjunto de anúncios<input id="adset-name" maxlength="120" required placeholder="Ex.: Implantes — Campinas — 25 a 55 anos"></label>
-<div class="adset-location-field"><label>Localizações<input id="adset-location-search" type="search" placeholder="Pesquisar cidade ou bairro..." autocomplete="off"></label><div id="adset-location-results" role="status"></div><div id="adset-selected-locations" aria-live="polite"></div></div>
+<div class="adset-location-field"><label>Localizações<input id="adset-location-search" type="search" placeholder="Pesquisar cidade ou bairro..." autocomplete="off"></label><div id="adset-location-results" role="status"></div><label class="adset-city-context">Cidade de referência para localizar bairros sem coordenadas<input id="adset-location-city" value="Campinas" maxlength="80" placeholder="Ex.: Campinas"></label><div id="adset-selected-locations" aria-live="polite"></div><div id="adset-location-map" hidden></div></div>
 
 <label class="adset-gender-field">Gênero<select id="adset-gender"><option value="all">Todos</option><option value="male">Masculino</option><option value="female">Feminino</option></select></label>
 <label class="adset-age-field">Idade mínima<input id="adset-age-min" type="number" min="18" max="65" value="25" required></label>
