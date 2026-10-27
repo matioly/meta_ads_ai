@@ -52,3 +52,6 @@
 #adset-location-map .adset-map-radius{position:absolute;inset:0;overflow:hidden;pointer-events:none;display:flex;align-items:center;justify-content:center;z-index:1;}
 #adset-location-map .adset-map-circle{position:relative;flex:0 0 auto;max-width:88%;max-height:88%;box-sizing:border-box;}
 #adset-location-map .adset-map-radius-badge{z-index:2;}
+
+/* Interactive radius targeting */
+.adset-location-tabs{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 14px}.adset-location-tabs button{width:auto!important}.adset-manual-controls{display:flex;align-items:end;gap:14px;flex-wrap:wrap;margin:12px 0}.adset-manual-controls label{min-width:115px}.adset-manual-controls select{width:100%}#adset-manual-map{height:390px;max-width:900px;width:100%;border-radius:12px;overflow:hidden;z-index:0;background:#edf2f7}#adset-manual-feedback{color:#475569;font-size:14px}#adset-manual-coordinates{font-size:13px;color:#475569}@media(max-width:520px){#adset-manual-map{height:310px}}
