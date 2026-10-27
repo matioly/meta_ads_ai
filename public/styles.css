@@ -549,3 +549,24 @@ html[data-active-view="overview"] #campaign-section,
 html[data-active-view="overview"] #meta-real-campaigns,
 html[data-active-view="overview"] #integrations-section,
 html[data-active-view="overview"] #media-section {display:none!important}
+
+
+/* Performance drilldown: generous spacing and contained horizontal scrolling. */
+#performance-panel{box-sizing:border-box;min-width:0;max-width:100%;padding:28px 32px!important;margin:22px 0 26px;border-radius:20px;overflow:hidden}
+#performance-details{min-width:0;max-width:100%}
+#performance-details>summary{display:list-item;padding:8px 12px 14px 6px;line-height:1.55;font-size:18px!important;letter-spacing:-.015em;overflow-wrap:anywhere}
+#performance-details[open]>summary{margin-bottom:12px;border-bottom:1px solid #ececf3}
+#performance-details>p{margin:12px 6px 18px;line-height:1.6;color:#667085}
+#performance-panel .performance-controls{box-sizing:border-box;max-width:100%;align-items:end;gap:14px!important;padding:12px 6px 20px;margin:0!important}
+#performance-panel .performance-controls label{display:flex;flex-direction:column;gap:7px;min-width:130px;max-width:100%;font-size:13px}
+#performance-panel .performance-controls select{box-sizing:border-box;width:100%;max-width:100%;min-height:42px}
+#performance-panel .performance-controls label:nth-child(3){flex:1 1 220px}
+#performance-panel .performance-controls label:nth-child(4){flex:1 1 190px}
+#performance-panel .table-wrapper{box-sizing:border-box;display:block;width:100%;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;border:1px solid #e9eaf1;border-radius:12px;margin:12px 0 16px}
+#performance-panel table{width:max-content;min-width:100%;border-collapse:collapse}
+#performance-panel th,#performance-panel td{padding:15px 18px;white-space:nowrap;text-align:left}
+#performance-panel th:first-child,#performance-panel td:first-child{min-width:240px;max-width:340px;white-space:normal;overflow-wrap:anywhere}
+#performance-panel th{background:#f8f8fc}
+#performance-panel td{border-bottom:1px solid #edf0f4}
+#performance-panel small{display:block;padding:6px;line-height:1.6;color:#737b8c}
+@media(max-width:700px){#performance-panel{padding:20px 18px!important}#performance-details>summary{font-size:16px!important;padding:8px 4px 12px}#performance-panel th,#performance-panel td{padding:12px 14px}}
