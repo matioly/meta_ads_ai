@@ -6,6 +6,9 @@
  function changed(){document.querySelector("#adset-preview-form")?.dispatchEvent(new Event("input",{bubbles:true}));}
  function coords(item){return Number.isFinite(item.latitude)&&Number.isFinite(item.longitude);}
  function drawMap(){
+  // Meta city/neighborhood targeting uses Meta keys; no map preview required.
+  if(map){map.replaceChildren();map.hidden=true;}return;
+  /* Legacy map preview retained below for rollback reference. */
   if(!map)return;
   const points=[...chosen.values()].filter(coords);
   if(!points.length){map.replaceChildren();const item=[...chosen.values()][0];if(item){const msg=document.createElement("p");msg.className="adset-location-message";msg.textContent=item.resolving?"Localizando no mapa…":"📍 Não foi possível carregar a prévia do mapa. A localização selecionada continua no público em construção. Você pode continuar normalmente; a segmentação será confirmada ao criar o conjunto na Meta.";map.append(msg);map.hidden=false;}else map.hidden=true;return;}
@@ -69,11 +72,11 @@
    mode.addEventListener("change",()=>{if(mode.value==="radius"&&!coords(item)&&item.type!=="city"){resolve(item,key);return;}item.mode=mode.value;render();changed();});
    const radius=document.createElement("select");radius.setAttribute("aria-label","Raio para "+item.name);
    for(const km of [3,5,10,15,20]){const option=document.createElement("option");option.value=km;option.textContent=km+" km";radius.append(option);}
-   radius.value=String(item.radiusKm);radius.disabled=item.mode!=="radius"||item.resolving;
+   radius.value=String(item.radiusKm);radius.disabled=true;radius.hidden=true;
    radius.addEventListener("change",()=>{item.radiusKm=Number(radius.value);drawMap();changed();});
    const remove=document.createElement("button");remove.type="button";remove.className="secondary";remove.textContent="Remover";remove.addEventListener("click",()=>{chosen.delete(key);clearTimeout(timer);sequence++;results.replaceChildren();input.value="";render();changed();input.focus();});
    row.append(title,mode,radius,remove);
-   if(item.resolving||item.error){const msg=document.createElement("small");msg.className="adset-location-message";msg.textContent=item.resolving?"Localizando centro do bairro…":item.error;row.append(msg);if(item.error&&["neighborhood","subcity"].includes(item.type)){const retry=document.createElement("button");retry.type="button";retry.className="secondary";retry.textContent="Tentar localizar novamente";retry.addEventListener("click",()=>resolve(item,key));row.append(retry);}}
+   if(false&&(item.resolving||item.error)){const msg=document.createElement("small");msg.className="adset-location-message";msg.textContent=item.resolving?"Localizando centro do bairro…":item.error;row.append(msg);if(item.error&&["neighborhood","subcity"].includes(item.type)){const retry=document.createElement("button");retry.type="button";retry.className="secondary";retry.textContent="Tentar localizar novamente";retry.addEventListener("click",()=>resolve(item,key));row.append(retry);}}
    selected.append(row);
   }
   const cityContext=document.querySelector(".adset-city-context");if(cityContext)cityContext.hidden=![...chosen.values()].some(item=>item.error&&["neighborhood","subcity"].includes(item.type));
@@ -92,9 +95,9 @@
     const button=document.createElement("button");button.type="button";button.className="secondary";button.textContent="+ "+item.name+(item.region?", "+item.region:"");
     button.addEventListener("click",()=>{
      if(chosen.size){results.textContent="Remova a localização atual antes de escolher outra.";return;}
-     const location={key:item.key,type:item.type,name:item.name,region:item.region,radiusKm:3,latitude:item.latitude,longitude:item.longitude,mode:item.type==="region"?"native":coords(item)?"radius":"native",resolving:false,error:""};
+     const location={key:item.key,type:item.type,name:item.name,region:item.region,radiusKm:3,latitude:item.latitude,longitude:item.longitude,mode:"native",resolving:false,error:""};
      chosen.set(item.key,location);clearTimeout(timer);sequence++;results.replaceChildren();input.value="";
-     if(["city","neighborhood","subcity"].includes(item.type)&&!coords(location))resolve(location,item.key);
+     if(false&&["city","neighborhood","subcity"].includes(item.type)&&!coords(location))resolve(location,item.key);
      else{render();changed();}
     });results.append(button);
    }

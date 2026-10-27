@@ -19,7 +19,7 @@
   if(map)return;
   if(typeof L==="undefined"){feedback.textContent="Não foi possível carregar o mapa interativo. Tente atualizar a página.";return;}
   map=L.map("adset-manual-map").setView([-22.9056,-47.0608],11);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; OpenStreetMap contributors &copy; CARTO'}).addTo(map);
   map.on("click",e=>draw(e.latlng));
  }
  function setMode(value){
