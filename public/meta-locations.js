@@ -8,7 +8,7 @@
  function drawMap(){
   if(!map)return;
   const points=[...chosen.values()].filter(coords);
-  if(!points.length){map.replaceChildren();const item=[...chosen.values()][0];if(item){const msg=document.createElement("p");msg.className="adset-location-message";msg.textContent=item.resolving?"Localizando bairro no mapa…":"Mapa de conferência indisponível. A localização oficial da Meta continua selecionada; use Bairro inteiro (Meta) ou tente localizar o centro para aplicar um raio.";map.append(msg);map.hidden=false;}else map.hidden=true;return;}
+  if(!points.length){map.replaceChildren();const item=[...chosen.values()][0];if(item){const msg=document.createElement("p");msg.className="adset-location-message";msg.textContent=item.resolving?"Localizando no mapa…":"📍 Não foi possível carregar a prévia do mapa. A localização selecionada continua no público em construção. Você pode continuar normalmente; a segmentação será confirmada ao criar o conjunto na Meta.";map.append(msg);map.hidden=false;}else map.hidden=true;return;}
   const point=points[points.length-1],lat=point.latitude,lon=point.longitude;
   const radius=point.radiusKm||3,showCircle=point.mode==="radius";
   // The embedded OSM map is illustrative. A transparent overlay shows the
@@ -42,16 +42,16 @@
   item.resolving=true;render();
   try{
    const company=document.querySelector("#meta-company")?.value;
-   const city=document.querySelector("#adset-location-city")?.value.trim();
+   const city=item.type==="city"?item.name:document.querySelector("#adset-location-city")?.value.trim();
    if(!city)throw Error("Informe a cidade de referência para localizar o bairro.");
-   const qs=new URLSearchParams({name:item.name,city,state:item.region||"São Paulo"});
+   const qs=new URLSearchParams({name:item.name,city,state:item.region||""});
    const response=await fetch("/api/companies/"+encodeURIComponent(company)+"/meta-location-center?"+qs,{credentials:"same-origin"});
    const data=await response.json();
    if(!response.ok)throw Error(data.error||"Falha ao consultar mapa.");
    if(chosen.get(key)!==item)return;
    if(data.found){item.latitude=data.latitude;item.longitude=data.longitude;item.mode="radius";item.source=data.source;item.error="";}
-   else{item.mode="native";item.error=(data.message||"Centro não localizado.")+" O bairro inteiro da Meta continua disponível sem mapa.";}
-  }catch(e){item.mode="native";item.error=e.message+" Você ainda pode usar o bairro inteiro da Meta.";}
+   else{item.mode="native";item.error="Não foi possível localizar o mapa. A localização permanece selecionada no público em construção.";}
+  }catch(e){item.mode="native";item.error="Não foi possível localizar o mapa. A localização permanece selecionada no público em construção.";}
   finally{item.resolving=false;if(chosen.get(key)===item){render();changed();}}
  }
  function render(){
@@ -62,7 +62,7 @@
    const mode=document.createElement("select");mode.setAttribute("aria-label","Tipo de segmentação para "+item.name);
    const radiusMode=document.createElement("option");radiusMode.value="radius";radiusMode.textContent="📍 Raio personalizado";
    const nativeMode=document.createElement("option");nativeMode.value="native";nativeMode.textContent="Bairro inteiro (Meta, sem raio personalizado)";
-   if(item.type==="city"){nativeMode.disabled=true;nativeMode.textContent="Cidade (Meta)";}
+   if(item.type==="city"){nativeMode.textContent="Cidade inteira (Meta)";}
    if(item.type==="region"){radiusMode.disabled=true;nativeMode.textContent="Região inteira (Meta)";}
    mode.append(radiusMode,nativeMode);mode.value=item.mode; if(item.type==="city"||item.type==="region")mode.hidden=true;
    mode.disabled=item.resolving;
@@ -92,9 +92,9 @@
     const button=document.createElement("button");button.type="button";button.className="secondary";button.textContent="+ "+item.name+(item.region?", "+item.region:"");
     button.addEventListener("click",()=>{
      if(chosen.size){results.textContent="Remova a localização atual antes de escolher outra.";return;}
-     const location={key:item.key,type:item.type,name:item.name,region:item.region,radiusKm:3,latitude:item.latitude,longitude:item.longitude,mode:item.type==="region"?"native":"radius",resolving:false,error:""};
+     const location={key:item.key,type:item.type,name:item.name,region:item.region,radiusKm:3,latitude:item.latitude,longitude:item.longitude,mode:item.type==="region"?"native":coords(item)?"radius":"native",resolving:false,error:""};
      chosen.set(item.key,location);clearTimeout(timer);sequence++;results.replaceChildren();input.value="";
-     if(["neighborhood","subcity"].includes(item.type)&&!coords(location))resolve(location,item.key);
+     if(["city","neighborhood","subcity"].includes(item.type)&&!coords(location))resolve(location,item.key);
      else{render();changed();}
     });results.append(button);
    }
