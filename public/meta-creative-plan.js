@@ -65,7 +65,7 @@
    if(results[1].status==="rejected")throw results[1].reason;
    media=(results[0].value.media||[]).filter(m=>m.kind==="video"||m.kind==="image");
    drafts=results[1].value.drafts||[];
-   fill(mediaSelect,media,m=>(m.kind==="image"?"Imagem: ":"Vídeo: ")+m.name+" · "+(m.accountLabel||m.accountEmail||"Conta não informada"),"Selecione um vídeo");
+   fill(mediaSelect,media,m=>(m.kind==="image"?"Imagem: ":"Vídeo: ")+m.name+" · "+(m.accountLabel||m.accountEmail||"Conta não informada"),"Selecione um vídeo ou uma imagem");
    fill(saved,drafts,d=>d.headline+" · "+d.mediaName,"Selecione um anúncio");
    fill(publishSelect,drafts,d=>d.headline+" · "+d.mediaName,"Selecione um anúncio salvo");
    campaigns=results[2].status==="fulfilled"?(results[2].value.items||[]):[];
