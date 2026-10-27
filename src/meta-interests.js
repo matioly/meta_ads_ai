@@ -54,9 +54,11 @@ router.get("/:companyId/meta-location-center",access,async(req,res,next)=>{
   const candidates=await response.json();
   const norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
   const match=(Array.isArray(candidates)?candidates:[]).find(x=>{
-    const a=x.address||{},foundCity=a.city||a.town||a.municipality||a.village||"";
-    const foundName=a.suburb||a.neighbourhood||a.quarter||a.residential||x.name||"";
-    return norm(foundCity)===norm(city)&&norm(foundName)===norm(name)&&Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lon));
+    const a=x.address||{};
+    const names=[a.suburb,a.neighbourhood,a.quarter,a.residential,a.city_district,a.hamlet,x.name].filter(Boolean);
+    const cities=[a.city,a.town,a.municipality,a.village,a.county].filter(Boolean);
+    const cityMatches=cities.some(v=>norm(v)===norm(city))||norm(x.display_name).split(",").map(v=>v.trim()).includes(norm(city));
+    return cityMatches&&names.some(v=>norm(v)===norm(name))&&Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lon));
   });
   const value=match?{found:true,latitude:Number(match.lat),longitude:Number(match.lon),source:"OpenStreetMap / Nominatim",displayName:match.display_name}:{found:false,message:"Não foi possível confirmar o centro desse bairro nessa cidade. Use a área inteira definida pela Meta."};
   geoCache.set(cacheKey,{value,until:Date.now()+(match?7*86400000:3600000)});

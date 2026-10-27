@@ -8,7 +8,7 @@
  function drawMap(){
   if(!map)return;
   const points=[...chosen.values()].filter(coords);
-  if(!points.length){map.hidden=true;map.replaceChildren();return;}
+  if(!points.length){map.replaceChildren();const item=[...chosen.values()][0];if(item){const msg=document.createElement("p");msg.className="adset-location-message";msg.textContent=item.resolving?"Localizando bairro no mapa…":"Mapa indisponível: não foi possível confirmar as coordenadas desse local.";map.append(msg);map.hidden=false;}else map.hidden=true;return;}
   const point=points[points.length-1],lat=point.latitude,lon=point.longitude;
   const radius=point.radiusKm||3,showCircle=point.mode==="radius";
   // The embedded OSM map is illustrative. A transparent overlay shows the
@@ -64,7 +64,7 @@
    const nativeMode=document.createElement("option");nativeMode.value="native";nativeMode.textContent="Bairro inteiro (Meta)";
    if(item.type==="city"){nativeMode.disabled=true;nativeMode.textContent="Cidade (Meta)";}
    if(item.type==="region"){radiusMode.disabled=true;nativeMode.textContent="Região inteira (Meta)";}
-   mode.append(radiusMode,nativeMode);mode.value=item.mode;
+   mode.append(radiusMode,nativeMode);mode.value=item.mode; if(item.type==="city"||item.type==="region")mode.hidden=true;
    mode.disabled=item.resolving;
    mode.addEventListener("change",()=>{if(mode.value==="radius"&&!coords(item)&&item.type!=="city"){resolve(item,key);return;}item.mode=mode.value;render();changed();});
    const radius=document.createElement("select");radius.setAttribute("aria-label","Raio para "+item.name);
@@ -73,11 +73,12 @@
    radius.addEventListener("change",()=>{item.radiusKm=Number(radius.value);drawMap();changed();});
    const remove=document.createElement("button");remove.type="button";remove.className="secondary";remove.textContent="Remover";remove.addEventListener("click",()=>{chosen.delete(key);clearTimeout(timer);sequence++;results.replaceChildren();input.value="";render();changed();input.focus();});
    row.append(title,mode,radius,remove);
-   if(item.resolving||item.error){const msg=document.createElement("small");msg.className="adset-location-message";msg.textContent=item.resolving?"Localizando centro do bairro…":item.error;row.append(msg);}
+   if(item.resolving||item.error){const msg=document.createElement("small");msg.className="adset-location-message";msg.textContent=item.resolving?"Localizando centro do bairro…":item.error;row.append(msg);if(item.error&&["neighborhood","subcity"].includes(item.type)){const retry=document.createElement("button");retry.type="button";retry.className="secondary";retry.textContent="Tentar localizar novamente";retry.addEventListener("click",()=>resolve(item,key));row.append(retry);}}
    selected.append(row);
   }
+  const cityContext=document.querySelector(".adset-city-context");if(cityContext)cityContext.hidden=![...chosen.values()].some(item=>item.error&&["neighborhood","subcity"].includes(item.type));
   input.disabled=chosen.size>0;
-  input.placeholder=chosen.size?"Remova a localização selecionada para buscar outra.":"Pesquise uma cidade ou bairro";
+  input.placeholder="Pesquisar cidade ou bairro...";
   drawMap();
  }
  input.addEventListener("input",()=>{clearTimeout(timer);const q=input.value.trim(),seq=++sequence;results.replaceChildren();if(q.length<2){if(q.length)results.textContent="Digite pelo menos 2 caracteres para buscar.";return;}
