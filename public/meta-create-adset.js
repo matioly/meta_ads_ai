@@ -3,7 +3,7 @@
  const button=document.querySelector("#adset-create-button");
  const status=document.querySelector("#adset-create-feedback");
  if(!button||!status)return;
- button.addEventListener("click",async function(){
+ async function submitApprovedAdset(){
   status.textContent="Conferindo os dados…";
   try{
    const plan=approvedAdsetPreview;
@@ -38,5 +38,7 @@
   }catch(error){
    status.textContent="Não foi possível concluir: "+(error.message||"Erro desconhecido")+". Confira os públicos na Meta antes de tentar novamente.";
   }finally{button.disabled=false;}
- });
+ }
+ window.submitApprovedAdset=submitApprovedAdset;
+ button.addEventListener("click",submitApprovedAdset);
 })();
