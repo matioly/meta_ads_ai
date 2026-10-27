@@ -8,7 +8,7 @@
  function drawMap(){
   if(!map)return;
   const points=[...chosen.values()].filter(coords);
-  if(!points.length){map.replaceChildren();const item=[...chosen.values()][0];if(item){const msg=document.createElement("p");msg.className="adset-location-message";msg.textContent=item.resolving?"Localizando bairro no mapa…":"Mapa indisponível: não foi possível confirmar as coordenadas desse local.";map.append(msg);map.hidden=false;}else map.hidden=true;return;}
+  if(!points.length){map.replaceChildren();const item=[...chosen.values()][0];if(item){const msg=document.createElement("p");msg.className="adset-location-message";msg.textContent=item.resolving?"Localizando bairro no mapa…":"Mapa de conferência indisponível. A localização oficial da Meta continua selecionada; use Bairro inteiro (Meta) ou tente localizar o centro para aplicar um raio.";map.append(msg);map.hidden=false;}else map.hidden=true;return;}
   const point=points[points.length-1],lat=point.latitude,lon=point.longitude;
   const radius=point.radiusKm||3,showCircle=point.mode==="radius";
   // The embedded OSM map is illustrative. A transparent overlay shows the
@@ -50,8 +50,8 @@
    if(!response.ok)throw Error(data.error||"Falha ao consultar mapa.");
    if(chosen.get(key)!==item)return;
    if(data.found){item.latitude=data.latitude;item.longitude=data.longitude;item.mode="radius";item.source=data.source;item.error="";}
-   else{item.mode="native";item.error=data.message||"Centro não localizado.";}
-  }catch(e){item.mode="native";item.error=e.message;}
+   else{item.mode="native";item.error=(data.message||"Centro não localizado.")+" O bairro inteiro da Meta continua disponível sem mapa.";}
+  }catch(e){item.mode="native";item.error=e.message+" Você ainda pode usar o bairro inteiro da Meta.";}
   finally{item.resolving=false;if(chosen.get(key)===item){render();changed();}}
  }
  function render(){
@@ -61,7 +61,7 @@
    const title=document.createElement("strong");title.textContent=item.name+(item.region?", "+item.region:"");
    const mode=document.createElement("select");mode.setAttribute("aria-label","Tipo de segmentação para "+item.name);
    const radiusMode=document.createElement("option");radiusMode.value="radius";radiusMode.textContent="📍 Raio personalizado";
-   const nativeMode=document.createElement("option");nativeMode.value="native";nativeMode.textContent="Bairro inteiro (Meta)";
+   const nativeMode=document.createElement("option");nativeMode.value="native";nativeMode.textContent="Bairro inteiro (Meta, sem raio personalizado)";
    if(item.type==="city"){nativeMode.disabled=true;nativeMode.textContent="Cidade (Meta)";}
    if(item.type==="region"){radiusMode.disabled=true;nativeMode.textContent="Região inteira (Meta)";}
    mode.append(radiusMode,nativeMode);mode.value=item.mode; if(item.type==="city"||item.type==="region")mode.hidden=true;
@@ -98,7 +98,7 @@
      else{render();changed();}
     });results.append(button);
    }
-   if(!results.children.length)results.textContent="Nenhuma localidade disponível para esta busca. Tente apenas o nome do bairro (ex.: Taquaral).";
+   if(!results.children.length)results.textContent="A Meta não retornou localidades para esta busca. Tente informar bairro e cidade.";
   }catch(e){if(seq===sequence)results.textContent=e.message;}},350);
  });
  render();
