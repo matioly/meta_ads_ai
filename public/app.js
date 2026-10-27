@@ -33,7 +33,7 @@ const pages = {
   },
   campaigns: {
     title: 'Campanhas',
-    description: 'Consulte campanhas reais na Meta e seus rascunhos de planejamento.'
+    description: 'Consulte as campanhas reais da Meta da clínica selecionada.'
   },
   integrations: {
     title: 'Integrações',
@@ -113,7 +113,7 @@ function changeView (view) {
   $('#page-description').textContent = pages[view].description
 
   $('#overview-section').hidden = view !== 'overview'
-  $('#campaign-section').hidden = view !== 'campaigns'
+  $('#campaign-section').hidden = view !== 'campaigns' || location.pathname === '/campaigns.html'
   $('#meta-real-campaigns').hidden = view !== 'campaigns'
   $('#media-section').hidden = view !== 'media'
   $('#integrations-section').hidden = view !== 'integrations'
