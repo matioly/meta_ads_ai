@@ -6,9 +6,9 @@
     <meta name="theme-color" content="#171b2e" />
     <title>Meta Ads AI | Campanhas</title>
     <script src="/initial-view.js?v=82"></script>
-    <link rel="stylesheet" href="/styles.css?v=79" />
+    <link rel="stylesheet" href="/styles.css?v=79" /><style>.campaign-history-filters{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin:16px 0}.campaign-history-filters label{display:grid;gap:5px;min-width:150px;flex:1;font-size:13px}.campaign-history-filters input,.campaign-history-filters select{width:100%;min-height:38px}.campaign-history-filters button{min-height:38px}#meta-real-campaigns .table-wrapper{overflow-x:auto}#meta-real-campaigns table{min-width:950px}</style>
     <script src="/app.js?v=82" defer></script>
-    <script src="/media-library.js" defer></script><script src="/home-meta.js" defer></script>
+    <script src="/media-library.js" defer></script><script src="/home-meta.js" defer></script><script src="/campaign-history.js?v=1" defer></script>
   </head>
   <body>
     <aside class="sidebar">
@@ -104,7 +104,20 @@
           <div class="dashboard-insights"><article class="metric"><span>Impressões · 30 dias</span><strong id="dashboard-impressions">—</strong></article><article class="metric"><span>Cliques no link · 30 dias</span><strong id="dashboard-links">—</strong></article><article class="metric"><span>Conversas iniciadas · 30 dias</span><strong id="dashboard-conversations">—</strong><small>Quando disponível na Meta</small></article></div><p id="meta-home-feedback" role="status" class="meta-home-feedback">Carregando dados da Meta…</p>
         </section>
 
-        <section class="panel" id="meta-real-campaigns"><div class="panel-heading"><div><h2>Campanhas reais na Meta</h2><p>Dados da conta selecionada. Campanhas pausadas não geram gastos.</p></div><a class="secondary" href="/meta-campaigns.html">Abrir Gerenciador Meta ↗</a></div><div class="table-wrapper"><table><thead><tr><th>Campanha</th><th>Objetivo</th><th>Status</th><th>Orçamento/dia</th></tr></thead><tbody id="meta-home-rows"></tbody></table></div><p id="meta-campaigns-feedback" class="meta-home-feedback" role="status"></p></section>
+        <section class="panel" id="meta-real-campaigns">
+          <div class="panel-heading"><div><h2>Histórico de campanhas na Meta</h2><p>Campanhas ativas, pausadas, arquivadas e excluídas ainda disponibilizadas pela Meta.</p></div></div>
+          <div class="campaign-history-filters">
+            <label>Buscar campanha<input id="history-search" type="search" placeholder="Nome ou ID da campanha"></label>
+            <label>Status<select id="history-status"><option value="">Todos os status</option><option value="ACTIVE">Ativas</option><option value="PAUSED">Pausadas</option><option value="ARCHIVED">Arquivadas</option><option value="DELETED">Excluídas</option></select></label>
+            <label>Objetivo<select id="history-objective"><option value="">Todos os objetivos</option></select></label>
+            <label>Ordenar<select id="history-sort"><option value="recent">Mais recentes</option><option value="oldest">Mais antigas</option><option value="name">Nome A–Z</option><option value="budget">Maior orçamento</option></select></label>
+            <button class="secondary" id="history-refresh" type="button">Atualizar</button>
+          </div>
+          <p id="history-summary" class="meta-home-feedback" role="status">Carregando histórico…</p>
+          <div class="table-wrapper"><table><thead><tr><th>Campanha</th><th>Objetivo</th><th>Status</th><th>Status efetivo</th><th>Orçamento</th><th>Criada em</th><th>Atualizada em</th></tr></thead><tbody id="history-rows"></tbody></table></div>
+          <p id="history-feedback" class="meta-home-feedback" role="status"></p>
+          <p class="form-note">Campanhas removidas definitivamente podem não ser retornadas pela API da Meta. Esta tabela não é um backup histórico independente.</p>
+        </section>
 
         <section class="panel" id="campaign-section" hidden>
           <div class="panel-heading">
