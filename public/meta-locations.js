@@ -9,7 +9,7 @@
  const label=document.createElement("span");label.textContent=item.name+(item.region?", "+item.region:"")+(item.type==="custom"?" (pino)":"");
  const radius=document.createElement("select");radius.setAttribute("aria-label","Raio para "+item.name);
  for(const km of [3,5,10,15,20]){const option=document.createElement("option");option.value=km;option.textContent=km+" km";radius.append(option);}
- radius.value=String(item.radiusKm);radius.disabled=item.type==="region"||((item.type==="neighborhood"||item.type==="subcity")&&!Number.isFinite(Number(item.latitude)))||((item.type==="neighborhood"||item.type==="subcity")&&!Number.isFinite(Number(item.longitude)));radius.title=radius.disabled?"Esta localidade não possui coordenadas para configurar um raio":"Raio em quilômetros";radius.addEventListener("change",()=>{item.radiusKm=Number(radius.value);changed();});
+ radius.value=String(item.radiusKm);radius.disabled=item.type==="region"||((item.type==="neighborhood"||item.type==="subcity")&&(item.latitude==null||!Number.isFinite(Number(item.latitude))))||((item.type==="neighborhood"||item.type==="subcity")&&(item.longitude==null||!Number.isFinite(Number(item.longitude))));radius.title=radius.disabled?"Esta localidade não possui coordenadas para configurar um raio":"Raio em quilômetros";radius.addEventListener("change",()=>{item.radiusKm=Number(radius.value);changed();});
  const remove=document.createElement("button");remove.type="button";remove.className="secondary";remove.textContent="Remover";remove.addEventListener("click",()=>{chosen.delete(key);render();changed();});
  row.append(label,radius,remove);selected.append(row);
  }}
