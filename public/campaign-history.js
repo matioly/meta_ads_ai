@@ -10,6 +10,8 @@
  const money=value=>value==null?"—":new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(Number(value)/100);
  const statusLabels={ACTIVE:"Ativa",PAUSED:"Pausada",ARCHIVED:"Arquivada",DELETED:"Excluída",CAMPAIGN_PAUSED:"Campanha pausada",ADSET_PAUSED:"Conjunto pausado",WITH_ISSUES:"Com problemas",IN_PROCESS:"Em processamento",PENDING_REVIEW:"Em análise",DISAPPROVED:"Reprovada"};
  const label=value=>statusLabels[value]||value||"—";
+ const objectiveLabels={OUTCOME_AWARENESS:"Reconhecimento",OUTCOME_TRAFFIC:"Tráfego",OUTCOME_ENGAGEMENT:"Engajamento",OUTCOME_LEADS:"Cadastros (leads)",OUTCOME_APP_PROMOTION:"Promoção do aplicativo",OUTCOME_SALES:"Vendas",BRAND_AWARENESS:"Reconhecimento da marca",REACH:"Alcance",TRAFFIC:"Tráfego",ENGAGEMENT:"Engajamento",POST_ENGAGEMENT:"Engajamento com publicação",VIDEO_VIEWS:"Visualizações de vídeo",LEAD_GENERATION:"Geração de cadastros",MESSAGES:"Mensagens",CONVERSIONS:"Conversões",LINK_CLICKS:"Cliques no link",APP_INSTALLS:"Instalações do aplicativo",PRODUCT_CATALOG_SALES:"Vendas pelo catálogo",STORE_TRAFFIC:"Visitas à loja"};
+ const objectiveLabel=value=>objectiveLabels[value]||((value||"—").replace(/^OUTCOME_/,"").replace(/_/g," ").toLocaleLowerCase("pt-BR"));
  function cell(row,value){const td=document.createElement("td");td.textContent=String(value??"—");row.append(td);}
  async function expand(type,id){
   const key=type+":"+id, open=type==="adsets"?expandedCampaigns:expandedAdsets;
@@ -80,7 +82,7 @@
   for(const item of filtered){
    const row=document.createElement("tr");
    const name=document.createElement("td");const strong=document.createElement("strong");strong.textContent=item.name||"Sem nome";const small=document.createElement("small");small.textContent="ID: "+item.id;small.style.display="block";const button=document.createElement("button");button.type="button";button.className="history-expand";button.textContent=(expandedCampaigns.has(item.id)?"▼ ":"▶ ")+(item.name||"Sem nome");button.setAttribute("aria-expanded",String(expandedCampaigns.has(item.id)));button.addEventListener("click",()=>expand("adsets",item.id));name.append(button,small);row.append(name);
-   cell(row,item.objective);cell(row,label(item.status));cell(row,label(item.effectiveStatus));
+   cell(row,objectiveLabel(item.objective));cell(row,label(item.status));cell(row,label(item.effectiveStatus));
    cell(row,item.dailyBudget!=null?money(item.dailyBudget)+" / dia":item.lifetimeBudget!=null?money(item.lifetimeBudget)+" total":"—");
    cell(row,formatDate(item.createdAt));cell(row,formatDate(item.updatedAt));body.append(row);if(expandedCampaigns.has(item.id))detail(body,"adsets",null,"adsets:"+item.id);
   }
@@ -96,7 +98,7 @@
    if(!response.ok)throw Error(data.error||"Falha ao consultar campanhas.");
    items=data.items||[];loaded=true;
    const previous=objective.value;objective.replaceChildren();const all=document.createElement("option");all.value="";all.textContent="Todos os objetivos";objective.append(all);
-   for(const value of [...new Set(items.map(x=>x.objective).filter(Boolean))].sort()){const option=document.createElement("option");option.value=value;option.textContent=value;objective.append(option);}
+   for(const value of [...new Set(items.map(x=>x.objective).filter(Boolean))].sort()){const option=document.createElement("option");option.value=value;option.textContent=objectiveLabel(value);objective.append(option);}
    objective.value=previous;
    render();
    $("history-feedback").textContent=data.hasMore?"A Meta retornou um histórico parcial (limite de paginação atingido).":"Histórico consultado. Campanhas removidas permanentemente podem não estar disponíveis.";
