@@ -55,8 +55,8 @@ router.post("/:companyId/meta-create-adset",access,async(req,res,next)=>{
     if(account.id!==`act_${accountId}`||account.currency!=="BRL")
       return res.status(422).json({error:"A conta de anúncios deve estar configurada em reais (BRL)."});
     if(String(campaign.account_id||"").replace(/^act_/,"")!==accountId||
-       campaign.status!=="PAUSED"||!["OUTCOME_TRAFFIC","OUTCOME_ENGAGEMENT"].includes(campaign.objective))
-      return res.status(422).json({error:"Escolha uma campanha pausada de Tráfego ou Engajamento pertencente à conta selecionada."});
+       !["PAUSED","ACTIVE"].includes(campaign.status)||!["OUTCOME_TRAFFIC","OUTCOME_ENGAGEMENT"].includes(campaign.objective))
+      return res.status(422).json({error:"Escolha uma campanha ativa ou pausada de Tráfego ou Engajamento pertencente à conta selecionada."});
     const whatsapp=campaign.objective==="OUTCOME_ENGAGEMENT";
     if(whatsapp&&(!digits(rows[0].facebook_page_id)||rows[0].facebook_page_status!=="approved"))
       return res.status(422).json({error:"Vincule uma Página do Facebook aprovada para campanhas de WhatsApp."});
