@@ -39,7 +39,7 @@ async function downloadDrive(id,kind='video'){
   if(!response.ok)throw Error("O Drive não permitiu baixar a mídia. Confira se o arquivo está compartilhado para qualquer pessoa com o link.");
   const type=(response.headers.get("content-type")||"").split(";")[0].toLowerCase();
   if(!(kind==="video"?type.startsWith("video/"):["image/jpeg","image/png"].includes(type))&&type!=="application/octet-stream"){await response.body?.cancel();throw Error("O Drive retornou uma página em vez da mídia. É necessário um link de download público direto ou futura integração OAuth.");}
-  const max=75*1024*1024;const length=Number(response.headers.get("content-length")||0);
+  const max=150*1024*1024;const length=Number(response.headers.get("content-length")||0);
   if(length>max){await response.body?.cancel();throw Error("Arquivo maior que 75 MB. Use um arquivo menor para este teste.");}
   const chunks=[];let size=0;
   for await(const chunk of response.body){size+=chunk.length;if(size>max)throw Error("Vídeo maior que 75 MB.");chunks.push(chunk);}
